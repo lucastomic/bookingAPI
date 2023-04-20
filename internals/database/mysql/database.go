@@ -1,4 +1,4 @@
-package database
+package mysql
 
 import (
 	"database/sql"
@@ -9,9 +9,9 @@ import (
 )
 
 var sgbd string = "mysql"
-var password string = "root"
 var username string = "root"
-var dbname string = "naturalYSalvajeRent"
+var password string = "secret"
+var dbname string = "naturalYSalvaje"
 
 var lock = &sync.Mutex{}
 
