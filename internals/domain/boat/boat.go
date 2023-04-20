@@ -17,6 +17,7 @@ func EmtyBoat() *Boat {
 func (b Boat) Id() int {
 	return b.id
 }
+
 func (b Boat) Name() string {
 	return b.name
 }
