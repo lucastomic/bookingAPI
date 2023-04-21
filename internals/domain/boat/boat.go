@@ -6,8 +6,12 @@ type Boat struct {
 	stateRooms []StateRoom
 }
 
-func NewBoat(id int, name string, stateRooms []StateRoom) *Boat {
-	return &Boat{id, name, stateRooms}
+func NewBoat(name string, stateRooms []StateRoom) *Boat {
+	return &Boat{name: name, stateRooms: stateRooms}
+}
+
+func NewBoatWithId(id int, name string, stateRooms []StateRoom) *Boat {
+	return &Boat{id: id, name: name, stateRooms: stateRooms}
 }
 
 func EmtyBoat() *Boat {
@@ -21,6 +25,11 @@ func (b Boat) Id() int {
 func (b Boat) Name() string {
 	return b.name
 }
+
+func (b *Boat) SetName(name string) {
+	b.name = name
+}
+
 func (b Boat) StateRooms() []StateRoom {
 	return b.stateRooms
 }

@@ -10,5 +10,5 @@ type Repository[T any, I any] interface {
 	// FindById retrieves the object of type T with the ID specified as argument
 	// It returns the T object and nil if there is no error, or, a nil T object with
 	// the error otherwise
-	FindById(I) (T, error)
+	FindById(...I) (T, error)
 }
