@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/database"
-	"github.com/lucastomic/naturalYSalvajeRent/internals/database/mysql"
-	"github.com/lucastomic/naturalYSalvajeRent/internals/domain/boat"
+	boatDB "github.com/lucastomic/naturalYSalvajeRent/internals/database/mysql/boat"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 )
 
 func main() {
-	var repo database.Repository[boat.Boat, int] = mysql.NewBoatRepository()
+	var repo database.Repository[domain.Boat, int] = boatDB.NewBoatRepository()
 	boat, err := repo.FindById(1)
 	if err != nil {
 		fmt.Println(err)

@@ -1,11 +1,9 @@
-package boat
-
-import "github.com/lucastomic/naturalYSalvajeRent/internals/domain/reservation"
+package domain
 
 type StateRoom struct {
 	id           int
 	boatId       int
-	reservedDays []reservation.Reservation
+	reservedDays []Reservation
 }
 
 func (s StateRoom) Id() int {
@@ -15,14 +13,17 @@ func (s StateRoom) BoatId() int {
 	return s.boatId
 }
 
-func (s StateRoom) ReservedDays() []reservation.Reservation {
+func (s StateRoom) ReservedDays() []Reservation {
 	return s.reservedDays
+}
+func (s StateRoom) SetReservedDays(reservation []Reservation) {
+	s.reservedDays = reservation
 }
 
 func EmptyStateRoom() *StateRoom {
 	return &StateRoom{}
 }
 
-func NewStateRoom(id int, boatId int, reservedDays []reservation.Reservation) *StateRoom {
+func NewStateRoom(id int, boatId int, reservedDays []Reservation) *StateRoom {
 	return &StateRoom{id, boatId, reservedDays}
 }

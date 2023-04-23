@@ -1,9 +1,10 @@
-package mysql
+package boatDB
 
 import (
 	"database/sql"
 
-	"github.com/lucastomic/naturalYSalvajeRent/internals/domain/boat"
+	stateRoomDB "github.com/lucastomic/naturalYSalvajeRent/internals/database/mysql/stateRoom"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 )
 
 // boatPrimitiveRepoBehaivor implements the behaivor needed for implementing a CommmonMysqlRepository[boatPrimitiveRepoBehaivor,int]
@@ -15,55 +16,55 @@ const updateBoatStmt string = "UPDATE boat SET name = ? WHERE id = ?"
 const findBoatByIdStmt string = "SELECT id, name FROM boat WHERE id = ?"
 
 // insertStmt returns the statement to insert a new boat
-func (b boatPrimitiveRepoBehaivor) insertStmt() string {
+func (b boatPrimitiveRepoBehaivor) InsertStmt() string {
 	return insertBoatStmt
 }
 
 // updateStmt returns the statement to update a new boat
-func (b boatPrimitiveRepoBehaivor) updateStmt() string {
+func (b boatPrimitiveRepoBehaivor) UpdateStmt() string {
 	return updateBoatStmt
 }
 
 // findByIdStmt returns the statement to findByIdStmt a new boat
-func (b boatPrimitiveRepoBehaivor) findByIdStmt() string {
+func (b boatPrimitiveRepoBehaivor) FindByIdStmt() string {
 	return findBoatByIdStmt
 }
 
 // persistenceValues returns an array with the fields of a boat wihch will be
 // persisted in the database
-func (b boatPrimitiveRepoBehaivor) persistenceValues(boat boat.Boat) []any {
+func (b boatPrimitiveRepoBehaivor) PersistenceValues(boat domain.Boat) []any {
 	return []any{boat.Name()}
 }
 
 // empty returns an empty boat
-func (b boatPrimitiveRepoBehaivor) empty() *boat.Boat {
-	return boat.EmtyBoat()
+func (b boatPrimitiveRepoBehaivor) Empty() *domain.Boat {
+	return domain.EmtyBoat()
 }
 
 // id returns the id of the boat passed as argument
-func (b boatPrimitiveRepoBehaivor) id(boat boat.Boat) []int {
+func (b boatPrimitiveRepoBehaivor) Id(boat domain.Boat) []int {
 	return []int{boat.Id()}
 }
 
 // isZero checks wether the boat specified as paramter is a zero boat
-func (b boatPrimitiveRepoBehaivor) isZero(boat boat.Boat) bool {
+func (b boatPrimitiveRepoBehaivor) IsZero(boat domain.Boat) bool {
 	return boat.Name() == ""
 }
 
 // scan scans the boat inside the row passed by argument
-func (repo boatPrimitiveRepoBehaivor) scan(row *sql.Rows) (boat.Boat, error) {
+func (repo boatPrimitiveRepoBehaivor) Scan(row *sql.Rows) (domain.Boat, error) {
 	var id int
 	var name string
-	var stateRooms []boat.StateRoom = []boat.StateRoom{}
+	var stateRooms []domain.StateRoom = []domain.StateRoom{}
 	err := row.Scan(&id, &name)
 	if err != nil {
-		return *boat.EmtyBoat(), err
+		return *domain.EmtyBoat(), err
 	}
-	return *boat.NewBoatWithId(id, name, stateRooms), nil
+	return *domain.NewBoatWithId(id, name, stateRooms), nil
 }
 
-func (repo boatPrimitiveRepoBehaivor) updateRelations(boat *boat.Boat) error {
-	stateRoomRepo := NewStateRoomRepository()
+func (repo boatPrimitiveRepoBehaivor) UpdateRelations(boat *domain.Boat) error {
+	stateRoomRepo := stateRoomDB.NewStateRoomRepository()
 	boatStateRooms, err := stateRoomRepo.FindByBoatId(boat.Id())
 	if err != nil {
 		return err

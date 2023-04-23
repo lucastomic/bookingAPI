@@ -1,10 +1,10 @@
-package mysql
+package stateRoomDB
 
 import (
 	"database/sql"
 
-	"github.com/lucastomic/naturalYSalvajeRent/internals/domain/boat"
-	"github.com/lucastomic/naturalYSalvajeRent/internals/domain/reservation"
+	reservationDB "github.com/lucastomic/naturalYSalvajeRent/internals/database/mysql/reservation"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 )
 
 // stateRoomPrimitiveRepoBehaivor implements the behaivor needed for implementing a
@@ -17,55 +17,61 @@ const updateStateRoomStmt string = "UPDATE stateRoom SET id = ?, boatId =? WHERE
 const findStateRoomByIdStmt string = "SELECT id, boatId FROM stateRoom WHERE id = ? AND boatId = ? "
 
 // insertStmt returns the statement to insert a new stateRoom
-func (repo stateRoomPrimitiveRepoBehaivor) insertStmt() string {
+func (repo stateRoomPrimitiveRepoBehaivor) InsertStmt() string {
 	return insertStateRoomStmt
 }
 
 // updateStmt returns the statement to update a new stateRoom
-func (repo stateRoomPrimitiveRepoBehaivor) updateStmt() string {
+func (repo stateRoomPrimitiveRepoBehaivor) UpdateStmt() string {
 	return updateStateRoomStmt
 }
 
 // findByIdStmt returns the statement to findByIdStmt a new stateRoom
-func (repo stateRoomPrimitiveRepoBehaivor) findByIdStmt() string {
+func (repo stateRoomPrimitiveRepoBehaivor) FindByIdStmt() string {
 	return findStateRoomByIdStmt
 }
 
 // persistenceValues returns an array with the fields of a stateRoom wihch will be
 // persisted in the database
-func (repo stateRoomPrimitiveRepoBehaivor) persistenceValues(stateRoom boat.StateRoom) []any {
+func (repo stateRoomPrimitiveRepoBehaivor) PersistenceValues(stateRoom domain.StateRoom) []any {
 	return []any{stateRoom.Id(), stateRoom.BoatId()}
 }
 
 // empty returns an empty stateRoom
-func (repo stateRoomPrimitiveRepoBehaivor) empty() *boat.StateRoom {
-	return boat.EmptyStateRoom()
+func (repo stateRoomPrimitiveRepoBehaivor) Empty() *domain.StateRoom {
+	return domain.EmptyStateRoom()
 }
 
 // id returns the id of the stateRoom passed as argument
-func (repo stateRoomPrimitiveRepoBehaivor) id(stateRoom boat.StateRoom) []int {
+func (repo stateRoomPrimitiveRepoBehaivor) Id(stateRoom domain.StateRoom) []int {
 	return []int{stateRoom.BoatId(), stateRoom.Id()}
 }
 
 // isZero checks wether the stateRoom specified as paramter is a zero boat
-func (repo stateRoomPrimitiveRepoBehaivor) isZero(stateRoom boat.StateRoom) bool {
+func (repo stateRoomPrimitiveRepoBehaivor) IsZero(stateRoom domain.StateRoom) bool {
 	return stateRoom.ReservedDays() == nil && stateRoom.Id() == 0 && stateRoom.BoatId() == 0
 }
 
 // scan scans the stateRoom inside the row passed by argument
-func (repo stateRoomPrimitiveRepoBehaivor) scan(row *sql.Rows) (boat.StateRoom, error) {
+func (repo stateRoomPrimitiveRepoBehaivor) Scan(row *sql.Rows) (domain.StateRoom, error) {
 	var id int
 	var boatId int
 
-	var reservedDays []reservation.Reservation = []reservation.Reservation{}
+	var reservedDays []domain.Reservation = []domain.Reservation{}
 	err := row.Scan(&id, &boatId)
 	if err != nil {
-		return *boat.EmptyStateRoom(), nil
+		return *domain.EmptyStateRoom(), nil
 	}
 
-	return *boat.NewStateRoom(id, boatId, reservedDays), nil
+	return *domain.NewStateRoom(id, boatId, reservedDays), nil
 }
 
-func (repo stateRoomPrimitiveRepoBehaivor) updateRelations(boat *boat.StateRoom) error {
+func (repo stateRoomPrimitiveRepoBehaivor) UpdateRelations(stateRoom *domain.StateRoom) error {
+	reservationRepo := reservationDB.NewReservationRepository()
+	stateRoomReservations, err := reservationRepo.FindByStateRoom(*stateRoom)
+	if err != nil {
+		return err
+	}
+	stateRoom.SetReservedDays(stateRoomReservations)
 	return nil
 }

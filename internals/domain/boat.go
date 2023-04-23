@@ -1,4 +1,4 @@
-package boat
+package domain
 
 type Boat struct {
 	id         int

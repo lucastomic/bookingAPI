@@ -17,7 +17,7 @@ var lock = &sync.Mutex{}
 
 var instance *sql.DB
 
-func getInstance() *sql.DB {
+func GetInstance() *sql.DB {
 	lock.Lock()
 
 	defer lock.Unlock()

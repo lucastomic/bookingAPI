@@ -9,15 +9,15 @@ type IPrimitiveRepoBehaivor[T any, I any] interface {
 	// insertStmt returns a string with the SQL statement for inserting a T object in the database
 	// For example,
 	// INSERT INTO boat(name) VALUES(?)
-	insertStmt() string
+	InsertStmt() string
 	// updateStmt returns a string with the SQL statement for update a T object in the database
 	// given its Id. For example,
 	// UPDATE boat SET name = ? WHERE id = ?
-	updateStmt() string
+	UpdateStmt() string
 	// findByIdStmt returns a string with the SQL statement for selecting a T object in the database
 	// given its Id. For exmaple,
 	// SELECT name FROM boat WHERE id = ?
-	findByIdStmt() string
+	FindByIdStmt() string
 	// persistenceValues returns an array with the values to be persisted in the same order as
 	// the given in the insertStmt.
 	//
@@ -25,7 +25,7 @@ type IPrimitiveRepoBehaivor[T any, I any] interface {
 	// INSERT INTO boat(name, stateRoomsNumber, colour) VALUES(?,?,?)
 	// the persistenceValues must be
 	// []any{boat.Name(),boat.StateRoomsNumber(),boat.Color()}
-	persistenceValues(T) []any
+	PersistenceValues(T) []any
 	// id returns the id of the T object specified as argument. This ID must be wrapped
 	// in a slice, even if is a single element. This way, if the struct has only one ID called "id", it
 	// would return []{id}, and, if the struct has a compound id, for example id1 and id2, it would return []{id1,id2}
@@ -38,17 +38,17 @@ type IPrimitiveRepoBehaivor[T any, I any] interface {
 	// []{id1,id2}
 	// and not like this:
 	// []{id2,id1}
-	id(T) []I
+	Id(T) []I
 	// empty returns a Zero object of type T
-	empty() *T
+	Empty() *T
 	// isZero checks whether tge T object passed as argument is a Zero object
-	isZero(T) bool
+	IsZero(T) bool
 	// scan scans the T object in the row passed as argument and returns it parsed into
 	// the struct. If there is an error, it returns it as second value
 	// It doen't update de relations of the T object, only the primary elements
 	// For example, given a Boat{id int, name string, staeRooms []StateRoom}
 	// It will scan the values id and name, but not the relation OneToMany staeRooms
-	scan(*sql.Rows) (T, error)
+	Scan(*sql.Rows) (T, error)
 	// updateRelations takes a T object and update all its relations (OneToOne, OneToMany, ManyToOne and ManyToMany)
-	updateRelations(*T) error
+	UpdateRelations(*T) error
 }
