@@ -16,7 +16,7 @@ func (s StateRoom) BoatId() int {
 func (s StateRoom) ReservedDays() []Reservation {
 	return s.reservedDays
 }
-func (s StateRoom) SetReservedDays(reservation []Reservation) {
+func (s *StateRoom) SetReservedDays(reservation []Reservation) {
 	s.reservedDays = reservation
 }
 
