@@ -14,10 +14,6 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	boat.SetName("DuploJR")
+	fmt.Print(boat)
 
-	err = repo.Save(boat)
-	if err != nil {
-		fmt.Println(err)
-	}
 }

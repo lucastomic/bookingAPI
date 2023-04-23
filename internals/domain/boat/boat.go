@@ -33,3 +33,7 @@ func (b *Boat) SetName(name string) {
 func (b Boat) StateRooms() []StateRoom {
 	return b.stateRooms
 }
+
+func (b *Boat) SetStateRooms(stateRooms []StateRoom) {
+	b.stateRooms = stateRooms
+}
