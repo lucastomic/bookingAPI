@@ -19,8 +19,8 @@ CREATE TABLE reservation(
   id INT AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL,
   phone VARCHAR(255) NOT NULL,
-  firstDay DATETIME NOT NULL,
-  lastDay DATETIME NOT NULL,
+  firstDay DATE NOT NULL,
+  lastDay DATE NOT NULL,
   boatId INT NOT NULL,
   stateRoomId INT NOT NULL,
   

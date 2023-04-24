@@ -3,17 +3,17 @@ package main
 import (
 	"fmt"
 
-	"github.com/lucastomic/naturalYSalvajeRent/internals/database"
-	boatDB "github.com/lucastomic/naturalYSalvajeRent/internals/database/mysql/boat"
-	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
 )
 
 func main() {
-	var repo database.Repository[domain.Boat, int] = boatDB.NewBoatRepository()
+
+	repo := databaseport.NewBoatRepository()
+
 	boat, err := repo.FindById(1)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Print(boat)
+	fmt.Print(boat.StateRooms()[0].ReservedDays()[0].FirstDay().Date())
 
 }

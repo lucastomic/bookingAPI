@@ -37,6 +37,7 @@ func (repo CommonMysqlLogic[T, I]) insertNew(object T) error {
 		_, err = stmt.Exec(values...)
 	}
 	return err
+
 }
 
 // alreadyExists checks whether an object has already been inserted into the DB
@@ -89,7 +90,7 @@ func (repo CommonMysqlLogic[T, I]) FindById(id ...I) (T, error) {
 	idsParsed := repo.parseISliceToAnySlice(id)
 	stmt := repo.FindByIdStmt()
 	response, err := repo.Query(stmt, idsParsed)
-	if err != nil {
+	if err != nil || len(response) == 0 {
 		return *repo.Empty(), err
 	}
 	return response[0], nil

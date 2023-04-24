@@ -16,7 +16,6 @@ func NewReservationRepository() ReservationRepository {
 	return ReservationRepository{commonBehaivor}
 }
 func (repo ReservationRepository) FindByStateRoom(stateRoom domain.StateRoom) ([]domain.Reservation, error) {
-
 	response, err := repo.Query(findByStateRoomStmt, []any{stateRoom.Id(), stateRoom.BoatId()})
 	if err != nil {
 		return []domain.Reservation{}, err
