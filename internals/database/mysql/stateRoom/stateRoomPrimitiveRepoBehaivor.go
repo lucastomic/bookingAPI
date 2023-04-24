@@ -60,7 +60,7 @@ func (repo stateRoomPrimitiveRepoBehaivor) Scan(row *sql.Rows) (domain.StateRoom
 	var reservedDays []domain.Reservation = []domain.Reservation{}
 	err := row.Scan(&id, &boatId)
 	if err != nil {
-		return *domain.EmptyStateRoom(), nil
+		return *domain.EmptyStateRoom(), err
 	}
 
 	return *domain.NewStateRoom(id, boatId, reservedDays), nil

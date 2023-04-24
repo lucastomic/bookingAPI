@@ -41,8 +41,8 @@ func (repo reservationPrimitiveRepoBehaivor) Scan(rows *sql.Rows) (domain.Reserv
 	var id int
 	var name string
 	var phone string
-	var firstDay time.Time
-	var lastDay time.Time
+	var firstDay string
+	var lastDay string
 	var boatId int
 	var stateRoomId int
 	err := rows.Scan(&id, &name, &phone, &firstDay, &lastDay, &boatId, &stateRoomId)
@@ -51,7 +51,8 @@ func (repo reservationPrimitiveRepoBehaivor) Scan(rows *sql.Rows) (domain.Reserv
 	}
 
 	user := domain.NewUser(name, phone)
-	return *domain.NewReservation(id, user, firstDay, lastDay, boatId, stateRoomId), nil
+	//TODO CHEANGES DAYS
+	return *domain.NewReservation(id, user, time.Now(), time.Now(), boatId, stateRoomId), nil
 }
 
 func (repo reservationPrimitiveRepoBehaivor) UpdateRelations(reservation *domain.Reservation) error {
