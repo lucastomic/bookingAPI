@@ -13,9 +13,15 @@ type reservationPrimitiveRepoBehaivor struct {
 const insertStmt string = "INSERT INTO reservation(name, phone,firstDay,lastDay,boatId,stateRoomId) VALUES(?,?,?,?,?,?)"
 const updateStmt string = "UPDATE reservation SET name = ?,phone = ?, firstDay = ?, lastDay = ?, boatId = ?, stateRoomId = ? WHERE id = ?"
 const findByIdStmt string = "SELECT * FROM reservation WHERE id = ?"
+const findAllStmt string = "SELECT * FROM reservation"
+const removeStmt string = "REMOVE FROM reservation WHERE id = ?"
 
 func (repo reservationPrimitiveRepoBehaivor) InsertStmt() string {
 	return insertStmt
+}
+
+func (repo reservationPrimitiveRepoBehaivor) RemoveStmt() string {
+	return removeStmt
 }
 
 // UpdateStmt returns the SQL statement for updating a reservation in the database.
@@ -26,6 +32,9 @@ func (repo reservationPrimitiveRepoBehaivor) UpdateStmt() string {
 // FindByIdStmt returns the SQL statement for finding a reservation by its ID in the database.
 func (repo reservationPrimitiveRepoBehaivor) FindByIdStmt() string {
 	return findByIdStmt
+}
+func (repo reservationPrimitiveRepoBehaivor) FindAllStmt() string {
+	return findAllStmt
 }
 
 // PersistenceValues returns a slice of type []any that contains the values of the reservation's properties to be persisted in the database.

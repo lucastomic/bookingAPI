@@ -96,6 +96,18 @@ func (repo CommonMysqlLogic[T, I]) FindById(id ...I) (T, error) {
 	return response[0], nil
 }
 
+// GetAll retrieves all the T objects form the database
+// In case of error, it returns an empty slice and the error.
+func (repo CommonMysqlLogic[T, I]) FindAll() ([]T, error) {
+	stmt := repo.FindAllStmt()
+	response, err := repo.Query(stmt, []any{})
+	if err != nil || len(response) == 0 {
+		return []T{}, err
+	}
+	return response, nil
+
+}
+
 // parseISliceToAnySlice parses a slice []I into a []any slice
 func (repo CommonMysqlLogic[T, I]) parseISliceToAnySlice(slice []I) []any {
 	response := make([]any, len(slice))
@@ -154,4 +166,23 @@ func (repo CommonMysqlLogic[T, I]) getEntityFromRow(rows *sql.Rows) (T, error) {
 		return *repo.Empty(), err
 	}
 	return response, nil
+}
+
+// Remove removes a T object from the database
+// If an error ocurrs it returns it, otherwise return nil
+func (repo CommonMysqlLogic[T, I]) Remove(object T) error {
+	db := GetInstance()
+	stmt, err := db.Prepare(repo.RemoveStmt())
+	if err != nil {
+		return err
+	}
+	ids := repo.Id(object)
+	idsParsed := repo.parseISliceToAnySlice(ids)
+	_, err = stmt.Exec(idsParsed...)
+	defer stmt.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+
 }

@@ -14,10 +14,17 @@ type boatPrimitiveRepoBehaivor struct {
 const insertBoatStmt string = "INSERT INTO boat(name) VALUES(?)"
 const updateBoatStmt string = "UPDATE boat SET name = ? WHERE id = ?"
 const findBoatByIdStmt string = "SELECT id, name FROM boat WHERE id = ?"
+const findAllStmt string = "SELECT id, name FROM boat"
+const removeStmt string = "DELETE FROM boat WHERE id = ?"
 
 // insertStmt returns the statement to insert a new boat
 func (b boatPrimitiveRepoBehaivor) InsertStmt() string {
 	return insertBoatStmt
+}
+
+// RemoveStmt returns rhe statement to remove a boat
+func (b boatPrimitiveRepoBehaivor) RemoveStmt() string {
+	return removeStmt
 }
 
 // updateStmt returns the statement to update a new boat
@@ -28,6 +35,11 @@ func (b boatPrimitiveRepoBehaivor) UpdateStmt() string {
 // findByIdStmt returns the statement to findByIdStmt a new boat
 func (b boatPrimitiveRepoBehaivor) FindByIdStmt() string {
 	return findBoatByIdStmt
+}
+
+// findByIdStmt returns the statement to findByIdStmt a new boat
+func (b boatPrimitiveRepoBehaivor) FindAllStmt() string {
+	return findAllStmt
 }
 
 // persistenceValues returns an array with the fields of a boat wihch will be

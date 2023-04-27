@@ -3,7 +3,6 @@ package databaseport
 import "github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 
 type IReservationRepository interface {
-	Save(domain.Reservation) error
-	FindById(...int) (domain.Reservation, error)
+	repository[domain.Reservation, int]
 	FindByStateRoom(domain.StateRoom) ([]domain.Reservation, error)
 }

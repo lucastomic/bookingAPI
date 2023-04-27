@@ -14,21 +14,33 @@ type stateRoomPrimitiveRepoBehaivor struct {
 
 const insertStateRoomStmt string = "INSERT INTO stateRoom(id, boatId) VALUES(?,?)"
 const updateStateRoomStmt string = "UPDATE stateRoom SET id = ?, boatId =? WHERE id = ? AND boatId = ? "
-const findStateRoomByIdStmt string = "SELECT id, boatId FROM stateRoom WHERE id = ? AND boatId = ? "
+const findStateRoomByIdStmt string = "SELECT FROM stateRoom WHERE id = ? AND boatId = ? "
+const findAllstmt string = "SELECT * FROM stateRoom"
+const removeStmt string = "REMOVE FROM stateRoom WHERE id = ? AND boatId = ? "
 
-// insertStmt returns the statement to insert a new stateRoom
+// insertStmt returns the SQL statement to insert a new stateRoom
 func (repo stateRoomPrimitiveRepoBehaivor) InsertStmt() string {
 	return insertStateRoomStmt
 }
 
-// updateStmt returns the statement to update a new stateRoom
+// RemoveStmt returns the SQL statement to remove a stateRoom
+func (repo stateRoomPrimitiveRepoBehaivor) RemoveStmt() string {
+	return removeStmt
+}
+
+// updateStmt returns the SQL statement to update a new stateRoom
 func (repo stateRoomPrimitiveRepoBehaivor) UpdateStmt() string {
 	return updateStateRoomStmt
 }
 
-// findByIdStmt returns the statement to findByIdStmt a new stateRoom
+// findByIdStmt returns the SQL statement to find a stateRoom by id
 func (repo stateRoomPrimitiveRepoBehaivor) FindByIdStmt() string {
 	return findStateRoomByIdStmt
+}
+
+// findAllStmt returns the SQL statement to find all the staterooms
+func (repo stateRoomPrimitiveRepoBehaivor) FindAllStmt() string {
+	return findAllstmt
 }
 
 // persistenceValues returns an array with the fields of a stateRoom wihch will be

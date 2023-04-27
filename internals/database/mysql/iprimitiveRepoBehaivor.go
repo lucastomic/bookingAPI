@@ -6,6 +6,11 @@ import "database/sql"
 // The type T is the struct which the repository handles (for example, for a BoatRepository, it would be Boat)
 // and I is the ID type of the struct T
 type IPrimitiveRepoBehaivor[T any, I any] interface {
+	// RemoveStmt returns a string with the SQL statement for removing a T object from the database
+	// given its Id
+	// For example,
+	// DELETE FROM boat WHERE id = ?;
+	RemoveStmt() string
 	// insertStmt returns a string with the SQL statement for inserting a T object in the database
 	// For example,
 	// INSERT INTO boat(name) VALUES(?)
@@ -16,8 +21,12 @@ type IPrimitiveRepoBehaivor[T any, I any] interface {
 	UpdateStmt() string
 	// findByIdStmt returns a string with the SQL statement for selecting a T object in the database
 	// given its Id. For exmaple,
-	// SELECT name FROM boat WHERE id = ?
+	// SELECT * FROM boat WHERE id = ?
 	FindByIdStmt() string
+	// FindAll returns a string with the SQL statement for selecting all the  T object from the database
+	// For exmaple,
+	// SELECT * FROM boat
+	FindAllStmt() string
 	// persistenceValues returns an array with the values to be persisted in the same order as
 	// the given in the insertStmt.
 	//

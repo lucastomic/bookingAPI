@@ -1,8 +1,8 @@
 package domain
 
 type User struct {
-	name  string
-	phone string
+	name  string `json:"name"`
+	phone string `json:"phone"`
 }
 
 func NewUser(name string, phone string) User {
