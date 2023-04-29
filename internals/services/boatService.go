@@ -1,8 +1,11 @@
 package services
 
 import (
+	"errors"
+
 	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/exceptions"
 )
 
 // boatService is a service that provides operations related to boats.
@@ -18,6 +21,9 @@ func NewBoatService(repo databaseport.IBoatRepository) *boatService {
 // CreateBoat creates a new boat by calling the UpdateBoat() method with the given boat,
 // and returns the updated boat or an error if the update fails.
 func (b boatService) CreateBoat(boat domain.Boat) (domain.Boat, error) {
+	if boat.Name() == "" {
+		return *domain.EmtyBoat(), errors.New("Boat must have a name")
+	}
 	return b.UpdateBoat(boat)
 }
 
@@ -47,6 +53,9 @@ func (b boatService) GetBoat(boatId int) (domain.Boat, error) {
 	boat, err := b.FindById(boatId)
 	if err != nil {
 		return *domain.EmtyBoat(), err
+	}
+	if boat.Name() == "" {
+		return *domain.EmtyBoat(), exceptions.NotFound
 	}
 	return boat, nil
 }

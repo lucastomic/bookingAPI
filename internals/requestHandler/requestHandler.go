@@ -4,15 +4,16 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/boatController"
-	serviceports "github.com/lucastomic/naturalYSalvajeRent/internals/services/ports"
+	reservationcontroller "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/reservationController"
+	stateroomcontroller "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/stateRoomController"
 )
-
-var boatService = serviceports.NewBoatService()
 
 func Run() {
 
 	r := gin.Default()
 	boatController.AddEndpoints(r)
+	stateroomcontroller.AddEndpoints(r)
+	reservationcontroller.AddEndpoints(r)
 
 	r.Run()
 }

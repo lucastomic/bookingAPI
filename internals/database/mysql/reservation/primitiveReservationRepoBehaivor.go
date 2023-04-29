@@ -2,9 +2,10 @@ package reservationDB
 
 import (
 	"database/sql"
-	"time"
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+
+	"github.com/lucastomic/naturalYSalvajeRent/internals/timeParser"
 )
 
 type reservationPrimitiveRepoBehaivor struct {
@@ -60,8 +61,6 @@ func (repo reservationPrimitiveRepoBehaivor) IsZero(reservation domain.Reservati
 // Scan takes a pointer to a sql.Rows object as input and scans the rows to populate a domain.Reservation object, which is then returned
 // along with any error that may occur during scanning.
 func (repo reservationPrimitiveRepoBehaivor) Scan(rows *sql.Rows) (domain.Reservation, error) {
-	const dateFormat = "2006-01-02"
-
 	var id, boatId, stateRoomId int
 	var name, phone, firstDay, lastDay string
 
@@ -71,8 +70,8 @@ func (repo reservationPrimitiveRepoBehaivor) Scan(rows *sql.Rows) (domain.Reserv
 	}
 
 	user := domain.NewUser(name, phone)
-	firstDayParsed, _ := time.Parse(dateFormat, firstDay)
-	lastDayParsed, _ := time.Parse(dateFormat, lastDay)
+	firstDayParsed, _ := timeParser.ParseFromString(firstDay)
+	lastDayParsed, _ := timeParser.ParseFromString(lastDay)
 
 	return *domain.NewReservation(id, user, firstDayParsed, lastDayParsed, boatId, stateRoomId), nil
 }

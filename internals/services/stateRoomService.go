@@ -16,6 +16,14 @@ func (s StateRoomService) AddStateRoom(stateRoom domain.StateRoom) (domain.State
 	return s.UpdateStateRoom(stateRoom)
 }
 
+// AddEmptyStateRoom adds an empty sateRoom to a boat
+func (s StateRoomService) AddEmptyStateRoom(boatId int) error {
+	stateRoom := domain.EmptyStateRoom()
+	stateRoom.SetBoatId(boatId)
+	_, err := s.UpdateStateRoom(*stateRoom)
+	return err
+}
+
 // UpdateStateRoom updates an existing state room by calling the Save() method with the given state room,
 // and returns the updated state room or an error if the save operation fails.
 func (s StateRoomService) UpdateStateRoom(stateRoom domain.StateRoom) (domain.StateRoom, error) {
@@ -30,8 +38,5 @@ func (s StateRoomService) UpdateStateRoom(stateRoom domain.StateRoom) (domain.St
 // and returns an error if the removal operation fails.
 func (s StateRoomService) DeleteStateRoom(stateRoom domain.StateRoom) error {
 	err := s.Remove(stateRoom)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
