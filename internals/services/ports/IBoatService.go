@@ -8,4 +8,5 @@ type IBoatService interface {
 	DeleteBoat(boat domain.Boat) error
 	GetBoat(boatId int) (domain.Boat, error)
 	GetAllBoats() ([]domain.Boat, error)
+	GetFullCapacityDays(domain.Boat) []string
 }

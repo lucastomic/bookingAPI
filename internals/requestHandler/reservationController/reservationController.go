@@ -33,6 +33,10 @@ func addReservation(c *gin.Context) {
 	}
 
 	reservation, err := reservationService.ParseReservationRequest(body)
+	if err != nil {
+		exceptionhandling.HandleException(c, err)
+		return
+	}
 	err = reservationService.CreateReservation(reservation)
 	if err != nil {
 		exceptionhandling.HandleException(c, err)

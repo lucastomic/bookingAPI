@@ -6,6 +6,5 @@ type User struct {
 }
 
 func NewUser(name string, phone string) User {
-
 	return User{name, phone}
 }

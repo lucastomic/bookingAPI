@@ -11,9 +11,11 @@ func NewBoatService() IBoatService {
 }
 
 func NewStateRoomService() IStateRoomService {
-	return services.StateRoomService{}
+	repo := databaseport.NewStateRoomRepository()
+	return services.StateRoomService{IStateRoomRepository: repo}
 }
 
 func NewReservationService() IReservationService {
-	return services.ReservationServcie{}
+	repo := databaseport.NewReservationRepository()
+	return services.ReservationServcie{IReservationRepository: repo}
 }

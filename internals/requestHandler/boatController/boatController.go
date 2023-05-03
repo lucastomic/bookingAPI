@@ -10,20 +10,24 @@ import (
 
 	exceptionhandling "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/exceptionHandling"
 	serviceports "github.com/lucastomic/naturalYSalvajeRent/internals/services/ports"
+	viewport "github.com/lucastomic/naturalYSalvajeRent/internals/view/port"
 )
 
 const boatEndpoint = "boat"
 const getBoatEndpoint = boatEndpoint + "/:id"
 const createBoatEndpoint = boatEndpoint
 const deleteBoatEndpoint = boatEndpoint + "/:id"
+const getFullCapacityDaysEndpoint = boatEndpoint + "/reserved/:id"
 
 var boatService = serviceports.NewBoatService()
+var boatView = viewport.NewBoatView()
 
 // AddEndpoints takes a gin.Engine object and updates all the boat endpoints
 func AddEndpoints(r *gin.Engine) {
 	r.GET(getBoatEndpoint, getBoat)
 	r.POST(createBoatEndpoint, createBoat)
 	r.DELETE(deleteBoatEndpoint, deleteBoat)
+	r.GET(getFullCapacityDaysEndpoint, getFullCapacityDays)
 }
 
 // createBoat receives a request to create a new boat, reads the boat name from the request body,
@@ -107,9 +111,28 @@ func parseBoat(c *gin.Context, boat domain.Boat) {
 		return
 	}
 
+	c.JSON(http.StatusOK, boatView.ParseView(boat))
+}
+
+// getFullCapacityDays retrieve the completed days of a boat given its ID.
+// This means, the days when all the boat's staterooms are reserved
+func getFullCapacityDays(c *gin.Context) {
+	id := c.Param("id")
+
+	idParsed, err := strconv.Atoi(id)
+	if err != nil {
+		exceptionhandling.HandleException(c, exceptions.WrongIdType)
+		return
+	}
+
+	boat, err := boatService.GetBoat(idParsed)
+	if err != nil {
+		exceptionhandling.HandleException(c, err)
+		return
+	}
+
+	completeDays := boatService.GetFullCapacityDays(boat)
 	c.JSON(http.StatusOK, gin.H{
-		"name":      boat.Name(),
-		"id":        boat.Id(),
-		"stateRoom": boat.StateRooms(),
+		"days": completeDays,
 	})
 }

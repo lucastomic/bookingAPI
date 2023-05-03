@@ -13,6 +13,10 @@ func (s StateRoom) Id() int {
 	return s.id
 }
 
+func (s *StateRoom) SetId(id int) {
+	s.id = id
+}
+
 // BoatId returns the id of the boat the state room belongs to.
 func (s StateRoom) BoatId() int {
 	return s.boatId

@@ -20,8 +20,24 @@ func (s StateRoomService) AddStateRoom(stateRoom domain.StateRoom) (domain.State
 func (s StateRoomService) AddEmptyStateRoom(boatId int) error {
 	stateRoom := domain.EmptyStateRoom()
 	stateRoom.SetBoatId(boatId)
-	_, err := s.UpdateStateRoom(*stateRoom)
+	err := s.setStateRoomId(stateRoom)
+	if err != nil {
+		return err
+	}
+	_, err = s.UpdateStateRoom(*stateRoom)
 	return err
+}
+
+// setStateRoomId sets the Id of the given stateRoom to the amount of staterooms
+// that are in the stateRoom's boat (besides the stateroom treated). So, if the stateroom belongs to e boat
+// with 3 staterooms + the stateRoom passed as argument, the ID of this stateRoom will be set to 3
+func (s StateRoomService) setStateRoomId(stateRoom *domain.StateRoom) error {
+	boatStateRooms, err := s.FindByBoatId(stateRoom.BoatId())
+	if err != nil {
+		return err
+	}
+	(*stateRoom).SetId(len(boatStateRooms))
+	return nil
 }
 
 // UpdateStateRoom updates an existing state room by calling the Save() method with the given state room,

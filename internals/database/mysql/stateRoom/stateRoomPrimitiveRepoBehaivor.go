@@ -16,7 +16,7 @@ const insertStateRoomStmt string = "INSERT INTO stateRoom(id, boatId) VALUES(?,?
 const updateStateRoomStmt string = "UPDATE stateRoom SET id = ?, boatId =? WHERE id = ? AND boatId = ? "
 const findStateRoomByIdStmt string = "SELECT FROM stateRoom WHERE id = ? AND boatId = ? "
 const findAllstmt string = "SELECT * FROM stateRoom"
-const removeStmt string = "REMOVE FROM stateRoom WHERE id = ? AND boatId = ? "
+const removeStmt string = "DELETE FROM stateRoom WHERE id = ? AND boatId = ? "
 
 // insertStmt returns the SQL statement to insert a new stateRoom
 func (repo stateRoomPrimitiveRepoBehaivor) InsertStmt() string {

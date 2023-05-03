@@ -2,10 +2,12 @@ package services
 
 import (
 	"errors"
+	"time"
 
 	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/exceptions"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/timeParser"
 )
 
 // boatService is a service that provides operations related to boats.
@@ -22,7 +24,7 @@ func NewBoatService(repo databaseport.IBoatRepository) *boatService {
 // and returns the updated boat or an error if the update fails.
 func (b boatService) CreateBoat(boat domain.Boat) (domain.Boat, error) {
 	if boat.Name() == "" {
-		return *domain.EmtyBoat(), errors.New("Boat must have a name")
+		return *domain.EmtyBoat(), errors.New("boat must have a name")
 	}
 	return b.UpdateBoat(boat)
 }
@@ -68,4 +70,33 @@ func (b boatService) GetAllBoats() ([]domain.Boat, error) {
 		return []domain.Boat{}, err
 	}
 	return boats, nil
+}
+
+// GetFullCapacityDays get a slice of days when all the boat's staterooms are reserved
+func (b boatService) GetFullCapacityDays(boat domain.Boat) []string {
+	var response []string
+	var daysHash map[string]int = make(map[string]int)
+	for _, stateRoom := range boat.StateRooms() {
+		for _, reservation := range stateRoom.ReservedDays() {
+			reservation.ForEachDay(func(date time.Time) {
+				b.updateHashDays(&daysHash, &response, date, boat)
+			})
+
+		}
+	}
+	return response
+}
+
+// updateHashDays takes a date and inserts it in the given hash map. If it already exists, it increments its position,
+// if it doesn't is inserted with a value of 1. If any date get the same value as the amount of staterooms in the given boat,
+// it inserts this date as a string in a string slice specified as parameter
+func (b boatService) updateHashDays(daysHash *map[string]int, response *[]string, date time.Time, boat domain.Boat) {
+	if _, ok := (*daysHash)[timeParser.ToString(date)]; ok {
+		(*daysHash)[timeParser.ToString(date)]++
+		if (*daysHash)[timeParser.ToString(date)] == len(boat.StateRooms()) {
+			*response = append(*response, timeParser.ToString(date))
+		}
+	} else {
+		(*daysHash)[timeParser.ToString(date)] = 1
+	}
 }

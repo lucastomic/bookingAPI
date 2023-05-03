@@ -15,7 +15,7 @@ const insertStmt string = "INSERT INTO reservation(name, phone,firstDay,lastDay,
 const updateStmt string = "UPDATE reservation SET name = ?,phone = ?, firstDay = ?, lastDay = ?, boatId = ?, stateRoomId = ? WHERE id = ?"
 const findByIdStmt string = "SELECT * FROM reservation WHERE id = ?"
 const findAllStmt string = "SELECT * FROM reservation"
-const removeStmt string = "REMOVE FROM reservation WHERE id = ?"
+const removeStmt string = "DELETE FROM reservation WHERE id = ?"
 
 func (repo reservationPrimitiveRepoBehaivor) InsertStmt() string {
 	return insertStmt
