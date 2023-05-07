@@ -132,6 +132,7 @@ func getFullCapacityDays(c *gin.Context) {
 	}
 
 	completeDays := boatService.GetFullCapacityDays(boat)
+	c.Header("Access-Control-Allow-Origin", "*")
 	c.JSON(http.StatusOK, gin.H{
 		"days": completeDays,
 	})

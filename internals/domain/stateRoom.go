@@ -1,11 +1,13 @@
 package domain
 
+import "errors"
+
 // The StateRoom struct defines a state room in a boat.
 // A StateRoom has an id, the id of the boat it belongs to, and a list of reservations made for it.
 type StateRoom struct {
 	id           int
 	boatId       int
-	reservedDays []Reservation
+	reservations []Reservation
 }
 
 // Id returns the id of the state room.
@@ -27,14 +29,52 @@ func (s *StateRoom) SetBoatId(boatId int) {
 	s.boatId = boatId
 }
 
-// ReservedDays returns the list of reservations made for the state room.
-func (s StateRoom) ReservedDays() []Reservation {
-	return s.reservedDays
+// Reservations returns the list of reservations made for the state room.
+func (s StateRoom) Reservations() []Reservation {
+	return s.reservations
 }
 
 // SetReservedDays sets the list of reservations made for the state room.
 func (s *StateRoom) SetReservedDays(reservation []Reservation) {
-	s.reservedDays = reservation
+	s.reservations = reservation
+}
+
+// AddReservation adds a new reservation to a stateroom. If the reservation collides with another
+// reservation already reserved, it throws an error
+func (s *StateRoom) AddReservation(reservation Reservation) error {
+	if !s.ableToReservate(reservation) {
+		return errors.New("reservation collides with another reservation")
+	}
+	s.reservations = append(s.reservations, reservation)
+	return nil
+}
+
+// RemoveReservation removes the given reservation. If the specified reservation is not
+// in the stateRoom it throws an error
+func (s *StateRoom) RemoveReservation(reservationToRemve Reservation) error {
+	for i, reservation := range s.reservations {
+		if reservation.Equals(reservationToRemve) {
+			if len(s.reservations)-1 == i {
+				s.reservations = s.reservations[:i]
+			} else {
+				s.reservations = append(s.reservations[:i], s.reservations[i+1:]...)
+			}
+			return nil
+		}
+	}
+	return errors.New("reservatio doesn't exist")
+}
+
+// ableToReservate checks whether the range of a given reservation is completly free for reservate in the
+// stateroom
+func (s *StateRoom) ableToReservate(reservation Reservation) bool {
+	for _, reservation := range s.reservations {
+		if reservation.Contains(reservation.firstDay) || reservation.Contains(reservation.lastDay) {
+			return false
+		}
+	}
+	return true
+
 }
 
 // EmptyStateRoom creates and returns a new empty StateRoom.

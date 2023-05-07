@@ -61,7 +61,7 @@ func (repo stateRoomPrimitiveRepoBehaivor) Id(stateRoom domain.StateRoom) []int 
 
 // isZero checks wether the stateRoom specified as paramter is a zero boat
 func (repo stateRoomPrimitiveRepoBehaivor) IsZero(stateRoom domain.StateRoom) bool {
-	return stateRoom.ReservedDays() == nil && stateRoom.Id() == 0 && stateRoom.BoatId() == 0
+	return stateRoom.Reservations() == nil && stateRoom.Id() == 0 && stateRoom.BoatId() == 0
 }
 
 // scan scans the stateRoom inside the row passed by argument

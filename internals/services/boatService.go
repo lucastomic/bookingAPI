@@ -7,6 +7,7 @@ import (
 	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/exceptions"
+	reservesreallocator "github.com/lucastomic/naturalYSalvajeRent/internals/reservesReallocator"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/timeParser"
 )
 
@@ -77,7 +78,7 @@ func (b boatService) GetFullCapacityDays(boat domain.Boat) []string {
 	var response []string
 	var daysHash map[string]int = make(map[string]int)
 	for _, stateRoom := range boat.StateRooms() {
-		for _, reservation := range stateRoom.ReservedDays() {
+		for _, reservation := range stateRoom.Reservations() {
 			reservation.ForEachDay(func(date time.Time) {
 				b.updateHashDays(&daysHash, &response, date, boat)
 			})
@@ -99,4 +100,25 @@ func (b boatService) updateHashDays(daysHash *map[string]int, response *[]string
 	} else {
 		(*daysHash)[timeParser.ToString(date)] = 1
 	}
+}
+
+// AddReservation adds a new reservation to a boat.
+// It looks for a free date's range in all the boat's stateRooms which matchs with the reservation one
+// If there isn't a free range it reallocates all the reservations (except those which have already started)
+// in a way the new reservation can be placed.
+// If is impossilbe to allocate the reservation it throws an error.
+func (b boatService) AddReservation(boat domain.Boat, reservation domain.Reservation) error {
+	couldReserve := false
+	for _, stateRoom := range boat.StateRooms() {
+		if err := stateRoom.AddReservation(reservation); err == nil {
+			couldReserve = true
+		}
+	}
+	if !couldReserve {
+		err := reservesreallocator.RealloacteReserves(&boat, &reservation)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

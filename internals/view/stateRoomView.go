@@ -11,7 +11,7 @@ type stateRoomViewJSON struct {
 // ParseView parse all the reservations into a JSON array and imbibe it into a stateRoom JSON
 func (view stateRoomViewJSON) ParseView(stateRoom domain.StateRoom) gin.H {
 	var parsedReservations []gin.H = []gin.H{}
-	for _, reservation := range stateRoom.ReservedDays() {
+	for _, reservation := range stateRoom.Reservations() {
 		view.appendAsJson(&parsedReservations, reservation)
 	}
 	return gin.H{

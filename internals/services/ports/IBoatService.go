@@ -1,6 +1,8 @@
 package serviceports
 
-import "github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+import (
+	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+)
 
 type IBoatService interface {
 	CreateBoat(domain.Boat) (domain.Boat, error)

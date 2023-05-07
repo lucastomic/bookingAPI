@@ -40,6 +40,9 @@ func (r Reservation) LastDay() time.Time {
 func (r Reservation) BoatId() int {
 	return r.boatId
 }
+func (r *Reservation) SetBoatId(id int) {
+	r.boatId = id
+}
 
 // Id returns the unique ID of the reservation.
 func (r Reservation) Id() int {
@@ -51,9 +54,8 @@ func (r Reservation) StateRoomId() int {
 	return r.stateRoomId
 }
 
-// EmptyReservation returns a new empty Reservation struct pointer.
-func EmptyReservation() *Reservation {
-	return &Reservation{}
+func (r Reservation) SetStateRoomId(id int) {
+	r.stateRoomId = id
 }
 
 // ForEachDay takes a function as a parameter and executes that function for each day of the reservation period.
@@ -63,6 +65,21 @@ func (r Reservation) ForEachDay(function func(time.Time)) {
 		function(currentDate)
 		currentDate = currentDate.Add(time.Hour * 24)
 	}
+}
+
+// Contains checks whether a concret day is contained in the reservation
+func (r Reservation) Contains(dateToCheck time.Time) bool {
+	return (r.firstDay.After(dateToCheck) && r.lastDay.Before(dateToCheck)) || timeParser.Equals(dateToCheck, r.firstDay) || timeParser.Equals(dateToCheck, r.lastDay)
+}
+
+// Equals cheks whether the reservation is the same as the specified by argument.
+func (r Reservation) Equals(reservation Reservation) bool {
+	return reservation.id == r.id
+}
+
+// EmptyReservation returns a new empty Reservation struct pointer.
+func EmptyReservation() *Reservation {
+	return &Reservation{}
 }
 
 // NewReservation creates and returns a new Reservation struct pointer with the provided parameters.
