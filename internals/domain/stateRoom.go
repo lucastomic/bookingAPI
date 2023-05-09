@@ -1,6 +1,9 @@
 package domain
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
 // The StateRoom struct defines a state room in a boat.
 // A StateRoom has an id, the id of the boat it belongs to, and a list of reservations made for it.
@@ -42,11 +45,23 @@ func (s *StateRoom) SetReservedDays(reservation []Reservation) {
 // AddReservation adds a new reservation to a stateroom. If the reservation collides with another
 // reservation already reserved, it throws an error
 func (s *StateRoom) AddReservation(reservation Reservation) error {
+
 	if !s.ableToReservate(reservation) {
 		return errors.New("reservation collides with another reservation")
 	}
 	s.reservations = append(s.reservations, reservation)
 	return nil
+}
+
+// GetStartedReservation returns the current reservation (those which has already started but hasn't finished yet)
+// if it exists. If it doesn't existm returns a zero reservation
+func (s StateRoom) GetStartedReservation() Reservation {
+	for _, stateRoomReservation := range s.reservations {
+		if stateRoomReservation.Contains(time.Now()) {
+			return stateRoomReservation
+		}
+	}
+	return *new(Reservation)
 }
 
 // RemoveReservation removes the given reservation. If the specified reservation is not
@@ -62,14 +77,14 @@ func (s *StateRoom) RemoveReservation(reservationToRemve Reservation) error {
 			return nil
 		}
 	}
-	return errors.New("reservatio doesn't exist")
+	return errors.New("reservation doesn't exist")
 }
 
 // ableToReservate checks whether the range of a given reservation is completly free for reservate in the
 // stateroom
-func (s *StateRoom) ableToReservate(reservation Reservation) bool {
-	for _, reservation := range s.reservations {
-		if reservation.Contains(reservation.firstDay) || reservation.Contains(reservation.lastDay) {
+func (s *StateRoom) ableToReservate(reservationToCheck Reservation) bool {
+	for _, stateRoomReservation := range s.reservations {
+		if stateRoomReservation.Overlaps(reservationToCheck) {
 			return false
 		}
 	}

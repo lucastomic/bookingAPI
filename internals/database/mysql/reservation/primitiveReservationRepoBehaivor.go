@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/timeParser"
 )
 
 type reservationPrimitiveRepoBehaivor struct {

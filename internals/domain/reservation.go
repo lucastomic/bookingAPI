@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/timeParser"
@@ -54,8 +55,27 @@ func (r Reservation) StateRoomId() int {
 	return r.stateRoomId
 }
 
-func (r Reservation) SetStateRoomId(id int) {
+func (r *Reservation) SetStateRoomId(id int) {
 	r.stateRoomId = id
+}
+
+// IsZero checks whether the reservation is a zero value
+func (s Reservation) IsZero() bool {
+	return s.id == 0 && s.boatId == 0 && s.user.name == "" && s.user.phone == "" && s.firstDay.IsZero() && s.stateRoomId == 0 && s.lastDay.IsZero()
+
+}
+
+// String parses the reservation into a redeable string
+func (s Reservation) String() string {
+	var response string
+	response += "user name: " + s.UserName() + "\n"
+	response += "user phone: " + s.UserPhone() + "\n"
+	response += "boat: " + strconv.Itoa(s.BoatId()) + "\n"
+	response += "id: " + strconv.Itoa(s.Id()) + "\n"
+	response += "first day: " + timeParser.ToString(s.firstDay) + "\n"
+	response += "last day: " + timeParser.ToString(s.lastDay) + "\n"
+	return response
+
 }
 
 // ForEachDay takes a function as a parameter and executes that function for each day of the reservation period.
@@ -69,12 +89,28 @@ func (r Reservation) ForEachDay(function func(time.Time)) {
 
 // Contains checks whether a concret day is contained in the reservation
 func (r Reservation) Contains(dateToCheck time.Time) bool {
-	return (r.firstDay.After(dateToCheck) && r.lastDay.Before(dateToCheck)) || timeParser.Equals(dateToCheck, r.firstDay) || timeParser.Equals(dateToCheck, r.lastDay)
+	return (r.firstDay.Before(dateToCheck) && r.lastDay.After(dateToCheck)) || timeParser.Equals(dateToCheck, r.firstDay) || timeParser.Equals(dateToCheck, r.lastDay)
+}
+
+// Overlaps checks whether the reservation r collides with the given reservation reservationToCheck. This means, this reservations
+// shares at least one day
+func (r Reservation) Overlaps(reservationToCheck Reservation) bool {
+	return r.Contains(reservationToCheck.firstDay) || r.Contains(reservationToCheck.lastDay) || reservationToCheck.Contains(r.firstDay) || reservationToCheck.Contains(r.lastDay)
+}
+
+// EndsBefore checks whether r time range is finished before the given dateToCheck's day
+func (r Reservation) EndsBefore(dateToCheck time.Time) bool {
+	return r.lastDay.Before(dateToCheck) && (!timeParser.Equals(dateToCheck, r.firstDay))
+}
+
+// StartsAfter checks whether r time range is started after the given dateToCheck's day
+func (r Reservation) StartsAfter(dateToCheck time.Time) bool {
+	return r.firstDay.After(dateToCheck) && (!timeParser.Equals(dateToCheck, r.firstDay))
 }
 
 // Equals cheks whether the reservation is the same as the specified by argument.
 func (r Reservation) Equals(reservation Reservation) bool {
-	return reservation.id == r.id
+	return reservation.id == r.id && reservation.boatId == r.boatId && r.firstDay == reservation.firstDay && r.user.name == reservation.user.name
 }
 
 // EmptyReservation returns a new empty Reservation struct pointer.

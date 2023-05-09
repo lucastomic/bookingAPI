@@ -1,6 +1,8 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type Boat struct {
 	id         int
@@ -44,14 +46,29 @@ func (b Boat) StateRooms() []StateRoom {
 }
 
 // This method returns a slice of all unstarted reservations on the boat.
-func (b Boat) GetUnstartedReservations() []Reservation {
-	var response []Reservation
+func (b Boat) GetUnstartedReservations() []*Reservation {
+	var response []*Reservation
 	for _, stateRoom := range b.stateRooms {
-		for _, reservation := range stateRoom.Reservations() {
-			if !reservation.Contains(time.Now()) {
-				response = append(response, reservation)
+		for i, reservation := range stateRoom.Reservations() {
+			if reservation.StartsAfter(time.Now()) {
+				response = append(response, &stateRoom.Reservations()[i])
 			}
 		}
+	}
+	return response
+}
+
+// GetStateRoomsWithStartedReservations retrieves the boat's staterooms with only thje reservations which has already started
+// It doesn't modifies the actual staterooms. Only returns a copy of them with the started reservations
+func (b Boat) GetStateRoomsWithStartedReservations() []StateRoom {
+	var response []StateRoom
+	for _, stateRoom := range b.stateRooms {
+		if reservation := stateRoom.GetStartedReservation(); !reservation.IsZero() {
+			stateRoom.SetReservedDays([]Reservation{stateRoom.GetStartedReservation()})
+		} else {
+			stateRoom.SetReservedDays([]Reservation{})
+		}
+		response = append(response, stateRoom)
 	}
 	return response
 }
