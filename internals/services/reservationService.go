@@ -69,6 +69,6 @@ func (s ReservationServcie) ParseReservationRequest(req reservationrequest.Reser
 		return *domain.EmptyReservation(), ex
 	}
 	user := domain.NewUser(req.Name, req.Phone)
-	reservation := domain.NewReservation(0, user, firstDay, lastDay, req.BoatId, req.StateRoomId)
+	reservation := domain.NewReservation(0, user, firstDay, lastDay, req.BoatId, 0)
 	return *reservation, nil
 }

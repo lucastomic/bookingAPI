@@ -45,7 +45,6 @@ func (s *StateRoom) SetReservedDays(reservation []Reservation) {
 // AddReservation adds a new reservation to a stateroom. If the reservation collides with another
 // reservation already reserved, it throws an error
 func (s *StateRoom) AddReservation(reservation Reservation) error {
-
 	if !s.ableToReservate(reservation) {
 		return errors.New("reservation collides with another reservation")
 	}

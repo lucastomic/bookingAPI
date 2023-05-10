@@ -14,20 +14,26 @@ import (
 // boatService is a service that provides operations related to boats.
 type boatService struct {
 	databaseport.IBoatRepository
+	reservationRepo databaseport.IReservationRepository
 }
 
 // Returns a new boat service given its repository
-func NewBoatService(repo databaseport.IBoatRepository) *boatService {
-	return &boatService{repo}
+func NewBoatService(repo databaseport.IBoatRepository, reservationRepo databaseport.IReservationRepository) *boatService {
+	return &boatService{repo, reservationRepo}
 }
 
 // CreateBoat creates a new boat by calling the UpdateBoat() method with the given boat,
 // and returns the updated boat or an error if the update fails.
+// TODO: it returns a wrong ID
 func (b boatService) CreateBoat(boat domain.Boat) (domain.Boat, error) {
 	if boat.Name() == "" {
 		return *domain.EmtyBoat(), errors.New("boat must have a name")
 	}
-	return b.UpdateBoat(boat)
+	_, err := b.UpdateBoat(boat)
+	if err != nil {
+		return *domain.EmtyBoat(), err
+	}
+	return boat, nil
 }
 
 // UpdateBoat updates an existing boat by calling the Save() method with the given boat,
@@ -109,10 +115,16 @@ func (b boatService) updateHashDays(daysHash *map[string]int, response *[]string
 // If is impossilbe to allocate the reservation it throws an error.
 func (b boatService) AddReservation(boat domain.Boat, reservation domain.Reservation) error {
 	couldReserve := false
-	for _, stateRoom := range boat.StateRooms() {
+	stIndex := 0
+	for stIndex < len(boat.StateRooms()) && !couldReserve {
+		stateRoom := boat.StateRooms()[stIndex]
 		if err := stateRoom.AddReservation(reservation); err == nil {
+			reservation.SetStateRoomId(stIndex)
 			couldReserve = true
+			b.Save(boat)
+			b.reservationRepo.Save(reservation)
 		}
+		stIndex++
 	}
 	if !couldReserve {
 		err := reservesreallocator.RealloacteReserves(&boat, &reservation)

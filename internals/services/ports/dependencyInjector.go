@@ -7,7 +7,8 @@ import (
 
 func NewBoatService() IBoatService {
 	repo := databaseport.NewBoatRepository()
-	return services.NewBoatService(repo)
+	reservationRepo := databaseport.NewReservationRepository()
+	return services.NewBoatService(repo, reservationRepo)
 }
 
 func NewStateRoomService() IStateRoomService {

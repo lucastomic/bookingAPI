@@ -9,6 +9,7 @@ import (
 	"github.com/lucastomic/naturalYSalvajeRent/internals/exceptions"
 
 	exceptionhandling "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/exceptionHandling"
+	reservationrequest "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/reservationController/reservationRequest"
 	serviceports "github.com/lucastomic/naturalYSalvajeRent/internals/services/ports"
 	viewport "github.com/lucastomic/naturalYSalvajeRent/internals/view/port"
 )
@@ -16,16 +17,19 @@ import (
 const boatEndpoint = "boat"
 const getBoatEndpoint = boatEndpoint + "/:id"
 const createBoatEndpoint = boatEndpoint
+const addReservationEndpoint = boatEndpoint + "/reservate"
 const deleteBoatEndpoint = boatEndpoint + "/:id"
 const getFullCapacityDaysEndpoint = boatEndpoint + "/reserved/:id"
 
 var boatService = serviceports.NewBoatService()
+var reservationService = serviceports.NewReservationService()
 var boatView = viewport.NewBoatView()
 
 // AddEndpoints takes a gin.Engine object and updates all the boat endpoints
 func AddEndpoints(r *gin.Engine) {
 	r.GET(getBoatEndpoint, getBoat)
 	r.POST(createBoatEndpoint, createBoat)
+	r.POST(addReservationEndpoint, addReservation)
 	r.DELETE(deleteBoatEndpoint, deleteBoat)
 	r.GET(getFullCapacityDaysEndpoint, getFullCapacityDays)
 }
@@ -136,4 +140,36 @@ func getFullCapacityDays(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"days": completeDays,
 	})
+}
+
+// addReservation adds a new reservation to a boat.
+// If there isn't enoguh space to reservate in the specified dates range, it returns an error.
+// Also returns an error if the request body is not correct or if the boat id specified doesn't exist
+func addReservation(c *gin.Context) {
+	var body reservationrequest.ReservationRequest
+	if err := c.Bind(&body); err != nil {
+		exceptionhandling.HandleException(c, err)
+		return
+	}
+
+	boat, err := boatService.GetBoat(body.BoatId)
+
+	if err != nil {
+		err = exceptions.NewApiError(http.StatusBadRequest, "boat with id "+strconv.Itoa(body.BoatId)+" doesn't exist")
+		exceptionhandling.HandleException(c, err)
+		return
+	}
+
+	reservation, err := reservationService.ParseReservationRequest(body)
+	if err != nil {
+		exceptionhandling.HandleException(c, err)
+		return
+	}
+
+	err = boatService.AddReservation(boat, reservation)
+	if err != nil {
+		err = exceptions.NewApiError(http.StatusConflict, "unable to set the new reservation. There is not enough space")
+		exceptionhandling.HandleException(c, err)
+	}
+
 }
