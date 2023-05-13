@@ -1,10 +1,10 @@
 package domain
 
 type User struct {
-	name  string
+	email string
 	phone string
 }
 
-func NewUser(name string, phone string) User {
-	return User{name, phone}
+func NewUser(email string, phone string) User {
+	return User{email, phone}
 }

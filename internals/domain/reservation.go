@@ -17,9 +17,9 @@ type Reservation struct {
 	stateRoomId int
 }
 
-// UserName returns the name of the user associated with the reservation.
-func (r Reservation) UserName() string {
-	return r.user.name
+// Email returns the email of the user associated with the reservation.
+func (r Reservation) Email() string {
+	return r.user.email
 }
 
 // UserPhone returns the phone number of the user associated with the reservation.
@@ -61,14 +61,14 @@ func (r *Reservation) SetStateRoomId(id int) {
 
 // IsZero checks whether the reservation is a zero value
 func (s Reservation) IsZero() bool {
-	return s.id == 0 && s.boatId == 0 && s.user.name == "" && s.user.phone == "" && s.firstDay.IsZero() && s.stateRoomId == 0 && s.lastDay.IsZero()
+	return s.id == 0 && s.boatId == 0 && s.user.email == "" && s.user.phone == "" && s.firstDay.IsZero() && s.stateRoomId == 0 && s.lastDay.IsZero()
 
 }
 
 // String parses the reservation into a redeable string
 func (s Reservation) String() string {
 	var response string
-	response += "user name: " + s.UserName() + "\n"
+	response += "user email: " + s.Email() + "\n"
 	response += "user phone: " + s.UserPhone() + "\n"
 	response += "boat: " + strconv.Itoa(s.BoatId()) + "\n"
 	response += "id: " + strconv.Itoa(s.Id()) + "\n"
@@ -110,7 +110,7 @@ func (r Reservation) StartsAfter(dateToCheck time.Time) bool {
 
 // Equals cheks whether the reservation is the same as the specified by argument.
 func (r Reservation) Equals(reservation Reservation) bool {
-	return reservation.id == r.id && reservation.boatId == r.boatId && r.firstDay == reservation.firstDay && r.user.name == reservation.user.name
+	return reservation.id == r.id && reservation.boatId == r.boatId && r.firstDay == reservation.firstDay && r.user.email == reservation.user.email
 }
 
 // EmptyReservation returns a new empty Reservation struct pointer.

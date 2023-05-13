@@ -163,7 +163,6 @@ func addReservation(c *gin.Context) {
 		exceptionhandling.HandleException(c, err)
 	}
 	c.Header("Access-Control-Allow-Origin", "*")
-
 }
 
 // parseReservationFromBody parses the reservation from a request body. If there is any error, it returns it as

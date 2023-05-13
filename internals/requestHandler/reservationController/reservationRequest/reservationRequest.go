@@ -1,7 +1,7 @@
 package reservationrequest
 
 type ReservationRequest struct {
-	Name     string `json:"name"`
+	Email    string `json:"email"`
 	Phone    string `json:"phone"`
 	FirstDay string `json:"firstDay"`
 	LastDay  string `json:"lastDay"`

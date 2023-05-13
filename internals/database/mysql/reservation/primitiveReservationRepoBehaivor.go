@@ -39,7 +39,7 @@ func (repo reservationPrimitiveRepoBehaivor) FindAllStmt() string {
 
 // PersistenceValues returns a slice of type []any that contains the values of the reservation's properties to be persisted in the database.
 func (repo reservationPrimitiveRepoBehaivor) PersistenceValues(reservation domain.Reservation) []any {
-	return []any{reservation.UserName(), reservation.UserPhone(), reservation.FirstDay(), reservation.LastDay(), reservation.BoatId(), reservation.StateRoomId()}
+	return []any{reservation.Email(), reservation.UserPhone(), reservation.FirstDay(), reservation.LastDay(), reservation.BoatId(), reservation.StateRoomId()}
 }
 
 // Id returns a slice of type []int that contains the ID of the reservation to be used as a parameter in database operations.

@@ -38,7 +38,7 @@ func (s ReservationServcie) GetReservation(id int) (domain.Reservation, error) {
 	if err != nil {
 		return *domain.EmptyReservation(), err
 	}
-	if reservation.Id() == 0 && reservation.BoatId() == 0 && reservation.UserName() == "" {
+	if reservation.Id() == 0 && reservation.BoatId() == 0 && reservation.Email() == "" {
 		return *domain.EmptyReservation(), exceptions.NotFound
 	}
 	return reservation, nil
@@ -68,7 +68,7 @@ func (s ReservationServcie) ParseReservationRequest(req reservationrequest.Reser
 		ex := exceptions.NewApiError(http.StatusBadRequest, "Bad lastDay format. Must be a string with yyyy-mm-dd format")
 		return *domain.EmptyReservation(), ex
 	}
-	user := domain.NewUser(req.Name, req.Phone)
+	user := domain.NewUser(req.Email, req.Phone)
 	reservation := domain.NewReservation(0, user, firstDay, lastDay, req.BoatId, 0)
 	return *reservation, nil
 }
