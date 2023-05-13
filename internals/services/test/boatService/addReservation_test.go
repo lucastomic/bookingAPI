@@ -45,7 +45,7 @@ var firstDaysReserved = domain.NewBoat("First days reserved", []domain.StateRoom
 	*stateRoom1,
 })
 
-var unableReservate = domain.NewBoat("Unable reservate", []domain.StateRoom{
+var possibleBoat = domain.NewBoat("Unable reservate", []domain.StateRoom{
 	*domain.NewStateRoom(0, 0, []domain.Reservation{
 		*newReservation(0, 3),
 		*newReservation(4, 7),
@@ -87,12 +87,14 @@ var addReservationTests = []struct {
 		false,
 	},
 	{
-		*unableReservate,
+		*possibleBoat,
 		*newReservation(4, 10),
 		true,
 	},
 }
 
+// TODO: REPLACE BOATSERVICE WITH ONE WITH MOCKED REPO
+// THE TEST WON'T BE RIGHT UNTIL IS DONE
 func TestAddReservation(t *testing.T) {
 	for _, tt := range addReservationTests {
 		t.Run(tt.Name(), func(t *testing.T) {

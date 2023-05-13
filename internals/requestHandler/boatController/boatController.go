@@ -15,6 +15,7 @@ import (
 )
 
 const boatEndpoint = "boat"
+
 const getBoatEndpoint = boatEndpoint + "/:id"
 const createBoatEndpoint = boatEndpoint
 const addReservationEndpoint = boatEndpoint + "/reservate"
@@ -146,30 +147,37 @@ func getFullCapacityDays(c *gin.Context) {
 // If there isn't enoguh space to reservate in the specified dates range, it returns an error.
 // Also returns an error if the request body is not correct or if the boat id specified doesn't exist
 func addReservation(c *gin.Context) {
-	var body reservationrequest.ReservationRequest
-	if err := c.Bind(&body); err != nil {
+	reservation, err := parseReservationFromBody(c)
+	if err != nil {
 		exceptionhandling.HandleException(c, err)
 		return
 	}
-
-	boat, err := boatService.GetBoat(body.BoatId)
-
+	boat, err := boatService.GetBoat(reservation.BoatId())
 	if err != nil {
-		err = exceptions.NewApiError(http.StatusBadRequest, "boat with id "+strconv.Itoa(body.BoatId)+" doesn't exist")
+		err = exceptions.NewApiError(http.StatusBadRequest, "boat with id "+strconv.Itoa(reservation.BoatId())+" doesn't exist")
 		exceptionhandling.HandleException(c, err)
 		return
+	}
+	err = boatService.AddReservation(boat, reservation)
+	if err != nil {
+		exceptionhandling.HandleException(c, err)
+	}
+	c.Header("Access-Control-Allow-Origin", "*")
+
+}
+
+// parseReservationFromBody parses the reservation from a request body. If there is any error, it returns it as
+// second value with an empty reservation as first. Otherwise, returns the reservation
+func parseReservationFromBody(c *gin.Context) (domain.Reservation, error) {
+	var body reservationrequest.ReservationRequest
+	if err := c.BindJSON(&body); err != nil {
+		return *domain.EmptyReservation(), err
 	}
 
 	reservation, err := reservationService.ParseReservationRequest(body)
 	if err != nil {
-		exceptionhandling.HandleException(c, err)
-		return
+		return *domain.EmptyReservation(), err
 	}
-
-	err = boatService.AddReservation(boat, reservation)
-	if err != nil {
-		err = exceptions.NewApiError(http.StatusConflict, "unable to set the new reservation. There is not enough space")
-		exceptionhandling.HandleException(c, err)
-	}
+	return reservation, nil
 
 }

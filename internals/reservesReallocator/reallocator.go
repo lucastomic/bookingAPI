@@ -5,7 +5,6 @@ import (
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/datastructure"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
-	"github.com/lucastomic/naturalYSalvajeRent/internals/timeParser"
 )
 
 // NOTE: The reallocating system is a Backtracking algorithm. To understand the way the reservations are reallocated,
@@ -29,7 +28,7 @@ func RealloacteReserves(boat *domain.Boat, reservation *domain.Reservation) erro
 	recursiveRealloaction(&success, &stateRooms, reservationsQueue)
 
 	if !success {
-		return errors.New("unable to reallocate new reservation")
+		return errors.New("unable to set the new reservation. There is not enough space")
 	} else {
 		boat.SetStateRooms(stateRooms)
 	}
@@ -44,21 +43,7 @@ func recursiveRealloaction(
 	reservations *datastructure.Queue[*domain.Reservation],
 ) {
 	if reservations.IsEmpty() {
-
-		var xd [][]map[string]string
-		for _, st := range *stateRooms {
-			var xdchild []map[string]string
-			for _, res := range st.Reservations() {
-				xdchild = append(xdchild, map[string]string{
-					"from": timeParser.ToString(res.FirstDay()),
-					"to":   timeParser.ToString(res.LastDay()),
-				})
-			}
-			xd = append(xd, xdchild)
-		}
-
 		*success = true
-
 	} else {
 		exploreChildNodes(success, stateRooms, reservations)
 	}
@@ -73,16 +58,18 @@ func exploreChildNodes(
 	i := 0
 	reservation, _ := reservations.Pop()
 	for !*success && len(*stateRooms) > i {
+		oldStateRoomId := reservation.StateRoomId()
+		reservation.SetStateRoomId((*stateRooms)[i].Id())
 		if err := (*stateRooms)[i].AddReservation(*reservation); err == nil {
-			oldStateRoomId := reservation.StateRoomId()
-			reservation.SetStateRoomId((*stateRooms)[i].Id())
 			recursiveRealloaction(success, stateRooms, reservations)
-			if !*success {
-				reservation.SetStateRoomId(oldStateRoomId)
-				(*stateRooms)[i].RemoveReservation(*reservation)
-				reservations.Push(reservation)
-			}
+		}
+		if !*success {
+			reservation.SetStateRoomId(oldStateRoomId)
+			(*stateRooms)[i].RemoveReservation(*reservation)
 		}
 		i++
+	}
+	if !*success {
+		reservations.Push(reservation)
 	}
 }

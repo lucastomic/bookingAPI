@@ -17,6 +17,16 @@ type CommonMysqlLogic[T any, I any] struct {
 
 // Save persists the object specified as argument into the database. If it exists,
 // it updates the modified values, if it doesn't it creates a new register
+// It also persists the changes/insertions of all its childs.
+// For example, given
+//
+//	type A struct{
+//		name string
+//		childs []B
+//	}
+//
+// Save(A) would persist the object A and its field "name", but it also would persist,
+// all the changes/insertions in their childs (the slice of B objects)
 func (repo CommonMysqlLogic[T, I]) Save(object T) error {
 	var err error
 	if repo.alreadyExists(object) {
@@ -24,6 +34,11 @@ func (repo CommonMysqlLogic[T, I]) Save(object T) error {
 	} else {
 		err = repo.insertNew(object)
 	}
+	if err != nil {
+		return err
+	}
+	err = repo.SaveChildsChanges(&object)
+
 	return err
 }
 

@@ -5,5 +5,6 @@ import (
 	serviceports "github.com/lucastomic/naturalYSalvajeRent/internals/services/ports"
 )
 
+// TODO MUST BE REPLACED BY A BOATSERVICE WITH A MOCKED REPOSITORY
 var boatService = serviceports.NewBoatService()
 var user1 = domain.NewUser("Lucas Tomic", "1234212")

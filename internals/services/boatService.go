@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"net/http"
 	"time"
 
 	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
@@ -114,23 +115,13 @@ func (b boatService) updateHashDays(daysHash *map[string]int, response *[]string
 // in a way the new reservation can be placed.
 // If is impossilbe to allocate the reservation it throws an error.
 func (b boatService) AddReservation(boat domain.Boat, reservation domain.Reservation) error {
-	couldReserve := false
-	stIndex := 0
-	for stIndex < len(boat.StateRooms()) && !couldReserve {
-		stateRoom := boat.StateRooms()[stIndex]
-		if err := stateRoom.AddReservation(reservation); err == nil {
-			reservation.SetStateRoomId(stIndex)
-			couldReserve = true
-			b.Save(boat)
-			b.reservationRepo.Save(reservation)
-		}
-		stIndex++
-	}
+	couldReserve := boat.AddReservation(&reservation)
 	if !couldReserve {
 		err := reservesreallocator.RealloacteReserves(&boat, &reservation)
 		if err != nil {
-			return err
+			return exceptions.NewApiError(http.StatusConflict, err.Error())
 		}
 	}
-	return nil
+	err := b.Save(boat)
+	return err
 }

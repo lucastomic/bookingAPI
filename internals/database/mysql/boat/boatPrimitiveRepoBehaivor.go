@@ -84,3 +84,16 @@ func (repo boatPrimitiveRepoBehaivor) UpdateRelations(boat *domain.Boat) error {
 	boat.SetStateRooms(boatStateRooms)
 	return nil
 }
+
+// SaveChildsChanges takes all the staterooms in the boat and save their changes in the datanase (or
+// inserts a new stateroom if it's a new one)
+func (repo boatPrimitiveRepoBehaivor) SaveChildsChanges(boat *domain.Boat) error {
+	stateRoomRepo := stateRoomDB.NewStateRoomRepository()
+	for _, stateRoom := range boat.StateRooms() {
+		err := stateRoomRepo.Save(stateRoom)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

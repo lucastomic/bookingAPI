@@ -60,4 +60,7 @@ type IPrimitiveRepoBehaivor[T any, I any] interface {
 	Scan(*sql.Rows) (T, error)
 	// updateRelations takes a T object and update all its relations (OneToOne, OneToMany, ManyToOne and ManyToMany)
 	UpdateRelations(*T) error
+	// SaveChildsChanges takes a T object and save the changes in all their childs. If a new child was inserted into
+	// the database or if one of them was modified, it persists the changes in the database
+	SaveChildsChanges(*T) error
 }

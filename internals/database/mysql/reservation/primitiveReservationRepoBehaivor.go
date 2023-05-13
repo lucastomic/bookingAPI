@@ -80,3 +80,6 @@ func (repo reservationPrimitiveRepoBehaivor) Scan(rows *sql.Rows) (domain.Reserv
 func (repo reservationPrimitiveRepoBehaivor) UpdateRelations(reservation *domain.Reservation) error {
 	return nil
 }
+func (repo reservationPrimitiveRepoBehaivor) SaveChildsChanges(reservation *domain.Reservation) error {
+	return nil
+}

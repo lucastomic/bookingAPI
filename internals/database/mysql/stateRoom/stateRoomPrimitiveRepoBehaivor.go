@@ -14,7 +14,7 @@ type stateRoomPrimitiveRepoBehaivor struct {
 
 const insertStateRoomStmt string = "INSERT INTO stateRoom(id, boatId) VALUES(?,?)"
 const updateStateRoomStmt string = "UPDATE stateRoom SET id = ?, boatId =? WHERE id = ? AND boatId = ? "
-const findStateRoomByIdStmt string = "SELECT FROM stateRoom WHERE id = ? AND boatId = ? "
+const findStateRoomByIdStmt string = "SELECT * FROM stateRoom WHERE id = ? AND boatId = ? "
 const findAllstmt string = "SELECT * FROM stateRoom"
 const removeStmt string = "DELETE FROM stateRoom WHERE id = ? AND boatId = ? "
 
@@ -56,7 +56,7 @@ func (repo stateRoomPrimitiveRepoBehaivor) Empty() *domain.StateRoom {
 
 // id returns the id of the stateRoom passed as argument
 func (repo stateRoomPrimitiveRepoBehaivor) Id(stateRoom domain.StateRoom) []int {
-	return []int{stateRoom.BoatId(), stateRoom.Id()}
+	return []int{stateRoom.Id(), stateRoom.BoatId()}
 }
 
 // isZero checks wether the stateRoom specified as paramter is a zero boat
@@ -86,4 +86,17 @@ func (repo stateRoomPrimitiveRepoBehaivor) UpdateRelations(stateRoom *domain.Sta
 	}
 	stateRoom.SetReservedDays(stateRoomReservations)
 	return nil
+}
+
+// SaveChildsChanges takes all the stateroom's reservations and persists them
+func (repo stateRoomPrimitiveRepoBehaivor) SaveChildsChanges(stateRoom *domain.StateRoom) error {
+	reservationRepo := reservationDB.NewReservationRepository()
+	for _, reservation := range stateRoom.Reservations() {
+		err := reservationRepo.Save(reservation)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+
 }
