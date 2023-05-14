@@ -30,7 +30,7 @@ func GetInstance() *sql.DB {
 }
 
 func initDatabase() *sql.DB {
-	var dataSource string = fmt.Sprintf("%s:%s@/%s", username, password, dbname)
+	var dataSource string = fmt.Sprintf("%s:%s@(mysql)/%s", username, password, dbname)
 
 	db, err := sql.Open(sgbd, dataSource)
 

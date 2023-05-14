@@ -81,7 +81,7 @@ func (s Reservation) String() string {
 // ForEachDay takes a function as a parameter and executes that function for each day of the reservation period.
 func (r Reservation) ForEachDay(function func(time.Time)) {
 	currentDate := r.FirstDay()
-	for !timeParser.Equals(currentDate, r.LastDay()) {
+	for !timeParser.Equals(currentDate, r.LastDay().Add(time.Hour*24)) {
 		function(currentDate)
 		currentDate = currentDate.Add(time.Hour * 24)
 	}
@@ -96,6 +96,12 @@ func (r Reservation) Contains(dateToCheck time.Time) bool {
 // shares at least one day
 func (r Reservation) Overlaps(reservationToCheck Reservation) bool {
 	return r.Contains(reservationToCheck.firstDay) || r.Contains(reservationToCheck.lastDay) || reservationToCheck.Contains(r.firstDay) || reservationToCheck.Contains(r.lastDay)
+}
+
+// HasStarted cheks whether the reservation has started yet (don't care if the reservation has already ended or not).
+// Returns true if the first day of the reservation is before time.Now() and the first day is not today (time.Now())
+func (r Reservation) HasStarted() bool {
+	return r.firstDay.Before(time.Now()) && !timeParser.Equals(r.firstDay, time.Now())
 }
 
 // EndsBefore checks whether r time range is finished before the given dateToCheck's day

@@ -67,10 +67,8 @@ func (b *Boat) AddReservation(reservation *Reservation) bool {
 	i := 0
 	for i < len(b.StateRooms()) && !couldReserve {
 		stateRoom := &b.StateRooms()[i]
-		if err := stateRoom.AddReservation(*reservation); err == nil {
-			reservation.SetStateRoomId(i)
-			couldReserve = true
-		}
+		err := stateRoom.AddReservation(*reservation)
+		couldReserve = err == nil
 		i++
 	}
 	return couldReserve

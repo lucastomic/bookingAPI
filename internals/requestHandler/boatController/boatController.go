@@ -122,6 +122,8 @@ func parseBoat(c *gin.Context, boat domain.Boat) {
 // getFullCapacityDays retrieve the completed days of a boat given its ID.
 // This means, the days when all the boat's staterooms are reserved
 func getFullCapacityDays(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+
 	id := c.Param("id")
 
 	idParsed, err := strconv.Atoi(id)
@@ -137,7 +139,6 @@ func getFullCapacityDays(c *gin.Context) {
 	}
 
 	completeDays := boatService.GetFullCapacityDays(boat)
-	c.Header("Access-Control-Allow-Origin", "*")
 	c.JSON(http.StatusOK, gin.H{
 		"days": completeDays,
 	})
@@ -147,11 +148,20 @@ func getFullCapacityDays(c *gin.Context) {
 // If there isn't enoguh space to reservate in the specified dates range, it returns an error.
 // Also returns an error if the request body is not correct or if the boat id specified doesn't exist
 func addReservation(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+
 	reservation, err := parseReservationFromBody(c)
 	if err != nil {
 		exceptionhandling.HandleException(c, err)
 		return
 	}
+
+	if reservation.HasStarted() {
+		err = exceptions.NewApiError(http.StatusBadRequest, "this dates are not allowed (first day has already passed)")
+		exceptionhandling.HandleException(c, err)
+		return
+	}
+
 	boat, err := boatService.GetBoat(reservation.BoatId())
 	if err != nil {
 		err = exceptions.NewApiError(http.StatusBadRequest, "boat with id "+strconv.Itoa(reservation.BoatId())+" doesn't exist")
@@ -162,7 +172,6 @@ func addReservation(c *gin.Context) {
 	if err != nil {
 		exceptionhandling.HandleException(c, err)
 	}
-	c.Header("Access-Control-Allow-Origin", "*")
 }
 
 // parseReservationFromBody parses the reservation from a request body. If there is any error, it returns it as
