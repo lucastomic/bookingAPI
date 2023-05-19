@@ -191,6 +191,9 @@ CREATE TABLE reservation(
 );
 ```
 
+## Testing
+As this is not a real project, there was no need of spending time in a extensive coverage. However, for the demonstration of knowledge, some functions were covered
+
 
 ## Docker
 Also, it makes use of Docker for managing the database and dockerize the application, using besides [air](https://github.com/cosmtrek/air) for live reload.
