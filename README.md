@@ -5,7 +5,7 @@ This is the stack used for the project development:
 - Docker
 - MYSQL
 - AWS
-Next, It will be explained the different software engeneering areas involved in this project
+
 # API usage
 This section won't get in details deeply (explanation of the parameters, possible returns, etc) because it's not the porpouse of the repository, but the explanation of the Software engeneering areas involved in its construction.
 
