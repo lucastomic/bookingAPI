@@ -195,6 +195,49 @@ CREATE TABLE reservation(
 As this is not a real project, there was no need of spending time in a extensive coverage. However, for the demonstration of knowledge, some functions were covered
 
 
+
+
+```
+var user1 = domain.NewUser("Lucas Tomic", "1234212")
+var date = time.Date(2023, 05, 03, 20, 34, 58, 651387237, time.UTC)
+
+var reservation2Days = domain.NewReservation(0, user1, date, date.Add(time.Hour*24*2), 0, 0)
+
+var containsTests = []struct {
+	reservation1 domain.Reservation
+	date         time.Time
+	expected     bool
+}{
+	{
+		*reservation2Days,
+		date.Add(time.Hour * 24),
+		true,
+	},
+	{
+		*reservation2Days,
+		date.Add(time.Hour * 72),
+		false,
+	},
+	{
+		*reservation2Days,
+		date,
+		true,
+	},
+}
+
+func TestContains(t *testing.T) {
+	for i, tt := range containsTests {
+		t.Run("Test N: "+strconv.Itoa(i), func(t *testing.T) {
+			got := tt.reservation1.Contains(tt.date)
+			if got != tt.expected {
+				t.Errorf("Expected: %v, got: %v", tt.expected, got)
+			}
+
+		})
+	}
+}
+```
+
 ## Docker
 Also, it makes use of Docker for managing the database and dockerize the application, using besides [air](https://github.com/cosmtrek/air) for live reload.
 
