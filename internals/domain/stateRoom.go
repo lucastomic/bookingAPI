@@ -2,7 +2,8 @@ package domain
 
 import (
 	"errors"
-	"time"
+
+	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
 )
 
 // The StateRoom struct defines a state room in a boat.
@@ -57,7 +58,7 @@ func (s *StateRoom) AddReservation(reservation Reservation) error {
 // if it exists. If it doesn't existm returns a zero reservation
 func (s StateRoom) GetStartedReservation() Reservation {
 	for _, stateRoomReservation := range s.reservations {
-		if stateRoomReservation.Contains(time.Now()) {
+		if stateRoomReservation.Contains(timesimplified.Now()) {
 			return stateRoomReservation
 		}
 	}

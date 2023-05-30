@@ -3,13 +3,11 @@ package services
 import (
 	"errors"
 	"net/http"
-	"time"
 
 	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/exceptions"
 	reservesreallocator "github.com/lucastomic/naturalYSalvajeRent/internals/reservesReallocator"
-	"github.com/lucastomic/naturalYSalvajeRent/internals/timeParser"
 )
 
 // boatService is a service that provides operations related to boats.
@@ -83,30 +81,11 @@ func (b boatService) GetAllBoats() ([]domain.Boat, error) {
 // GetFullCapacityDays get a slice of days when all the boat's staterooms are reserved
 func (b boatService) GetFullCapacityDays(boat domain.Boat) []string {
 	var response []string
-	var daysHash map[string]int = make(map[string]int)
-	for _, stateRoom := range boat.StateRooms() {
-		for _, reservation := range stateRoom.Reservations() {
-			reservation.ForEachDay(func(date time.Time) {
-				b.updateHashDays(&daysHash, &response, date, boat)
-			})
-
-		}
+	var days = boat.GetFullCapacityDays()
+	for _, day := range days {
+		response = append(response, day.ToString())
 	}
 	return response
-}
-
-// updateHashDays takes a date and inserts it in the given hash map. If it already exists, it increments its position,
-// if it doesn't is inserted with a value of 1. If any date get the same value as the amount of staterooms in the given boat,
-// it inserts this date as a string in a string slice specified as parameter
-func (b boatService) updateHashDays(daysHash *map[string]int, response *[]string, date time.Time, boat domain.Boat) {
-	if _, ok := (*daysHash)[timeParser.ToString(date)]; ok {
-		(*daysHash)[timeParser.ToString(date)]++
-		if (*daysHash)[timeParser.ToString(date)] == len(boat.StateRooms()) {
-			*response = append(*response, timeParser.ToString(date))
-		}
-	} else {
-		(*daysHash)[timeParser.ToString(date)] = 1
-	}
 }
 
 // AddReservation adds a new reservation to a boat.
@@ -124,4 +103,14 @@ func (b boatService) AddReservation(boat domain.Boat, reservation domain.Reserva
 	}
 	err := b.Save(boat)
 	return err
+}
+
+// GetNotEmptyDays retrives those days where there is at least one reservation of a boat.
+func (b boatService) GetNotEmptyDays(boat domain.Boat) []string {
+	var response []string
+	var days = boat.GetNotEmptyDays()
+	for _, day := range days {
+		response = append(response, day.ToString())
+	}
+	return response
 }

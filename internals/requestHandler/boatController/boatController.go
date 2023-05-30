@@ -29,10 +29,10 @@ var boatView = viewport.NewBoatView()
 // AddEndpoints takes a gin.Engine object and updates all the boat endpoints
 func AddEndpoints(r *gin.Engine) {
 	r.GET(getBoatEndpoint, getBoat)
+	r.GET(getFullCapacityDaysEndpoint, getFullCapacityDays)
 	r.POST(createBoatEndpoint, createBoat)
 	r.POST(addReservationEndpoint, addReservation)
 	r.DELETE(deleteBoatEndpoint, deleteBoat)
-	r.GET(getFullCapacityDaysEndpoint, getFullCapacityDays)
 }
 
 // createBoat receives a request to create a new boat, reads the boat name from the request body,
@@ -119,9 +119,33 @@ func parseBoat(c *gin.Context, boat domain.Boat) {
 	c.JSON(http.StatusOK, boatView.ParseView(boat))
 }
 
-// getFullCapacityDays retrieve the completed days of a boat given its ID.
+// getFullCapacityDays retrieves the completed days of a boat given its ID.
 // This means, the days when all the boat's staterooms are reserved
 func getFullCapacityDays(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+
+	id := c.Param("id")
+
+	idParsed, err := strconv.Atoi(id)
+	if err != nil {
+		exceptionhandling.HandleException(c, exceptions.WrongIdType)
+		return
+	}
+
+	boat, err := boatService.GetBoat(idParsed)
+	if err != nil {
+		exceptionhandling.HandleException(c, err)
+		return
+	}
+
+	completeDays := boatService.GetFullCapacityDays(boat)
+	c.JSON(http.StatusOK, gin.H{
+		"days": completeDays,
+	})
+}
+
+// getNotEmptyDays retrives those days where there is at least one reservation of a boat given its ID.
+func getNotEmptyDays(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
 
 	id := c.Param("id")

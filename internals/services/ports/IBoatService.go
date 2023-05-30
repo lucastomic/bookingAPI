@@ -11,5 +11,6 @@ type IBoatService interface {
 	GetBoat(boatId int) (domain.Boat, error)
 	GetAllBoats() ([]domain.Boat, error)
 	GetFullCapacityDays(domain.Boat) []string
+	GetNotEmptyDays(domain.Boat) []string
 	AddReservation(domain.Boat, domain.Reservation) error
 }

@@ -2,9 +2,10 @@ package reservationDB
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
-	"github.com/lucastomic/naturalYSalvajeRent/internals/timeParser"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
 )
 
 type reservationPrimitiveRepoBehaivor struct {
@@ -39,7 +40,7 @@ func (repo reservationPrimitiveRepoBehaivor) FindAllStmt() string {
 
 // PersistenceValues returns a slice of type []any that contains the values of the reservation's properties to be persisted in the database.
 func (repo reservationPrimitiveRepoBehaivor) PersistenceValues(reservation domain.Reservation) []any {
-	return []any{reservation.Email(), reservation.UserPhone(), reservation.FirstDay(), reservation.LastDay(), reservation.BoatId(), reservation.StateRoomId()}
+	return []any{reservation.Email(), reservation.UserPhone(), time.Time(reservation.FirstDay()), time.Time(reservation.LastDay()), reservation.BoatId(), reservation.StateRoomId()}
 }
 
 // Id returns a slice of type []int that contains the ID of the reservation to be used as a parameter in database operations.
@@ -69,8 +70,8 @@ func (repo reservationPrimitiveRepoBehaivor) Scan(rows *sql.Rows) (domain.Reserv
 	}
 
 	user := domain.NewUser(name, phone)
-	firstDayParsed, _ := timeParser.ParseFromString(firstDay)
-	lastDayParsed, _ := timeParser.ParseFromString(lastDay)
+	firstDayParsed, _ := timesimplified.FromString(firstDay)
+	lastDayParsed, _ := timesimplified.FromString(lastDay)
 
 	return *domain.NewReservation(id, user, firstDayParsed, lastDayParsed, boatId, stateRoomId), nil
 }

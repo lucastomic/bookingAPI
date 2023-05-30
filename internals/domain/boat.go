@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"time"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
 )
 
 type Boat struct {
@@ -50,7 +50,7 @@ func (b Boat) GetUnstartedReservations() []*Reservation {
 	var response []*Reservation
 	for _, stateRoom := range b.stateRooms {
 		for i, reservation := range stateRoom.Reservations() {
-			if reservation.StartsAfter(time.Now()) {
+			if reservation.StartsAfter(timesimplified.Now()) {
 				response = append(response, &stateRoom.Reservations()[i])
 			}
 		}
@@ -87,6 +87,52 @@ func (b Boat) GetStateRoomsWithStartedReservations() []StateRoom {
 		response = append(response, stateRoom)
 	}
 	return response
+}
+
+// GetNotEmptyDays retruns those days when there is at least one resrevation
+func (b Boat) GetNotEmptyDays() []timesimplified.Time {
+	hashMap := make(map[timesimplified.Time]bool)
+	var response []timesimplified.Time
+	for _, stateroom := range b.stateRooms {
+		for _, reservation := range stateroom.reservations {
+			reservation.ForEachDay(func(t timesimplified.Time) {
+				if alreadyCounted := hashMap[t]; !alreadyCounted {
+					hashMap[t] = true
+					response = append(response, t)
+				}
+			})
+		}
+	}
+	return response
+}
+
+// GetFullCapacityDays get a slice of days when all the boat's staterooms are reserved
+func (b Boat) GetFullCapacityDays() []timesimplified.Time {
+	var response []timesimplified.Time
+	var daysHash map[timesimplified.Time]int = make(map[timesimplified.Time]int)
+	for _, stateRoom := range b.StateRooms() {
+		for _, reservation := range stateRoom.Reservations() {
+			reservation.ForEachDay(func(date timesimplified.Time) {
+				b.updateHashDays(&daysHash, &response, date)
+			})
+
+		}
+	}
+	return response
+}
+
+// updateHashDays takes a date and inserts it in the given hash map. If it already exists, it increments its position,
+// if it doesn't is inserted with a value of 1. If any date get the same value as the amount of staterooms in the given boat,
+// it inserts this date as a string in a string slice specified as parameter
+func (b Boat) updateHashDays(daysHash *map[timesimplified.Time]int, response *[]timesimplified.Time, date timesimplified.Time) {
+	if _, ok := (*daysHash)[date]; ok {
+		(*daysHash)[date]++
+		if (*daysHash)[date] == len(b.StateRooms()) {
+			*response = append(*response, date)
+		}
+	} else {
+		(*daysHash)[date] = 1
+	}
 }
 
 // This method sets the state rooms of the boat.

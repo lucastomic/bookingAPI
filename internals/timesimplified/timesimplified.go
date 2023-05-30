@@ -1,10 +1,16 @@
 package timesimplified
 
-import "time"
+import (
+	"time"
+)
 
 type Time time.Time
 
 const dateFormat = "2006-01-02"
+
+func NewTime(year int, month int, day int) Time {
+	return Time(time.Date(year, time.Month(month), day, 20, 34, 58, 651387237, time.UTC))
+}
 
 // ToString returns a string representing a given Time. It only returns the
 // yyyy-mm-dd format, this means, only the first 10 characters of the time.Time.String() method.
@@ -21,6 +27,30 @@ func (t Time) Month() time.Month {
 }
 func (t Time) Year() int {
 	return time.Time(t).Year()
+}
+
+func (t Time) IsZero() bool {
+	return time.Time(t).IsZero()
+}
+
+func (t Time) AddDays(days int) Time {
+	daysNumber := time.Duration(days)
+	return Time(time.Time(t).Add(daysNumber * 24 * time.Hour))
+}
+
+func (t Time) Before(dateToCheck Time) bool {
+	dateToCheckParsed := time.Time(dateToCheck)
+	tParsed := time.Time(t)
+	return tParsed.Before(dateToCheckParsed)
+}
+func (t Time) After(dateToCheck Time) bool {
+	dateToCheckParsed := time.Time(dateToCheck)
+	tParsed := time.Time(t)
+	return tParsed.After(dateToCheckParsed)
+}
+
+func Now() Time {
+	return Time(time.Now())
 }
 
 // Equals checks whether two dates are the same. It compares if both days,

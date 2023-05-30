@@ -1,6 +1,7 @@
 package exceptionhandling
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,7 @@ func HandleException(c *gin.Context, err error) {
 			"error": msg,
 		})
 	} else {
+		fmt.Print(err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})

@@ -2,15 +2,15 @@ package domaintests
 
 import (
 	"testing"
-	"time"
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
 )
 
-var today = time.Now()
+var today = timesimplified.Now()
 
-func newReservation(startDay time.Duration, finalDay time.Duration) *domain.Reservation {
-	return domain.NewReservation(0, user1, today.Add(time.Hour*24*startDay), today.Add(time.Hour*24*finalDay), 0, 2)
+func newReservation(startDay int, finalDay int) *domain.Reservation {
+	return domain.NewReservation(0, user1, today.AddDays(startDay), today.AddDays(finalDay), 0, 2)
 }
 
 var reserveFromTodayUntil3 = newReservation(0, 3)

@@ -6,7 +6,7 @@ import (
 	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/exceptions"
-	"github.com/lucastomic/naturalYSalvajeRent/internals/timeParser"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
 
 	reservationrequest "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/reservationController/reservationRequest"
 )
@@ -58,12 +58,12 @@ func (s ReservationServcie) DeleteReservation(reservation domain.Reservation) er
 // ParseReservationRequest retrieeves a Reservation given a reservationRequest. If there is an error, it specifies
 func (s ReservationServcie) ParseReservationRequest(req reservationrequest.ReservationRequest) (domain.Reservation, error) {
 
-	firstDay, err := timeParser.ParseFromString(req.FirstDay)
+	firstDay, err := timesimplified.FromString(req.FirstDay)
 	if err != nil {
 		ex := exceptions.NewApiError(http.StatusBadRequest, "Bad firstDay format. Must be a string with yyyy-mm-dd format")
 		return *domain.EmptyReservation(), ex
 	}
-	lastDay, err := timeParser.ParseFromString(req.LastDay)
+	lastDay, err := timesimplified.FromString(req.LastDay)
 	if err != nil {
 		ex := exceptions.NewApiError(http.StatusBadRequest, "Bad lastDay format. Must be a string with yyyy-mm-dd format")
 		return *domain.EmptyReservation(), ex

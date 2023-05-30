@@ -3,7 +3,6 @@ package view
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
-	"github.com/lucastomic/naturalYSalvajeRent/internals/timeParser"
 )
 
 type ReservationViewJSON struct {
@@ -20,7 +19,7 @@ func (view ReservationViewJSON) ParseView(reservation domain.Reservation) gin.H 
 		"id":       reservation.Id(),
 		"email":    reservation.Email(),
 		"phone":    reservation.UserPhone(),
-		"firstDay": timeParser.ToString(reservation.FirstDay()),
-		"lastDay":  timeParser.ToString(reservation.LastDay()),
+		"firstDay": reservation.FirstDay().ToString(),
+		"lastDay":  reservation.LastDay().ToString(),
 	}
 }

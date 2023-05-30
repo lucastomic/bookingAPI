@@ -2,36 +2,36 @@ package boatservicetests
 
 import (
 	"testing"
-	"time"
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
 )
 
-var date = time.Date(2023, 05, 03, 20, 34, 58, 651387237, time.UTC)
+var date = timesimplified.NewTime(2023, 05, 3)
 
-var reservation2days = *domain.NewReservation(0, user1, date, date.Add(time.Hour*48), 0, 1)
-var reservation3Days = *domain.NewReservation(0, user1, date, date.Add(time.Hour*72), 0, 1)
-var reservation4Days = *domain.NewReservation(0, user1, date, date.Add(time.Hour*96), 0, 2)
+func newRes(from int, to int) domain.Reservation {
+	return *domain.NewReservation(0, user1, date.AddDays(from), date.AddDays(to), 0, 1)
+}
 
 // StateRooms for testing
 var stateRoom2daysReserved = *domain.NewStateRoom(0, 0, []domain.Reservation{
-	reservation2days,
+	newRes(0, 1),
 })
 
 var stateRoomReserved3days = *domain.NewStateRoom(1, 0, []domain.Reservation{
-	reservation3Days,
+	newRes(0, 2),
 })
 
 var stateRoomReserved4days = *domain.NewStateRoom(2, 0, []domain.Reservation{
-	reservation4Days,
+	newRes(0, 3),
 })
 
 var stateRoomReserved2daysAnd4th = *domain.NewStateRoom(0, 0, []domain.Reservation{
-	reservation2days,
-	*domain.NewReservation(0, user1, date.Add(time.Hour*72), date.Add(time.Hour*96), 0, 1),
+	newRes(0, 1),
+	newRes(3, 3),
 })
 
-var boatWith2days = domain.NewBoatWithId(0, "2 days", []domain.StateRoom{
+var boatWith3days = domain.NewBoatWithId(0, "3 days", []domain.StateRoom{
 	stateRoom2daysReserved,
 	stateRoomReserved3days,
 	stateRoomReserved4days,
@@ -40,7 +40,7 @@ var boatWith2days = domain.NewBoatWithId(0, "2 days", []domain.StateRoom{
 var boatWithoutDays = domain.NewBoatWithId(0, "Without days", []domain.StateRoom{
 	stateRoom2daysReserved,
 	*domain.NewStateRoom(1, 0, []domain.Reservation{
-		*domain.NewReservation(0, user1, date.Add(time.Hour*48), date.Add(time.Hour*72), 0, 1),
+		*domain.NewReservation(0, user1, date.AddDays(3), date.AddDays(4), 0, 1),
 	}),
 })
 
@@ -54,7 +54,7 @@ var fullCapacityDaysTest = []struct {
 	boat     domain.Boat
 	expected []string
 }{
-	{*boatWith2days, []string{"2023-05-03", "2023-05-04"}},
+	{*boatWith3days, []string{"2023-05-03", "2023-05-04"}},
 	{*boatWithoutDays, []string{}},
 	{*boatWithSeparatedRanges, []string{"2023-05-03", "2023-05-04", "2023-05-06"}},
 }

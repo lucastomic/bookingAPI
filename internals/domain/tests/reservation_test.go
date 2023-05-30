@@ -3,29 +3,29 @@ package domaintests
 import (
 	"strconv"
 	"testing"
-	"time"
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
 )
 
 var user1 = domain.NewUser("Lucas Tomic", "1234212")
-var date = time.Date(2023, 05, 03, 20, 34, 58, 651387237, time.UTC)
+var date = timesimplified.NewTime(2023, 05, 06)
 
-var reservation2Days = domain.NewReservation(0, user1, date, date.Add(time.Hour*24*2), 0, 0)
+var reservation2Days = domain.NewReservation(0, user1, date, date.AddDays(2), 0, 0)
 
 var containsTests = []struct {
 	reservation1 domain.Reservation
-	date         time.Time
+	date         timesimplified.Time
 	expected     bool
 }{
 	{
 		*reservation2Days,
-		date.Add(time.Hour * 24),
+		date.AddDays(1),
 		true,
 	},
 	{
 		*reservation2Days,
-		date.Add(time.Hour * 72),
+		date.AddDays(3),
 		false,
 	},
 	{
