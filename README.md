@@ -14,6 +14,8 @@ The application counts with the next endpoints:
 Get a specific boat, given its ID
 ### `GET /boat/reserved/:id`
 Get the days when a boat it's in its full capacity (this means those days when all the staterooms are reserved) given its ID
+### `GET /boat/notEmpty/:id`
+Get those days where there is at least one reservation of a boat given its ID
 ### `POST /boat`
 Creates a new boat, expects a JSON body request like this:
 ```json

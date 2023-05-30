@@ -21,6 +21,7 @@ const createBoatEndpoint = boatEndpoint
 const addReservationEndpoint = boatEndpoint + "/reservate"
 const deleteBoatEndpoint = boatEndpoint + "/:id"
 const getFullCapacityDaysEndpoint = boatEndpoint + "/reserved/:id"
+const getNotEmptyDaysEndpoints = boatEndpoint + "/notEmpty/:id"
 
 var boatService = serviceports.NewBoatService()
 var reservationService = serviceports.NewReservationService()
@@ -30,6 +31,7 @@ var boatView = viewport.NewBoatView()
 func AddEndpoints(r *gin.Engine) {
 	r.GET(getBoatEndpoint, getBoat)
 	r.GET(getFullCapacityDaysEndpoint, getFullCapacityDays)
+	r.GET(getNotEmptyDaysEndpoints, getNotEmptyDays)
 	r.POST(createBoatEndpoint, createBoat)
 	r.POST(addReservationEndpoint, addReservation)
 	r.DELETE(deleteBoatEndpoint, deleteBoat)
@@ -162,7 +164,7 @@ func getNotEmptyDays(c *gin.Context) {
 		return
 	}
 
-	completeDays := boatService.GetFullCapacityDays(boat)
+	completeDays := boatService.GetNotEmptyDays(boat)
 	c.JSON(http.StatusOK, gin.H{
 		"days": completeDays,
 	})
