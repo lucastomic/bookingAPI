@@ -63,15 +63,32 @@ func (b Boat) GetUnstartedReservations() []*Reservation {
 // It doesn't reallocates any reservation of the boat. In others words, does NOT change any reservation already reserved on the boat
 // Returns true if the reservation was allocated propperly and false if there is no any free range for the reservation
 func (b *Boat) AddReservation(reservation *Reservation) bool {
-	couldReserve := false
+	couldReservate := false
 	i := 0
-	for i < len(b.StateRooms()) && !couldReserve {
+	for i < len(b.StateRooms()) && !couldReservate {
 		stateRoom := &b.StateRooms()[i]
 		err := stateRoom.AddReservation(*reservation)
-		couldReserve = err == nil
+		couldReservate = err == nil
 		i++
 	}
-	return couldReserve
+	return couldReservate
+}
+
+// ReservateFullBoat reservates all the staterooms in the boat.
+// Returns true if the reservation was allocated propperly and false if there is no free range for the reservation
+func (b *Boat) ReservateFullBoat(reservation *Reservation) bool {
+	timeRangeIsAvailable := true
+	i := 0
+	stateroomsCopy := b.StateRooms()
+	for i < len(b.StateRooms()) && timeRangeIsAvailable {
+		err := stateroomsCopy[i].AddReservation(*reservation)
+		timeRangeIsAvailable = err == nil
+		i++
+	}
+	if timeRangeIsAvailable {
+		b.SetStateRooms(stateroomsCopy)
+	}
+	return timeRangeIsAvailable
 }
 
 // GetStateRoomsWithStartedReservations retrieves the boat's staterooms with only thje reservations which has already started

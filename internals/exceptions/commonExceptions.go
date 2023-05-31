@@ -3,6 +3,7 @@ package exceptions
 import "net/http"
 
 var (
-	NotFound    = apiErrorInfo{http.StatusNotFound, "not found"}
-	WrongIdType = apiErrorInfo{http.StatusBadRequest, "parameter id must be a integer"}
+	NotFound            = apiErrorInfo{http.StatusNotFound, "not found"}
+	WrongIdType         = apiErrorInfo{http.StatusBadRequest, "parameter id must be a integer"}
+	ReservationCollides = apiErrorInfo{http.StatusConflict, "unable to set the new reservation. There is not enough space"}
 )

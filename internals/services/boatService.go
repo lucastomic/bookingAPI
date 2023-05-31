@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"net/http"
 
 	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
@@ -98,7 +97,7 @@ func (b boatService) AddReservation(boat domain.Boat, reservation domain.Reserva
 	if !couldReserve {
 		err := reservesreallocator.RealloacteReserves(&boat, &reservation)
 		if err != nil {
-			return exceptions.NewApiError(http.StatusConflict, err.Error())
+			return exceptions.ReservationCollides
 		}
 	}
 	err := b.Save(boat)
@@ -113,4 +112,15 @@ func (b boatService) GetNotEmptyDays(boat domain.Boat) []string {
 		response = append(response, day.ToString())
 	}
 	return response
+}
+
+// ReservateFullBoat reservates all the staterooms in the boat.
+// Returns true if the reservation was allocated propperly and false if there is no free range for the reservation
+func (b boatService) ResevateFullBoat(boat domain.Boat, reservation domain.Reservation) error {
+	couldReservate := boat.ReservateFullBoat(&reservation)
+	if !couldReservate {
+		return exceptions.ReservationCollides
+	}
+	err := b.Save(boat)
+	return err
 }

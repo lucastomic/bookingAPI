@@ -22,6 +22,7 @@ const addReservationEndpoint = boatEndpoint + "/reservate"
 const deleteBoatEndpoint = boatEndpoint + "/:id"
 const getFullCapacityDaysEndpoint = boatEndpoint + "/reserved/:id"
 const getNotEmptyDaysEndpoints = boatEndpoint + "/notEmpty/:id"
+const reservateFullBoatEndpoint = boatEndpoint + "/reservateFullBoat"
 
 var boatService = serviceports.NewBoatService()
 var reservationService = serviceports.NewReservationService()
@@ -34,6 +35,7 @@ func AddEndpoints(r *gin.Engine) {
 	r.GET(getNotEmptyDaysEndpoints, getNotEmptyDays)
 	r.POST(createBoatEndpoint, createBoat)
 	r.POST(addReservationEndpoint, addReservation)
+	r.POST(reservateFullBoatEndpoint, reservateFullBoat)
 	r.DELETE(deleteBoatEndpoint, deleteBoat)
 }
 
@@ -195,6 +197,36 @@ func addReservation(c *gin.Context) {
 		return
 	}
 	err = boatService.AddReservation(boat, reservation)
+	if err != nil {
+		exceptionhandling.HandleException(c, err)
+	}
+}
+
+// addReservation adds a new reservation to a boat.
+// If there isn't enoguh space to reservate in the specified dates range, it returns an error.
+// Also returns an error if the request body is not correct or if the boat id specified doesn't exist
+func reservateFullBoat(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+
+	reservation, err := parseReservationFromBody(c)
+	if err != nil {
+		exceptionhandling.HandleException(c, err)
+		return
+	}
+
+	if reservation.HasStarted() {
+		err = exceptions.NewApiError(http.StatusBadRequest, "this dates are not allowed (first day has already passed)")
+		exceptionhandling.HandleException(c, err)
+		return
+	}
+
+	boat, err := boatService.GetBoat(reservation.BoatId())
+	if err != nil {
+		err = exceptions.NewApiError(http.StatusBadRequest, "boat with id "+strconv.Itoa(reservation.BoatId())+" doesn't exist")
+		exceptionhandling.HandleException(c, err)
+		return
+	}
+	err = boatService.ResevateFullBoat(boat, reservation)
 	if err != nil {
 		exceptionhandling.HandleException(c, err)
 	}

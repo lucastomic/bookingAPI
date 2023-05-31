@@ -35,6 +35,18 @@ Makes a reservation in a boat, expects a JSON body request like this:
 }
 ```
 This endpoint could return an error if there is not enough space for the new reservation
+### `POST /boat/reservateFullBoat`
+Reservates reserves the entire boat for the specified reservation. Expects a JSON body request like this:
+```json
+{
+	"email":"ltomicb@gmail.com",
+	"phone":"623029321",
+	"firstDay":"2023-12-06",
+	"lastDay":"2023-12-09",
+	"boatId":13
+}
+```
+This endpoint could return an error if there is not enough space for the new reservation
 ### `DELETE /boat/:id`
 Deletes a specific boat, given its ID
 
