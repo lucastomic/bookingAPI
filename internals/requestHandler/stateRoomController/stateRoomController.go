@@ -33,7 +33,6 @@ func addStateRoom(c *gin.Context) {
 	}
 	boat, err := boatService.GetBoat(boatIdParsed)
 	if err != nil || boat.Name() == "" {
-
 		exceptionhandling.HandleException(c, err)
 		return
 	}

@@ -7,4 +7,4 @@ import (
 
 // TODO MUST BE REPLACED BY A BOATSERVICE WITH A MOCKED REPOSITORY
 var boatService = serviceports.NewBoatService()
-var user1 = domain.NewUser("Lucas Tomic", "1234212")
+var user1 = domain.NewClient("Lucas Tomic", "1234212")

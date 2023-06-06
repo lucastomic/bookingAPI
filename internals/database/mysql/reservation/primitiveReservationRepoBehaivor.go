@@ -69,7 +69,7 @@ func (repo reservationPrimitiveRepoBehaivor) Scan(rows *sql.Rows) (domain.Reserv
 		return *domain.EmptyReservation(), err
 	}
 
-	user := domain.NewUser(name, phone)
+	user := domain.NewClient(name, phone)
 	firstDayParsed, _ := timesimplified.FromString(firstDay)
 	lastDayParsed, _ := timesimplified.FromString(lastDay)
 

@@ -54,7 +54,7 @@ type IPrimitiveRepoBehaivor[T any, I any] interface {
 	IsZero(T) bool
 	// scan scans the T object in the row passed as argument and returns it parsed into
 	// the struct. If there is an error, it returns it as second value
-	// It doen't update de relations of the T object, only the primary elements
+	// It doesn't update de relations of the T object, only the primary elements
 	// For example, given a Boat{id int, name string, staeRooms []StateRoom}
 	// It will scan the values id and name, but not the relation OneToMany staeRooms
 	Scan(*sql.Rows) (T, error)

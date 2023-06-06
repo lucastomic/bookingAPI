@@ -8,6 +8,11 @@ import (
 	stateroomcontroller "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/stateRoomController"
 )
 
+var (
+	serverCert = "server-cert.pem"
+	serverKey  = "server-key.pem"
+)
+
 func Run() {
 
 	r := gin.Default()
@@ -15,5 +20,5 @@ func Run() {
 	stateroomcontroller.AddEndpoints(r)
 	reservationcontroller.AddEndpoints(r)
 
-	r.Run()
+	r.RunTLS(":8080", serverCert, serverKey)
 }

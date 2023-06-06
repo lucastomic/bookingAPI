@@ -50,7 +50,7 @@ func (b boatPrimitiveRepoBehaivor) PersistenceValues(boat domain.Boat) []any {
 
 // empty returns an empty boat
 func (b boatPrimitiveRepoBehaivor) Empty() *domain.Boat {
-	return domain.EmtyBoat()
+	return domain.EmptyBoat()
 }
 
 // id returns the id of the boat passed as argument
@@ -70,7 +70,7 @@ func (repo boatPrimitiveRepoBehaivor) Scan(row *sql.Rows) (domain.Boat, error) {
 	var stateRooms []domain.StateRoom = []domain.StateRoom{}
 	err := row.Scan(&id, &name)
 	if err != nil {
-		return *domain.EmtyBoat(), err
+		return *domain.EmptyBoat(), err
 	}
 	return *domain.NewBoatWithId(id, name, stateRooms), nil
 }

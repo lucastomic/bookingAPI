@@ -6,7 +6,7 @@ import (
 	stateRoomDB "github.com/lucastomic/naturalYSalvajeRent/internals/database/mysql/stateRoom"
 )
 
-func NewBoatRepository() IBoatRepository {
+func NewBoatRepository() BoatRepository {
 	return boatDB.NewBoatRepository()
 }
 

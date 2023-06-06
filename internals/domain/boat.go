@@ -21,7 +21,7 @@ func NewBoatWithId(id int, name string, stateRooms []StateRoom) *Boat {
 }
 
 // This function creates a new empty Boat instance.
-func EmtyBoat() *Boat {
+func EmptyBoat() *Boat {
 	return &Boat{}
 }
 

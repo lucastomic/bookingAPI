@@ -2,10 +2,18 @@ CREATE SCHEMA IF NOT EXISTS naturalYSalvaje;
 
 USE naturalYSalvaje;
 
+CREATE TABLE user(
+  email VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  PRIMARY KEY(email)
+);
+
 CREATE TABLE boat(
   id INT AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL,
+  owner VARCHAR(255) NOT NULL,
   PRIMARY KEY(id)
+  FOREIGN KEY(owner) REFERENCES user(email)
 );
 
 CREATE TABLE stateRoom(

@@ -11,12 +11,12 @@ import (
 
 // boatService is a service that provides operations related to boats.
 type boatService struct {
-	databaseport.IBoatRepository
+	databaseport.BoatRepository
 	reservationRepo databaseport.IReservationRepository
 }
 
 // Returns a new boat service given its repository
-func NewBoatService(repo databaseport.IBoatRepository, reservationRepo databaseport.IReservationRepository) *boatService {
+func NewBoatService(repo databaseport.BoatRepository, reservationRepo databaseport.IReservationRepository) *boatService {
 	return &boatService{repo, reservationRepo}
 }
 
@@ -25,11 +25,11 @@ func NewBoatService(repo databaseport.IBoatRepository, reservationRepo databasep
 // TODO: it returns a wrong ID
 func (b boatService) CreateBoat(boat domain.Boat) (domain.Boat, error) {
 	if boat.Name() == "" {
-		return *domain.EmtyBoat(), errors.New("boat must have a name")
+		return *domain.EmptyBoat(), errors.New("boat must have a name")
 	}
 	_, err := b.UpdateBoat(boat)
 	if err != nil {
-		return *domain.EmtyBoat(), err
+		return *domain.EmptyBoat(), err
 	}
 	return boat, nil
 }
@@ -39,7 +39,7 @@ func (b boatService) CreateBoat(boat domain.Boat) (domain.Boat, error) {
 func (b boatService) UpdateBoat(boat domain.Boat) (domain.Boat, error) {
 	err := b.Save(boat)
 	if err != nil {
-		return *domain.EmtyBoat(), err
+		return *domain.EmptyBoat(), err
 	}
 	return boat, nil
 }
@@ -59,10 +59,10 @@ func (b boatService) DeleteBoat(boat domain.Boat) error {
 func (b boatService) GetBoat(boatId int) (domain.Boat, error) {
 	boat, err := b.FindById(boatId)
 	if err != nil {
-		return *domain.EmtyBoat(), err
+		return *domain.EmptyBoat(), err
 	}
 	if boat.Name() == "" {
-		return *domain.EmtyBoat(), exceptions.NotFound
+		return *domain.EmptyBoat(), exceptions.NotFound
 	}
 	return boat, nil
 }

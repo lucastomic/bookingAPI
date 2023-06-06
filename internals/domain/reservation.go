@@ -9,7 +9,7 @@ import (
 // Reservation struct represents a booking reservation for a boat state room.
 type Reservation struct {
 	id          int
-	user        User
+	user        Client
 	firstDay    timesimplified.Time
 	lastDay     timesimplified.Time
 	boatId      int
@@ -124,7 +124,7 @@ func EmptyReservation() *Reservation {
 }
 
 // NewReservation creates and returns a new Reservation struct pointer with the provided parameters.
-func NewReservation(id int, user User, firstDay timesimplified.Time, lastDay timesimplified.Time, boatId int, stateRoomId int) *Reservation {
+func NewReservation(id int, user Client, firstDay timesimplified.Time, lastDay timesimplified.Time, boatId int, stateRoomId int) *Reservation {
 	return &Reservation{
 		id,
 		user,
