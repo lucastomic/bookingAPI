@@ -9,7 +9,7 @@ type UserRepository struct {
 	mysql.CommonMysqlLogic[domain.User, string]
 }
 
-func NewBoatRepository() UserRepository {
+func NewUserRepository() UserRepository {
 	commonBehaivor := commonMysqlLogicForUser()
 	return UserRepository{commonBehaivor}
 }

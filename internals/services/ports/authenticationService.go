@@ -1,7 +1,8 @@
 package serviceports
 
 type AuthenticationService interface {
-	SignIn() error
-	Login() error
+	Register(string, string) error
+	// Login returns the correspondient JWT if success
+	Login(string, string) (string, error)
 	Validate() error
 }

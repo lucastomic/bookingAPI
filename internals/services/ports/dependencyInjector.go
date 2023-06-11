@@ -20,3 +20,8 @@ func NewReservationService() IReservationService {
 	repo := databaseport.NewReservationRepository()
 	return services.ReservationServcie{IReservationRepository: repo}
 }
+
+func NewAuthenticationService() AuthenticationService {
+	repo := databaseport.NewUserRepository()
+	return services.NewAuthenticationService(repo)
+}
