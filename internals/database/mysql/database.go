@@ -3,15 +3,16 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
+	"os"
 	"sync"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 var sgbd string = "mysql"
-var username string = "root"
-var password string = "secret"
-var dbname string = "naturalYSalvaje"
+var username string = os.Getenv("MYSQL_USER")
+var password string = os.Getenv("MYSQL_PASSWORD")
+var dbname string = os.Getenv("MYSQL_DATABASE")
 
 var lock = &sync.Mutex{}
 
