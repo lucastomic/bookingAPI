@@ -3,16 +3,16 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
-	"os"
 	"sync"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/enviroment"
 )
 
-var sgbd string = "mysql"
-var username string = os.Getenv("MYSQL_USER")
-var password string = os.Getenv("MYSQL_PASSWORD")
-var dbname string = os.Getenv("MYSQL_DATABASE")
+var sgbd string = enviroment.GetSGBD()
+var username string = enviroment.GetDatabaseUser()
+var password string = enviroment.GetDatabasePassword()
+var dbname string = enviroment.GetDatabaseName()
 
 var lock = &sync.Mutex{}
 
@@ -31,7 +31,7 @@ func GetInstance() *sql.DB {
 }
 
 func initDatabase() *sql.DB {
-	var dataSource string = fmt.Sprintf("%s:%s@(mysql)/%s", username, password, dbname)
+	var dataSource string = fmt.Sprintf("%s:%s@()/%s", username, password, dbname)
 
 	db, err := sql.Open(sgbd, dataSource)
 

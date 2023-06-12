@@ -55,13 +55,14 @@ func (as authenticationService) validateEmailAndPassword(email string, password 
 }
 
 func (as authenticationService) getSignedToken(email string) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodES256,
+	//TODO: This Signing method must be changed for a asymetric one, such as SigningMethodES256
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"sub": email,
 			"exp": enviroment.GetJWTExpirationTime(),
 		})
 	key := enviroment.GetSigningKey()
-	signedToken, err := token.SignedString(key)
+	signedToken, err := token.SignedString([]byte(key))
 	return signedToken, err
 }
 
