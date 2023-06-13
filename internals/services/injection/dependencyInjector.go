@@ -3,6 +3,7 @@ package serviceinjector
 import (
 	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/services"
+	jwtservice "github.com/lucastomic/naturalYSalvajeRent/internals/services/jwtService"
 	serviceports "github.com/lucastomic/naturalYSalvajeRent/internals/services/ports"
 )
 
@@ -29,5 +30,5 @@ func NewAuthenticationService() serviceports.AuthenticationService {
 }
 
 func NewJWTService() serviceports.JWTService {
-	return services.NewJWTService()
+	return jwtservice.NewJWTService()
 }

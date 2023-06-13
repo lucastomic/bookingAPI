@@ -15,8 +15,8 @@ const removeReservationEndpoint = reservationEndpoint + "/:id"
 
 var reservationService = serviceinjector.NewReservationService()
 
-func AddEndpoints(r *gin.Engine) {
-	r.DELETE(removeReservationEndpoint, removeReservation)
+func AddEndpoints(r *gin.IRoutes) {
+	(*r).DELETE(removeReservationEndpoint, removeReservation)
 }
 
 // removeReservation function removes a reservation by its id from the database through the reservationService.

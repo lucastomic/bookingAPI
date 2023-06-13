@@ -1,4 +1,4 @@
-package middelwares
+package middelware
 
 import (
 	"net/http"
@@ -8,7 +8,7 @@ import (
 	serviceinjector "github.com/lucastomic/naturalYSalvajeRent/internals/services/injection"
 )
 
-var authService = serviceinjector.NewAuthenticationService()
+var jwtService = serviceinjector.NewJWTService()
 
 func Auth() gin.HandlerFunc {
 	return func(context *gin.Context) {
@@ -19,7 +19,7 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 		tokenString = removeBearerHeader(tokenString)
-		err := authService.Validate(tokenString)
+		err := jwtService.Validate(tokenString)
 		if err != nil {
 			context.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			context.Abort()

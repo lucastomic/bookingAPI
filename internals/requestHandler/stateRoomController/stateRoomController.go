@@ -17,8 +17,8 @@ var stateRoomService = serviceinjector.NewStateRoomService()
 var boatService = serviceinjector.NewBoatService()
 
 // AddEndpoints takes a gin.Engine object and updates all the staetRoom endpoints
-func AddEndpoints(r *gin.Engine) {
-	r.PUT(addStateRoomEndpoint, addStateRoom)
+func AddEndpoints(r *gin.IRoutes) {
+	(*r).PUT(addStateRoomEndpoint, addStateRoom)
 }
 
 // addStateRoom adds a state room to the boat whose ID is specified by parameter
