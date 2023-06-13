@@ -7,14 +7,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/exceptions"
 	exceptionhandling "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/exceptionHandling"
-	serviceports "github.com/lucastomic/naturalYSalvajeRent/internals/services/ports"
+	serviceinjector "github.com/lucastomic/naturalYSalvajeRent/internals/services/injection"
 )
 
 const stateRoomEndpoint = "stateRoom"
 const addStateRoomEndpoint = stateRoomEndpoint + "/add/:boatId"
 
-var stateRoomService = serviceports.NewStateRoomService()
-var boatService = serviceports.NewBoatService()
+var stateRoomService = serviceinjector.NewStateRoomService()
+var boatService = serviceinjector.NewBoatService()
 
 // AddEndpoints takes a gin.Engine object and updates all the staetRoom endpoints
 func AddEndpoints(r *gin.Engine) {

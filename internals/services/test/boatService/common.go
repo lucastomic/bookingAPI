@@ -2,9 +2,9 @@ package boatservicetests
 
 import (
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
-	serviceports "github.com/lucastomic/naturalYSalvajeRent/internals/services/ports"
+	serviceinjector "github.com/lucastomic/naturalYSalvajeRent/internals/services/injection"
 )
 
 // TODO MUST BE REPLACED BY A BOATSERVICE WITH A MOCKED REPOSITORY
-var boatService = serviceports.NewBoatService()
+var boatService = serviceinjector.NewBoatService()
 var user1 = domain.NewClient("Lucas Tomic", "1234212")

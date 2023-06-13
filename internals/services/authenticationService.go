@@ -3,20 +3,23 @@ package services
 import (
 	"errors"
 
-	"github.com/golang-jwt/jwt"
 	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
-	"github.com/lucastomic/naturalYSalvajeRent/internals/enviroment"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/exceptions"
+	serviceports "github.com/lucastomic/naturalYSalvajeRent/internals/services/ports"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type authenticationService struct {
 	databaseport.UserRepository
+	jwtService serviceports.JWTService
 }
 
-func NewAuthenticationService(repo databaseport.UserRepository) authenticationService {
-	return authenticationService{repo}
+func NewAuthenticationService(repo databaseport.UserRepository, jwtService serviceports.JWTService) authenticationService {
+	return authenticationService{
+		repo,
+		jwtService,
+	}
 }
 
 func (as authenticationService) Register(email string, rawPassword string) error {
@@ -34,38 +37,27 @@ func (as authenticationService) Login(email string, password string) (string, er
 	if err != nil {
 		return "", err
 	}
-	signedToken, err := as.getSignedToken(email)
+	signedToken, err := as.jwtService.GenerateToken(email)
 	if err != nil {
 		return "", errors.New("error singing JWT")
 	}
 	return signedToken, nil
 }
 
-func (as authenticationService) validateEmailAndPassword(email string, password string) error {
+func (as authenticationService) validateEmailAndPassword(email string, rawPassword string) error {
 	user, err := as.FindById(email)
 	if err != nil {
 		return exceptions.WrongEmailLogin
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password()), []byte(password))
+	err = as.compareHashAndPassword(rawPassword, user.Password())
 	if err != nil {
 		return exceptions.WrongPasswordLogin
 	}
 	return nil
-
 }
 
-func (as authenticationService) getSignedToken(email string) (string, error) {
-	//TODO: This Signing method must be changed for a asymetric one, such as SigningMethodES256
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
-		jwt.MapClaims{
-			"sub": email,
-			"exp": enviroment.GetJWTExpirationTime(),
-		})
-	key := enviroment.GetSigningKey()
-	signedToken, err := token.SignedString([]byte(key))
-	return signedToken, err
-}
-
-func (as authenticationService) Validate() error {
-	return nil
+func (as authenticationService) compareHashAndPassword(rawPassword string, hash string) error {
+	rawPasswordParsed := []byte(rawPassword)
+	hashParsed := []byte(hash)
+	return bcrypt.CompareHashAndPassword(hashParsed, rawPasswordParsed)
 }

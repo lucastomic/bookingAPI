@@ -10,7 +10,7 @@ import (
 
 	exceptionhandling "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/exceptionHandling"
 	reservationrequest "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/reservationController/reservationRequest"
-	serviceports "github.com/lucastomic/naturalYSalvajeRent/internals/services/ports"
+	serviceinjector "github.com/lucastomic/naturalYSalvajeRent/internals/services/injection"
 	viewport "github.com/lucastomic/naturalYSalvajeRent/internals/view/port"
 )
 
@@ -24,19 +24,19 @@ const getFullCapacityDaysEndpoint = boatEndpoint + "/reserved/:id"
 const getNotEmptyDaysEndpoints = boatEndpoint + "/notEmpty/:id"
 const reservateFullBoatEndpoint = boatEndpoint + "/reservateFullBoat"
 
-var boatService = serviceports.NewBoatService()
-var reservationService = serviceports.NewReservationService()
+var boatService = serviceinjector.NewBoatService()
+var reservationService = serviceinjector.NewReservationService()
 var boatView = viewport.NewBoatView()
 
 // AddEndpoints takes a gin.Engine object and updates all the boat endpoints
-func AddEndpoints(r *gin.Engine) {
-	r.GET(getBoatEndpoint, getBoat)
-	r.GET(getFullCapacityDaysEndpoint, getFullCapacityDays)
-	r.GET(getNotEmptyDaysEndpoints, getNotEmptyDays)
-	r.POST(createBoatEndpoint, createBoat)
-	r.POST(addReservationEndpoint, addReservation)
-	r.POST(reservateFullBoatEndpoint, reservateFullBoat)
-	r.DELETE(deleteBoatEndpoint, deleteBoat)
+func AddEndpoints(r *gin.IRoutes) {
+	(*r).GET(getBoatEndpoint, getBoat)
+	(*r).GET(getFullCapacityDaysEndpoint, getFullCapacityDays)
+	(*r).GET(getNotEmptyDaysEndpoints, getNotEmptyDays)
+	(*r).POST(createBoatEndpoint, createBoat)
+	(*r).POST(addReservationEndpoint, addReservation)
+	(*r).POST(reservateFullBoatEndpoint, reservateFullBoat)
+	(*r).DELETE(deleteBoatEndpoint, deleteBoat)
 }
 
 // createBoat receives a request to create a new boat, reads the boat name from the request body,

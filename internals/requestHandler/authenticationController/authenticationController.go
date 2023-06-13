@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	exceptionhandling "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/exceptionHandling"
-	serviceports "github.com/lucastomic/naturalYSalvajeRent/internals/services/ports"
+	serviceinjector "github.com/lucastomic/naturalYSalvajeRent/internals/services/injection"
 )
 
 const authEndpoint = "auth"
@@ -17,7 +17,7 @@ func AddEndpoints(r *gin.Engine) {
 	r.POST(loginEndpoint, login)
 }
 
-var authenticationService = serviceports.NewAuthenticationService()
+var authenticationService = serviceinjector.NewAuthenticationService()
 
 var userInRequestBody struct {
 	Email    string `json:"email"`
@@ -50,7 +50,7 @@ func login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusAccepted, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"token": jwt,
 	})
 }

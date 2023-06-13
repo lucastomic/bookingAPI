@@ -3,6 +3,7 @@ package enviroment
 import (
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -26,8 +27,10 @@ func init() {
 func GetSigningKey() string {
 	return os.Getenv(signingKey)
 }
-func GetJWTExpirationTime() string {
-	return os.Getenv(jwtExpirationTimeInMilliseconds)
+func GetJWTExpirationTime() int64 {
+	var rawResponse string = os.Getenv(jwtExpirationTimeInMilliseconds)
+	responseParsed, _ := strconv.Atoi(rawResponse)
+	return int64(responseParsed)
 }
 func GetDatabaseUser() string {
 	return os.Getenv(databaseUser)

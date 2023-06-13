@@ -7,13 +7,13 @@ import (
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/exceptions"
 	exceptionhandling "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/exceptionHandling"
-	serviceports "github.com/lucastomic/naturalYSalvajeRent/internals/services/ports"
+	serviceinjector "github.com/lucastomic/naturalYSalvajeRent/internals/services/injection"
 )
 
 const reservationEndpoint = "reservation"
 const removeReservationEndpoint = reservationEndpoint + "/:id"
 
-var reservationService = serviceports.NewReservationService()
+var reservationService = serviceinjector.NewReservationService()
 
 func AddEndpoints(r *gin.Engine) {
 	r.DELETE(removeReservationEndpoint, removeReservation)
