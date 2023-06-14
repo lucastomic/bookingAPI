@@ -10,6 +10,24 @@ This is the stack used for the project development:
 This section won't get in details deeply (explanation of the parameters, possible returns, etc) because it's not the porpouse of the repository, but the explanation of the Software engeneering areas involved in its construction.
 
 The application counts with the next endpoints:
+### `POST /auth/register`
+Creates a new user, expects a JSON body request like this:
+```json
+{
+  "email": "myEmail@gmail.com",
+  "password":"secretPassword"
+}
+```
+### `POST /auth/login`
+Authenticate the user and retrieve the Json Web Token, expects a JSON body request like this:
+```json
+{
+  "email": "myEmail@gmail.com",
+  "password":"secretPassword"
+}
+```
+### `GET /boat/:id`
+Get a specific boat, given its ID
 ### `GET /boat/:id`
 Get a specific boat, given its ID
 ### `GET /boat/reserved/:id`
@@ -258,6 +276,3 @@ Also, it makes use of Docker for managing the database and dockerize the applica
 ## Deployment
 For the deployment of the project, there where used AWS services, specifically AWS EC2 for the API hosting and RDS for the database.
 (The public endpoint for using the API is not exposed as the security section of the project hasn't been finished yet)
-
-## Pending to finish
-The development of this project hasn't take into account the security of the API. This area will be covered in the future
