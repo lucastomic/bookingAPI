@@ -7,6 +7,7 @@ import (
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/exceptions"
 	reservesreallocator "github.com/lucastomic/naturalYSalvajeRent/internals/reservesReallocator"
+	authenticationstate "github.com/lucastomic/naturalYSalvajeRent/internals/state/authentication"
 )
 
 // boatService is a service that provides operations related to boats.
@@ -70,10 +71,10 @@ func (b boatService) GetBoat(boatId int) (domain.Boat, error) {
 // GetAllBoats retrieves all boats by calling the FindAll() method,
 // and returns a slice of domain.Boat and an error.
 func (b boatService) GetAllBoats() ([]domain.Boat, error) {
-	boats, err := b.FindAll()
-	if err != nil {
-		return []domain.Boat{}, err
-	}
+	boats := authenticationstate.UserAuthenticated().Boats()
+	// if err != nil {
+	// 	return []domain.Boat{}, err
+	// }
 	return boats, nil
 }
 

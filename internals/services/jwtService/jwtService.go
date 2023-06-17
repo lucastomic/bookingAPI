@@ -20,9 +20,9 @@ func (as jwtService) Validate(signedToken string) (err error) {
 	if err != nil {
 		return err
 	}
-	claims, ok := token.Claims.(*jwtClaim)
-	if !ok {
-		return errors.New("couldn't parse claims")
+	claims, err := as.getClaims(token)
+	if err != nil {
+		return err
 	}
 	if claims.IsExpired() {
 		return errors.New("token expired")
@@ -31,9 +31,21 @@ func (as jwtService) Validate(signedToken string) (err error) {
 }
 
 func (service jwtService) GenerateToken(email string) (string, error) {
-	claims := service.getClaims(email)
+	claims := service.generateClaims(email)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return service.signToken(token)
+}
+
+func (service jwtService) GetEmail(token string) (string, error) {
+	tokenParsed, err := service.parseStringToToken(token)
+	if err != nil {
+		return "", errors.New("invalid token string")
+	}
+	claims, err := service.getClaims(tokenParsed)
+	if err != nil {
+		return "", err
+	}
+	return claims.Email, nil
 }
 
 func (service jwtService) parseStringToToken(token string) (*jwt.Token, error) {
@@ -46,7 +58,7 @@ func (service jwtService) parseStringToToken(token string) (*jwt.Token, error) {
 		},
 	)
 }
-func (service jwtService) getClaims(email string) *jwtClaim {
+func (service jwtService) generateClaims(email string) *jwtClaim {
 	//TODO: This Signing method must be changed for a asymetric one, such as SigningMethodES256
 	return &jwtClaim{
 		Email: email,
@@ -54,6 +66,14 @@ func (service jwtService) getClaims(email string) *jwtClaim {
 			ExpiresAt: service.getJWTExpirationTime(),
 		},
 	}
+}
+
+func (service jwtService) getClaims(token *jwt.Token) (jwtClaim, error) {
+	claims, ok := token.Claims.(*jwtClaim)
+	if !ok {
+		return jwtClaim{}, errors.New("couldn't parse claims")
+	}
+	return *claims, nil
 }
 
 func (service jwtService) signToken(token *jwt.Token) (string, error) {

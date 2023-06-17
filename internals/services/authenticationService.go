@@ -44,6 +44,10 @@ func (as authenticationService) Login(email string, password string) (string, er
 	return signedToken, nil
 }
 
+func (as authenticationService) GetUser(email string) (domain.User, error) {
+	return as.FindById(email)
+}
+
 func (as authenticationService) validateEmailAndPassword(email string, rawPassword string) error {
 	user, err := as.FindById(email)
 	if err != nil {

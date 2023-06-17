@@ -5,6 +5,7 @@ import (
 )
 
 type Boat struct {
+	owner      string
 	id         int
 	name       string
 	stateRooms []StateRoom
@@ -28,6 +29,10 @@ func EmptyBoat() *Boat {
 // This method returns the ID of the boat.
 func (b Boat) Id() int {
 	return b.id
+}
+
+func (b Boat) Owner() string {
+	return b.owner
 }
 
 // This method returns the name of the boat.
