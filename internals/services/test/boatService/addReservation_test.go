@@ -102,7 +102,6 @@ func TestAddReservation(t *testing.T) {
 			if (err != nil) == tt.expected {
 				t.Errorf("Failed")
 			}
-
 		})
 	}
 }

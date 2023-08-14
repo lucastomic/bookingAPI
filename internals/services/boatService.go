@@ -17,7 +17,10 @@ type boatService struct {
 }
 
 // Returns a new boat service given its repository
-func NewBoatService(repo databaseport.BoatRepository, reservationRepo databaseport.IReservationRepository) *boatService {
+func NewBoatService(
+	repo databaseport.BoatRepository,
+	reservationRepo databaseport.IReservationRepository,
+) *boatService {
 	return &boatService{repo, reservationRepo}
 }
 
@@ -81,7 +84,7 @@ func (b boatService) GetAllBoats() ([]domain.Boat, error) {
 // GetFullCapacityDays get a slice of days when all the boat's staterooms are reserved
 func (b boatService) GetFullCapacityDays(boat domain.Boat) []string {
 	var response []string
-	var days = boat.GetFullCapacityDays()
+	days := boat.GetFullCapacityDays()
 	for _, day := range days {
 		response = append(response, day.ToString())
 	}
@@ -108,7 +111,7 @@ func (b boatService) AddReservation(boat domain.Boat, reservation domain.Reserva
 // GetNotEmptyDays retrives those days where there is at least one reservation of a boat.
 func (b boatService) GetNotEmptyDays(boat domain.Boat) []string {
 	var response []string
-	var days = boat.GetNotEmptyDays()
+	days := boat.GetNotEmptyDays()
 	for _, day := range days {
 		response = append(response, day.ToString())
 	}

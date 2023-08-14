@@ -137,7 +137,6 @@ func (b Boat) GetFullCapacityDays() []timesimplified.Time {
 			reservation.ForEachDay(func(date timesimplified.Time) {
 				b.updateHashDays(&daysHash, &response, date)
 			})
-
 		}
 	}
 	return response
@@ -146,7 +145,11 @@ func (b Boat) GetFullCapacityDays() []timesimplified.Time {
 // updateHashDays takes a date and inserts it in the given hash map. If it already exists, it increments its position,
 // if it doesn't is inserted with a value of 1. If any date get the same value as the amount of staterooms in the given boat,
 // it inserts this date as a string in a string slice specified as parameter
-func (b Boat) updateHashDays(daysHash *map[timesimplified.Time]int, response *[]timesimplified.Time, date timesimplified.Time) {
+func (b Boat) updateHashDays(
+	daysHash *map[timesimplified.Time]int,
+	response *[]timesimplified.Time,
+	date timesimplified.Time,
+) {
 	if _, ok := (*daysHash)[date]; ok {
 		(*daysHash)[date]++
 		if (*daysHash)[date] == len(b.StateRooms()) {
