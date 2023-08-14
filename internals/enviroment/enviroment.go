@@ -1,7 +1,6 @@
 package enviroment
 
 import (
-	"log"
 	"os"
 	"strconv"
 
@@ -20,7 +19,7 @@ const (
 func init() {
 	err := godotenv.Load("../.env")
 	if err != nil {
-		log.Fatal("Error initalizing .env variables")
+		print("Error initalizing .env variables")
 	}
 }
 
