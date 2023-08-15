@@ -8,22 +8,20 @@ import (
 
 // Reservation struct represents a booking reservation for a boat state room.
 type Reservation struct {
-	id          int
-	user        Client
-	firstDay    timesimplified.Time
-	lastDay     timesimplified.Time
-	boatId      int
-	stateRoomId int
+	id         int
+	firstDay   timesimplified.Time
+	lastDay    timesimplified.Time
+	clients    []Client
+	passengers int
+	isOpen     bool
+	boatId     int
 }
 
-// Email returns the email of the user associated with the reservation.
-func (r Reservation) Email() string {
-	return r.user.email
+func (r Reservation) Clients() []Client {
+	return r.clients
 }
-
-// UserPhone returns the phone number of the user associated with the reservation.
-func (r Reservation) UserPhone() string {
-	return r.user.phone
+func (r *Reservation) SetClients(clients []Client) {
+	r.clients = clients
 }
 
 // FirstDay returns the start date of the reservation.
@@ -31,17 +29,19 @@ func (r Reservation) FirstDay() timesimplified.Time {
 	return r.firstDay
 }
 
+func (r Reservation) BoatId() int {
+	return r.boatId
+}
+
 // LastDay returns the end date of the reservation.
 func (r Reservation) LastDay() timesimplified.Time {
 	return r.lastDay
 }
-
-// BoatId returns the ID of the boat associated with the reservation.
-func (r Reservation) BoatId() int {
-	return r.boatId
+func (r Reservation) Passengers() int {
+	return r.passengers
 }
-func (r *Reservation) SetBoatId(id int) {
-	r.boatId = id
+func (r Reservation) IsOpen() bool {
+	return r.isOpen
 }
 
 // Id returns the unique ID of the reservation.
@@ -49,27 +49,23 @@ func (r Reservation) Id() int {
 	return r.id
 }
 
-// StateRoomId returns the ID of the state room associated with the reservation.
-func (r Reservation) StateRoomId() int {
-	return r.stateRoomId
-}
-
-func (r *Reservation) SetStateRoomId(id int) {
-	r.stateRoomId = id
-}
-
 // IsZero checks whether the reservation is a zero value
 func (s Reservation) IsZero() bool {
-	return s.id == 0 && s.boatId == 0 && s.user.email == "" && s.user.phone == "" && s.firstDay.IsZero() && s.stateRoomId == 0 && s.lastDay.IsZero()
+	return s.id == 0 && s.firstDay.IsZero() && s.lastDay.IsZero()
 
 }
 
 // String parses the reservation into a redeable string
 func (s Reservation) String() string {
 	var response string
-	response += "user email: " + s.Email() + "\n"
-	response += "user phone: " + s.UserPhone() + "\n"
-	response += "boat: " + strconv.Itoa(s.BoatId()) + "\n"
+	response += "clients:[" + "\n"
+	for _, client := range s.clients {
+		response += "	{" + "\n"
+		response += "		name: " + client.Name() + "\n"
+		response += "		phone: " + client.Phone() + "\n"
+		response += "	}" + "\n"
+	}
+	response += "]" + "\n"
 	response += "id: " + strconv.Itoa(s.Id()) + "\n"
 	response += "first day: " + s.firstDay.ToString() + "\n"
 	response += "last day: " + s.lastDay.ToString() + "\n"
@@ -115,7 +111,7 @@ func (r Reservation) StartsAfter(dateToCheck timesimplified.Time) bool {
 
 // Equals cheks whether the reservation is the same as the specified by argument.
 func (r Reservation) Equals(reservation Reservation) bool {
-	return reservation.id == r.id && reservation.boatId == r.boatId && r.firstDay == reservation.firstDay && r.user.email == reservation.user.email
+	return reservation.id == r.id
 }
 
 // EmptyReservation returns a new empty Reservation struct pointer.
@@ -124,13 +120,25 @@ func EmptyReservation() *Reservation {
 }
 
 // NewReservation creates and returns a new Reservation struct pointer with the provided parameters.
-func NewReservation(id int, user Client, firstDay timesimplified.Time, lastDay timesimplified.Time, boatId int, stateRoomId int) *Reservation {
+func NewReservation(id int, firstDay timesimplified.Time, lastDay timesimplified.Time, client Client, isOpen bool, passengers int, boatId int) *Reservation {
 	return &Reservation{
-		id,
-		user,
-		firstDay,
-		lastDay,
-		boatId,
-		stateRoomId,
+		id:         id,
+		clients:    []Client{client},
+		firstDay:   firstDay,
+		lastDay:    lastDay,
+		isOpen:     isOpen,
+		passengers: passengers,
+		boatId:     boatId,
+	}
+}
+func NewReservationWithoutClient(id int, firstDay timesimplified.Time, lastDay timesimplified.Time, isOpen bool, passengers int, boatId int) *Reservation {
+	return &Reservation{
+		id:         id,
+		clients:    []Client{},
+		firstDay:   firstDay,
+		lastDay:    lastDay,
+		isOpen:     isOpen,
+		passengers: passengers,
+		boatId:     boatId,
 	}
 }

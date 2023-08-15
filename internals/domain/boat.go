@@ -5,28 +5,25 @@ import (
 )
 
 type Boat struct {
-	owner      string
-	id         int
-	name       string
-	stateRooms []StateRoom
+	maxCapacity int
+	owner       string
+	id          int
+	name        string
+	stateRooms  []StateRoom
 }
 
-// This function creates a new Boat instance with the provided name and state rooms.
 func NewBoat(name string, stateRooms []StateRoom) *Boat {
 	return &Boat{name: name, stateRooms: stateRooms}
 }
 
-// This function creates a new Boat instance with the provided id, name and state rooms.
 func NewBoatWithId(id int, name string, stateRooms []StateRoom) *Boat {
 	return &Boat{id: id, name: name, stateRooms: stateRooms}
 }
 
-// This function creates a new empty Boat instance.
 func EmptyBoat() *Boat {
 	return &Boat{}
 }
 
-// This method returns the ID of the boat.
 func (b Boat) Id() int {
 	return b.id
 }
@@ -35,17 +32,14 @@ func (b Boat) Owner() string {
 	return b.owner
 }
 
-// This method returns the name of the boat.
 func (b Boat) Name() string {
 	return b.name
 }
 
-// This method sets the name of the boat.
 func (b *Boat) SetName(name string) {
 	b.name = name
 }
 
-// This method returns a slice of all state rooms on the boat.
 func (b Boat) StateRooms() []StateRoom {
 	return b.stateRooms
 }

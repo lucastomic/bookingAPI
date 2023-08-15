@@ -49,7 +49,6 @@ func (s *StateRoom) AddReservation(reservation Reservation) error {
 	if !s.ableToReservate(reservation) {
 		return errors.New("reservation collides with another reservation")
 	}
-	reservation.SetStateRoomId(s.id)
 	s.reservations = append(s.reservations, reservation)
 	return nil
 }

@@ -17,8 +17,7 @@ type ReservationViewJSON struct {
 func (view ReservationViewJSON) ParseView(reservation domain.Reservation) gin.H {
 	return gin.H{
 		"id":       reservation.Id(),
-		"email":    reservation.Email(),
-		"phone":    reservation.UserPhone(),
+		"clients":  reservation.Clients(),
 		"firstDay": reservation.FirstDay().ToString(),
 		"lastDay":  reservation.LastDay().ToString(),
 	}
