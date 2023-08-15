@@ -38,7 +38,7 @@ func (s ReservationServcie) GetReservation(id int) (domain.Reservation, error) {
 	if err != nil {
 		return *domain.EmptyReservation(), err
 	}
-	if reservation.Id() == 0 && reservation.BoatId() == 0 && reservation.Email() == "" {
+	if reservation.IsZero() {
 		return *domain.EmptyReservation(), exceptions.NotFound
 	}
 	return reservation, nil
@@ -69,6 +69,6 @@ func (s ReservationServcie) ParseReservationRequest(req reservationrequest.Reser
 		return *domain.EmptyReservation(), ex
 	}
 	user := domain.NewClient(req.Email, req.Phone)
-	reservation := domain.NewReservation(0, user, firstDay, lastDay, req.BoatId, 0)
+	reservation := domain.NewReservation(0, firstDay, lastDay, *user, false, 0, 0)
 	return *reservation, nil
 }
