@@ -12,7 +12,7 @@ type UserRepository struct {
 
 func NewUserRepository(boatRepo databaseport.IBoatRepository) UserRepository {
 	commonBehaivor := mysql.CommonMysqlLogic[domain.User, string]{
-		IPrimitiveRepoBehaivor: userPrimitiveRepoBehaivor{},
+		IPrimitiveRepoBehaivor: userPrimitiveRepoBehaivor{boatRepo},
 	}
 	return UserRepository{commonBehaivor}
 }
