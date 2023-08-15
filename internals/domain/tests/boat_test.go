@@ -10,7 +10,7 @@ import (
 var today = timesimplified.Now()
 
 func newReservation(startDay int, finalDay int) *domain.Reservation {
-	return domain.NewReservation(0, user1, today.AddDays(startDay), today.AddDays(finalDay), 0, 2)
+	return domain.NewReservation(0, today.AddDays(startDay), today.AddDays(finalDay), *user1, false, 0, 0)
 }
 
 var reserveFromTodayUntil3 = newReservation(0, 3)
@@ -70,6 +70,16 @@ var getUnstartedReservationsTests = []struct {
 		[]*domain.Reservation{},
 	},
 }
+
+// var maxCapacityBoatTests = []struct{
+// 	boat domain.Boat
+// 	personsToReserve int
+// 	expected bool
+// }{
+// 	{
+
+// 	}
+// }
 
 func TestGetUnestartedReservations(t *testing.T) {
 	for _, tt := range getUnstartedReservationsTests {

@@ -10,7 +10,7 @@ import (
 var date = timesimplified.NewTime(2023, 05, 3)
 
 func newRes(from int, to int) domain.Reservation {
-	return *domain.NewReservation(0, user1, date.AddDays(from), date.AddDays(to), 0, 1)
+	return *domain.NewReservation(0, date.AddDays(from), date.AddDays(to), *user1, false, 0, 0)
 }
 
 // StateRooms for testing
@@ -40,7 +40,7 @@ var boatWith3days = domain.NewBoatWithId(0, "3 days", []domain.StateRoom{
 var boatWithoutDays = domain.NewBoatWithId(0, "Without days", []domain.StateRoom{
 	stateRoom2daysReserved,
 	*domain.NewStateRoom(1, 0, []domain.Reservation{
-		*domain.NewReservation(0, user1, date.AddDays(3), date.AddDays(4), 0, 1),
+		*domain.NewReservation(0, date.AddDays(3), date.AddDays(4), *user1, false, 0, 0),
 	}),
 })
 
