@@ -12,13 +12,13 @@ import (
 
 // boatService is a service that provides operations related to boats.
 type boatService struct {
-	databaseport.BoatRepository
+	databaseport.IBoatRepository
 	reservationRepo databaseport.IReservationRepository
 }
 
 // Returns a new boat service given its repository
 func NewBoatService(
-	repo databaseport.BoatRepository,
+	repo databaseport.IBoatRepository,
 	reservationRepo databaseport.IReservationRepository,
 ) *boatService {
 	return &boatService{repo, reservationRepo}
