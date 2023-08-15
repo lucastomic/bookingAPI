@@ -11,11 +11,11 @@ import (
 )
 
 type authenticationService struct {
-	databaseport.UserRepository
+	databaseport.IUserRepository
 	jwtService serviceports.JWTService
 }
 
-func NewAuthenticationService(repo databaseport.UserRepository, jwtService serviceports.JWTService) authenticationService {
+func NewAuthenticationService(repo databaseport.IUserRepository, jwtService serviceports.JWTService) authenticationService {
 	return authenticationService{
 		repo,
 		jwtService,
