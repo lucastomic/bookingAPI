@@ -1,30 +1,30 @@
 package serviceinjector
 
 import (
-	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/database"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/services"
 	jwtservice "github.com/lucastomic/naturalYSalvajeRent/internals/services/jwtService"
 	serviceports "github.com/lucastomic/naturalYSalvajeRent/internals/services/ports"
 )
 
 func NewBoatService() serviceports.IBoatService {
-	repo := databaseport.NewBoatRepository()
-	reservationRepo := databaseport.NewReservationRepository()
+	repo := database.NewBoatRepository()
+	reservationRepo := database.NewReservationRepository()
 	return services.NewBoatService(repo, reservationRepo)
 }
 
 func NewStateRoomService() serviceports.IStateRoomService {
-	repo := databaseport.NewStateRoomRepository()
+	repo := database.NewStateRoomRepository()
 	return services.StateRoomService{IStateRoomRepository: repo}
 }
 
 func NewReservationService() serviceports.IReservationService {
-	repo := databaseport.NewReservationRepository()
+	repo := database.NewReservationRepository()
 	return services.ReservationServcie{IReservationRepository: repo}
 }
 
 func NewAuthenticationService() serviceports.AuthenticationService {
-	repo := databaseport.NewUserRepository()
+	repo := database.NewUserRepository()
 	jwtService := NewJWTService()
 	return services.NewAuthenticationService(repo, jwtService)
 }
