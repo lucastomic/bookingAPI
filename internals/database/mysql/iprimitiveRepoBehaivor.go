@@ -58,9 +58,11 @@ type IPrimitiveRepoBehaivor[T any, I any] interface {
 	// For example, given a Boat{id int, name string, staeRooms []StateRoom}
 	// It will scan the values id and name, but not the relation OneToMany staeRooms
 	Scan(*sql.Rows) (T, error)
-	// updateRelations takes a T object and update all its relations (OneToOne, OneToMany, ManyToOne and ManyToMany)
+	// updateRelations takes a T object and updates all its relations (OneToOne, OneToMany, ManyToOne and ManyToMany)
 	UpdateRelations(*T) error
 	// SaveChildsChanges takes a T object and save the changes in all their childs. If a new child was inserted into
 	// the database or if one of them was modified, it persists the changes in the database
 	SaveChildsChanges(*T) error
+	// SaveRealtions takes a T object and saves all its relations (OneToOne, OneToMany, ManyToOne and ManyToMany)
+	SaveRelations(*T) error
 }

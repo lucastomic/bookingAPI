@@ -3,12 +3,13 @@ package boatDB
 import (
 	"database/sql"
 
-	stateRoomDB "github.com/lucastomic/naturalYSalvajeRent/internals/database/mysql/stateRoom"
+	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 )
 
 // boatPrimitiveRepoBehaivor implements the behaivor needed for implementing a CommmonMysqlRepository[boatPrimitiveRepoBehaivor,int]
 type boatPrimitiveRepoBehaivor struct {
+	stateRoomRepo databaseport.IStateRoomRepository
 }
 
 const insertBoatStmt string = "INSERT INTO boat(name) VALUES(?)"
@@ -76,8 +77,7 @@ func (repo boatPrimitiveRepoBehaivor) Scan(row *sql.Rows) (domain.Boat, error) {
 }
 
 func (repo boatPrimitiveRepoBehaivor) UpdateRelations(boat *domain.Boat) error {
-	stateRoomRepo := stateRoomDB.NewStateRoomRepository()
-	boatStateRooms, err := stateRoomRepo.FindByBoatId(boat.Id())
+	boatStateRooms, err := repo.stateRoomRepo.FindByBoatId(boat.Id())
 	if err != nil {
 		return err
 	}
@@ -88,12 +88,15 @@ func (repo boatPrimitiveRepoBehaivor) UpdateRelations(boat *domain.Boat) error {
 // SaveChildsChanges takes all the staterooms in the boat and save their changes in the datanase (or
 // inserts a new stateroom if it's a new one)
 func (repo boatPrimitiveRepoBehaivor) SaveChildsChanges(boat *domain.Boat) error {
-	stateRoomRepo := stateRoomDB.NewStateRoomRepository()
 	for _, stateRoom := range boat.StateRooms() {
-		err := stateRoomRepo.Save(stateRoom)
+		err := repo.stateRoomRepo.Save(stateRoom)
 		if err != nil {
 			return err
 		}
 	}
+	return nil
+}
+
+func (repo boatPrimitiveRepoBehaivor) SaveRelations(boat *domain.Boat) error {
 	return nil
 }

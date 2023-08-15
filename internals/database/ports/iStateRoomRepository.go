@@ -1,8 +1,11 @@
 package databaseport
 
-import "github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+import (
+	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+)
 
 type IStateRoomRepository interface {
-	repository[domain.StateRoom, int]
+	Repository[domain.StateRoom, int]
 	FindByBoatId(int) ([]domain.StateRoom, error)
+	FindByReservation(domain.Reservation) ([]domain.StateRoom, error)
 }

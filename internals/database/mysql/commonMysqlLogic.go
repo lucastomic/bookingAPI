@@ -39,7 +39,99 @@ func (repo CommonMysqlLogic[T, I]) Save(object T) error {
 	}
 	err = repo.SaveChildsChanges(&object)
 
+	if err != nil {
+		return err
+	}
+
+	err = repo.SaveRelations(&object)
+
 	return err
+}
+
+// FindById returns an object given its Id.
+// If the wanted row has more than one id (a compound ID), both IDs must be passed as argument
+// (for example, FindById(id1,id2))
+// If an error ocurrs, it returns an empty object with the error as second
+// value. If no error ocurrs, it returns the object as first parameter and nil as second
+func (repo CommonMysqlLogic[T, I]) FindById(id ...I) (T, error) {
+	idsParsed := repo.parseISliceToAnySlice(id)
+	stmt := repo.FindByIdStmt()
+	response, err := repo.Query(stmt, idsParsed)
+	if err != nil || len(response) == 0 {
+		return *repo.Empty(), err
+	}
+	return response[0], nil
+}
+
+// GetAll retrieves all the T objects form the database
+// In case of error, it returns an empty slice and the error.
+func (repo CommonMysqlLogic[T, I]) FindAll() ([]T, error) {
+	stmt := repo.FindAllStmt()
+	response, err := repo.Query(stmt, []any{})
+	if err != nil || len(response) == 0 {
+		return []T{}, err
+	}
+	return response, nil
+
+}
+
+// Remove removes a T object from the database
+// If an error ocurrs it returns it, otherwise return nil
+func (repo CommonMysqlLogic[T, I]) Remove(object T) error {
+	db := GetInstance()
+	stmt, err := db.Prepare(repo.RemoveStmt())
+	if err != nil {
+		return err
+	}
+	ids := repo.Id(object)
+	idsParsed := repo.parseISliceToAnySlice(ids)
+	_, err = stmt.Exec(idsParsed...)
+	defer stmt.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+// Query retrieves an slice of T objects given a Query statement and the params to execute it.
+// In case of error, it returns an empty slice and the error.
+// It's important that the Query Statement passed as argument, must return all the columns of the entity
+
+// For example, given the next statement
+// SELECT * FROM cats WHERE color = ? AND age = ?
+// And the next params
+// []any{"Orange", 4}
+// Then, it would return a slice with all the orange cats with 4 yeats old
+func (repo CommonMysqlLogic[T, I]) Query(queryStmt string, queryParams []any) ([]T, error) {
+	var response []T
+	db := GetInstance()
+	stmt, err := db.Prepare(queryStmt)
+	if err != nil {
+		return []T{}, err
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(queryParams...)
+	if err != nil {
+		return []T{}, err
+	}
+	for rows.Next() {
+		newValue, err := repo.getEntityFromRow(rows)
+		if err != nil {
+			return []T{}, err
+		}
+		response = append(response, newValue)
+	}
+
+	if err != nil {
+		return []T{}, err
+	}
+
+	return response, nil
+}
+
+func (repo CommonMysqlLogic[T, I]) ExecStmt(stmt string, params []any) error {
+	return ExecStmt(stmt, params)
 }
 
 // insertNew creates a new DB register given a T object
@@ -96,33 +188,6 @@ func (repo CommonMysqlLogic[T, I]) concatId(originalSlice []any, ids []I) []any 
 	return response
 }
 
-// FindById returns an object given its Id.
-// If the wanted row has more than one id (a compound ID), both IDs must be passed as argument
-// (for example, FindById(id1,id2))
-// If an error ocurrs, it returns an empty object with the error as second
-// value. If no error ocurrs, it returns the object as first parameter and nil as second
-func (repo CommonMysqlLogic[T, I]) FindById(id ...I) (T, error) {
-	idsParsed := repo.parseISliceToAnySlice(id)
-	stmt := repo.FindByIdStmt()
-	response, err := repo.Query(stmt, idsParsed)
-	if err != nil || len(response) == 0 {
-		return *repo.Empty(), err
-	}
-	return response[0], nil
-}
-
-// GetAll retrieves all the T objects form the database
-// In case of error, it returns an empty slice and the error.
-func (repo CommonMysqlLogic[T, I]) FindAll() ([]T, error) {
-	stmt := repo.FindAllStmt()
-	response, err := repo.Query(stmt, []any{})
-	if err != nil || len(response) == 0 {
-		return []T{}, err
-	}
-	return response, nil
-
-}
-
 // parseISliceToAnySlice parses a slice []I into a []any slice
 func (repo CommonMysqlLogic[T, I]) parseISliceToAnySlice(slice []I) []any {
 	response := make([]any, len(slice))
@@ -130,42 +195,6 @@ func (repo CommonMysqlLogic[T, I]) parseISliceToAnySlice(slice []I) []any {
 		response[i] = val
 	}
 	return response
-}
-
-// Query retrieves an slice of T objects given a Query statement and the params to execute it.
-// In case of error, it returns an empty slice and the error.
-// It's important that the Query Statement passed as argument, must return all the columns of the entity
-
-// For example, given the next statement
-// SELECT * FROM cats WHERE color = ? AND age = ?
-// And the next params
-// []any{"Orange", 4}
-// Then, it would return a slice with all the orange cats with 4 yeats old
-func (repo CommonMysqlLogic[T, I]) Query(queryStmt string, queryParams []any) ([]T, error) {
-	var response []T
-	db := GetInstance()
-	stmt, err := db.Prepare(queryStmt)
-	if err != nil {
-		return []T{}, err
-	}
-	defer stmt.Close()
-	rows, err := stmt.Query(queryParams...)
-	if err != nil {
-		return []T{}, err
-	}
-	for rows.Next() {
-		newValue, err := repo.getEntityFromRow(rows)
-		if err != nil {
-			return []T{}, err
-		}
-		response = append(response, newValue)
-	}
-
-	if err != nil {
-		return []T{}, err
-	}
-
-	return response, nil
 }
 
 // getEntityFromRow retrieves the corrspondient object in the rows and update
@@ -181,23 +210,4 @@ func (repo CommonMysqlLogic[T, I]) getEntityFromRow(rows *sql.Rows) (T, error) {
 		return *repo.Empty(), err
 	}
 	return response, nil
-}
-
-// Remove removes a T object from the database
-// If an error ocurrs it returns it, otherwise return nil
-func (repo CommonMysqlLogic[T, I]) Remove(object T) error {
-	db := GetInstance()
-	stmt, err := db.Prepare(repo.RemoveStmt())
-	if err != nil {
-		return err
-	}
-	ids := repo.Id(object)
-	idsParsed := repo.parseISliceToAnySlice(ids)
-	_, err = stmt.Exec(idsParsed...)
-	defer stmt.Close()
-	if err != nil {
-		return err
-	}
-	return nil
-
 }

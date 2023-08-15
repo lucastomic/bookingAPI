@@ -1,7 +1,9 @@
 package databaseport
 
-import "github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+import (
+	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+)
 
-type UserRepository interface {
-	repository[domain.User, string]
+type IUserRepository interface {
+	Repository[domain.User, string]
 }

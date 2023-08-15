@@ -12,7 +12,8 @@ CREATE TABLE boat(
   id INT AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL,
   owner VARCHAR(255) NOT NULL,
-  PRIMARY KEY(id)
+  
+  PRIMARY KEY(id),
   FOREIGN KEY(owner) REFERENCES user(email)
 );
 
@@ -25,15 +26,38 @@ CREATE TABLE stateRoom(
 
 CREATE TABLE reservation(
   id INT AUTO_INCREMENT,
-  name VARCHAR(255) NOT NULL,
-  phone VARCHAR(255) NOT NULL,
   firstDay DATE NOT NULL,
   lastDay DATE NOT NULL,
+  passengers INT,
+  isOpen BOOLEAN,
   boatId INT NOT NULL,
-  stateRoomId INT NOT NULL,
   
   PRIMARY KEY(id),
-  FOREIGN KEY(boatId, stateRoomId) REFERENCES stateRoom(boatId,id)
+  FOREIGN KEY(boatId) REFERENCES boat(boatId)
+);
+
+CREATE TABLE client(
+  id INT AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  phone VARCHAR(255) NOT NULL,
+  PRIMARY KEY(id)
+);
+
+CREATE TABLE client_reservation(
+  client_id INT NOT NULL,
+  reservation_id INT NOT NULL,
+
+  FOREIGN KEY(client_id) REFERENCES client(id),
+  FOREIGN KEY(reservation_id) REFERENCES reservation(id)
 );
 
 
+CREATE TABLE stateRoom_reservation(
+  reservation_id INT NOT NULL,
+  stateroom_id INT NOT NULL,
+  boat_id INT NOT NULL,
+
+  FOREIGN KEY(reservation_id) REFERENCES reservation(id),
+  FOREIGN KEY(stateroom_id) REFERENCES stateRoom(id)
+  FOREIGN KEY(boat_id) REFERENCES boat(id)
+);

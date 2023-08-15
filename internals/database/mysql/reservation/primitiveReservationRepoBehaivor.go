@@ -4,15 +4,18 @@ import (
 	"database/sql"
 	"time"
 
+	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
 )
 
 type reservationPrimitiveRepoBehaivor struct {
+	clientRepository      databaseport.IClientRepository
+	clientReservationRepo databaseport.RelationSaver[domain.Client, domain.Reservation]
 }
 
-const insertStmt string = "INSERT INTO reservation(name, phone,firstDay,lastDay,boatId,stateRoomId) VALUES(?,?,?,?,?,?)"
-const updateStmt string = "UPDATE reservation SET name = ?,phone = ?, firstDay = ?, lastDay = ?, boatId = ?, stateRoomId = ? WHERE id = ?"
+const insertStmt string = "INSERT INTO reservation(firstDay,lastDay,passengers,isOpen,boatId) VALUES(?,?,?,?,?)"
+const updateStmt string = "UPDATE reservation SET firstDay = ?, lastDay = ?, passengers = ?, isOpen = ?, boatId = ? WHERE id = ?"
 const findByIdStmt string = "SELECT * FROM reservation WHERE id = ?"
 const findAllStmt string = "SELECT * FROM reservation"
 const removeStmt string = "DELETE FROM reservation WHERE id = ?"
@@ -20,17 +23,12 @@ const removeStmt string = "DELETE FROM reservation WHERE id = ?"
 func (repo reservationPrimitiveRepoBehaivor) InsertStmt() string {
 	return insertStmt
 }
-
 func (repo reservationPrimitiveRepoBehaivor) RemoveStmt() string {
 	return removeStmt
 }
-
-// UpdateStmt returns the SQL statement for updating a reservation in the database.
 func (repo reservationPrimitiveRepoBehaivor) UpdateStmt() string {
 	return updateStmt
 }
-
-// FindByIdStmt returns the SQL statement for finding a reservation by its ID in the database.
 func (repo reservationPrimitiveRepoBehaivor) FindByIdStmt() string {
 	return findByIdStmt
 }
@@ -38,49 +36,66 @@ func (repo reservationPrimitiveRepoBehaivor) FindAllStmt() string {
 	return findAllStmt
 }
 
-// PersistenceValues returns a slice of type []any that contains the values of the reservation's properties to be persisted in the database.
 func (repo reservationPrimitiveRepoBehaivor) PersistenceValues(reservation domain.Reservation) []any {
-	return []any{reservation.Email(), reservation.UserPhone(), time.Time(reservation.FirstDay()), time.Time(reservation.LastDay()), reservation.BoatId(), reservation.StateRoomId()}
+	return []any{time.Time(reservation.FirstDay()), time.Time(reservation.LastDay()), reservation.Passengers(), reservation.IsOpen(), reservation.BoatId()}
 }
 
-// Id returns a slice of type []int that contains the ID of the reservation to be used as a parameter in database operations.
 func (repo reservationPrimitiveRepoBehaivor) Id(reservation domain.Reservation) []int {
 	return []int{reservation.Id()}
 }
 
-// Empty returns a pointer to an empty domain.Reservation object, which can be used as a placeholder or default value.
 func (repo reservationPrimitiveRepoBehaivor) Empty() *domain.Reservation {
 	return domain.EmptyReservation()
 }
 
-// IsZero returns a boolean value indicating whether the reservation object has all its properties set to zero values, which typically indicates that it is empty or uninitialized.
 func (repo reservationPrimitiveRepoBehaivor) IsZero(reservation domain.Reservation) bool {
-	return reservation.Id() == 0 && reservation.BoatId() == 0 && reservation.FirstDay().IsZero() && reservation.LastDay().IsZero() && reservation.StateRoomId() == 0
+	return reservation.Id() == 0 && reservation.FirstDay().IsZero() && reservation.LastDay().IsZero()
 }
 
-// Scan takes a pointer to a sql.Rows object as input and scans the rows to populate a domain.Reservation object, which is then returned
-// along with any error that may occur during scanning.
 func (repo reservationPrimitiveRepoBehaivor) Scan(rows *sql.Rows) (domain.Reservation, error) {
-	var id, boatId, stateRoomId int
-	var name, phone, firstDay, lastDay string
+	var id, boatId, passengers int
+	var firstDay, lastDay string
+	var isOpen bool
 
-	err := rows.Scan(&id, &name, &phone, &firstDay, &lastDay, &boatId, &stateRoomId)
+	err := rows.Scan(&id, &firstDay, &lastDay, &passengers, &isOpen, &boatId)
 	if err != nil {
 		return *domain.EmptyReservation(), err
 	}
 
-	user := domain.NewClient(name, phone)
 	firstDayParsed, _ := timesimplified.FromString(firstDay)
 	lastDayParsed, _ := timesimplified.FromString(lastDay)
 
-	return *domain.NewReservation(id, user, firstDayParsed, lastDayParsed, boatId, stateRoomId), nil
+	if err != nil {
+		return *domain.EmptyReservation(), err
+	}
+
+	return *domain.NewReservationWithoutClient(id, firstDayParsed, lastDayParsed, isOpen, passengers, boatId), nil
 }
 
-// UpdateRelations takes a pointer to a domain.Reservation object as input and updates any related
-// entities or relationships in the database. Currently, it returns nil and does not perform any actual updates.
 func (repo reservationPrimitiveRepoBehaivor) UpdateRelations(reservation *domain.Reservation) error {
+	clients, err := repo.clientRepository.FindByReservation(*reservation)
+	if err != nil {
+		return err
+	}
+	reservation.SetClients(clients)
 	return nil
 }
+
 func (repo reservationPrimitiveRepoBehaivor) SaveChildsChanges(reservation *domain.Reservation) error {
+	for _, client := range reservation.Clients() {
+		err := repo.clientRepository.Save(client)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func (repo reservationPrimitiveRepoBehaivor) SaveRelations(reservation *domain.Reservation) error {
+	for _, client := range reservation.Clients() {
+		err := repo.clientReservationRepo.Save(client, *reservation)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }

@@ -3,13 +3,15 @@ package stateRoomDB
 import (
 	"database/sql"
 
-	reservationDB "github.com/lucastomic/naturalYSalvajeRent/internals/database/mysql/reservation"
+	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 )
 
 // stateRoomPrimitiveRepoBehaivor implements the behaivor needed for implementing a
 // CommmonMysqlRepository[stateRoomPrimitiveRepoBehaivor,int]
 type stateRoomPrimitiveRepoBehaivor struct {
+	reservationRepo       databaseport.IReservationRepository
+	clientReservationRepo databaseport.RelationSaver[domain.StateRoom, domain.Reservation]
 }
 
 const insertStateRoomStmt string = "INSERT INTO stateRoom(id, boatId) VALUES(?,?)"
@@ -79,8 +81,7 @@ func (repo stateRoomPrimitiveRepoBehaivor) Scan(row *sql.Rows) (domain.StateRoom
 }
 
 func (repo stateRoomPrimitiveRepoBehaivor) UpdateRelations(stateRoom *domain.StateRoom) error {
-	reservationRepo := reservationDB.NewReservationRepository()
-	stateRoomReservations, err := reservationRepo.FindByStateRoom(*stateRoom)
+	stateRoomReservations, err := repo.reservationRepo.FindByStateRoom(*stateRoom)
 	if err != nil {
 		return err
 	}
@@ -90,13 +91,21 @@ func (repo stateRoomPrimitiveRepoBehaivor) UpdateRelations(stateRoom *domain.Sta
 
 // SaveChildsChanges takes all the stateroom's reservations and persists them
 func (repo stateRoomPrimitiveRepoBehaivor) SaveChildsChanges(stateRoom *domain.StateRoom) error {
-	reservationRepo := reservationDB.NewReservationRepository()
 	for _, reservation := range stateRoom.Reservations() {
-		err := reservationRepo.Save(reservation)
+		err := repo.reservationRepo.Save(reservation)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
+}
 
+func (repo stateRoomPrimitiveRepoBehaivor) SaveRelations(stateRoom *domain.StateRoom) error {
+	for _, reservation := range stateRoom.Reservations() {
+		err := repo.clientReservationRepo.Save(*stateRoom, reservation)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

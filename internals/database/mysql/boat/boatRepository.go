@@ -2,6 +2,7 @@ package boatDB
 
 import (
 	"github.com/lucastomic/naturalYSalvajeRent/internals/database/mysql"
+	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 )
 
@@ -12,8 +13,14 @@ type BoatRepository struct {
 
 const findBoatsByOwnerStmt string = "SELECT * FROM boat WHERE owner = ? "
 
-func NewBoatRepository() BoatRepository {
-	commonBehaivor := newBoatCommonMysqlLogic()
+func NewBoatRepository(
+	stateRoomRepo databaseport.IStateRoomRepository,
+) BoatRepository {
+	commonBehaivor := mysql.CommonMysqlLogic[domain.Boat, int]{
+		IPrimitiveRepoBehaivor: boatPrimitiveRepoBehaivor{
+			stateRoomRepo: stateRoomRepo,
+		},
+	}
 	return BoatRepository{commonBehaivor}
 }
 

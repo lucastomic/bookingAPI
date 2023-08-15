@@ -3,11 +3,12 @@ package userDB
 import (
 	"database/sql"
 
-	boatDB "github.com/lucastomic/naturalYSalvajeRent/internals/database/mysql/boat"
+	databaseport "github.com/lucastomic/naturalYSalvajeRent/internals/database/ports"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 )
 
 type userPrimitiveRepoBehaivor struct {
+	boatRepo databaseport.IBoatRepository
 }
 
 const insertStmt string = "INSERT INTO user(email,password) VALUES(?,?)"
@@ -73,8 +74,7 @@ func (repo userPrimitiveRepoBehaivor) Scan(row *sql.Rows) (domain.User, error) {
 }
 
 func (repo userPrimitiveRepoBehaivor) UpdateRelations(user *domain.User) error {
-	boatRepo := boatDB.NewBoatRepository()
-	boats, err := boatRepo.FindByUser(user.Email())
+	boats, err := repo.boatRepo.FindByUser(user.Email())
 	if err != nil {
 		return err
 	}
@@ -85,12 +85,14 @@ func (repo userPrimitiveRepoBehaivor) UpdateRelations(user *domain.User) error {
 // SaveChildsChanges takes all the staterooms in the user and save their changes in the datanase (or
 // inserts a new stateroom if it's a new one)
 func (repo userPrimitiveRepoBehaivor) SaveChildsChanges(user *domain.User) error {
-	boatRepo := boatDB.NewBoatRepository()
 	for _, boat := range user.Boats() {
-		err := boatRepo.Save(boat)
+		err := repo.boatRepo.Save(boat)
 		if err != nil {
 			return err
 		}
 	}
+	return nil
+}
+func (repo userPrimitiveRepoBehaivor) SaveRelations(user *domain.User) error {
 	return nil
 }

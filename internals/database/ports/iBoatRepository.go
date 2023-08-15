@@ -1,8 +1,10 @@
 package databaseport
 
-import "github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+import (
+	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+)
 
-type BoatRepository interface {
-	repository[domain.Boat, int]
+type IBoatRepository interface {
+	Repository[domain.Boat, int]
 	FindByUser(email string) ([]domain.Boat, error)
 }
