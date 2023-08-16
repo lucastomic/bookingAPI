@@ -11,7 +11,7 @@ import (
 var today = timesimplified.Now()
 
 func newReservation(startDay int, finalDay int) *domain.Reservation {
-	return domain.NewReservation(0, today.AddDays(startDay), today.AddDays(finalDay), user1, false, 0)
+	return domain.NewReservation(0, today.AddDays(startDay), today.AddDays(finalDay), user1, true, 0)
 }
 
 var stateRoom1 = domain.NewStateRoom(0, 0, []*domain.Reservation{
@@ -102,7 +102,7 @@ var addReservationTests = []struct {
 func TestAddReservation(t *testing.T) {
 	for _, tt := range addReservationTests {
 		t.Run(tt.Name(), func(t *testing.T) {
-			err := boatService.AddReservation(tt.Boat, tt.Reservation)
+			err := boatService.ReservateStateroom(tt.Boat, tt.Reservation)
 			if (err != nil) == tt.expected {
 				t.Errorf("Failed")
 			}

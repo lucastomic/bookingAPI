@@ -88,20 +88,16 @@ func (b boatService) GetFullCapacityDays(boat domain.Boat) []string {
 	return response
 }
 
-// AddReservation adds a new reservation to a boat.
-// It looks for a free date's range in all the boat's stateRooms which matchs with the reservation one
-// If there isn't a free range it reallocates all the reservations (except those which have already started)
-// in a way the new reservation can be placed.
-// If is impossilbe to allocate the reservation it throws an error.
-func (b boatService) AddReservation(boat domain.Boat, reservation domain.Reservation) error {
-	couldReserve := boat.AddReservation(&reservation)
-	if !couldReserve {
-		err := reservesreallocator.RealloacteReserves(&boat, &reservation)
-		if err != nil {
-			return exceptions.ReservationCollides
-		}
+func (b boatService) ReservateStateroom(boat domain.Boat, reservation domain.Reservation) error {
+	if boat.TimeRangeHasDisponibility(reservation) {
+		err := boat.ReservateStateroom(&reservation)
+		return err
 	}
-	err := b.Save(&boat)
+	err := reservesreallocator.RealloacteReserves(&boat, &reservation)
+	if err != nil {
+		return exceptions.ReservationCollides
+	}
+	err = b.Save(&boat)
 	return err
 }
 

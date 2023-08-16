@@ -198,7 +198,7 @@ func addReservation(c *gin.Context) {
 		exceptionhandling.HandleException(c, err)
 		return
 	}
-	err = boatService.AddReservation(boat, reservation)
+	err = boatService.ReservateStateroom(boat, reservation)
 	if err != nil {
 		exceptionhandling.HandleException(c, err)
 	}

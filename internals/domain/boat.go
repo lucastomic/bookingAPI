@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"errors"
+
 	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
 )
 
@@ -61,20 +63,33 @@ func (b Boat) GetUnstartedReservations() []*Reservation {
 	return response
 }
 
-// AddReservation looks for a free date's range in all the boat's stateRooms which matchs with the reservation
-// one. If there is place to set the reservation, it adds to the stateroom and change the reservation's stateRoomId.
-// It doesn't reallocates any reservation of the boat. In others words, does NOT change any reservation already reserved on the boat
-// Returns true if the reservation was allocated propperly and false if there is no any free range for the reservation
-func (b *Boat) AddReservation(reservation *Reservation) bool {
-	couldReservate := false
+func (b *Boat) TimeRangeHasDisponibility(reservation Reservation) bool {
+	response := false
 	i := 0
-	for i < len(b.StateRooms()) && !couldReservate {
+	for i < len(b.StateRooms()) && !response {
 		stateRoom := &b.StateRooms()[i]
-		err := (*stateRoom).AddReservation(reservation)
-		couldReservate = err == nil
+		response = (*stateRoom).CanReservate(reservation)
 		i++
 	}
-	return couldReservate
+	return response
+}
+
+func (b *Boat) ReservateStateroom(reservation *Reservation) error {
+	if !reservation.IsOpen() {
+		return errors.New("can't allocate close reservations in only one stateroom. Must be allocated in the entire boat")
+	}
+	if !b.TimeRangeHasDisponibility(*reservation) {
+		return errors.New("there is not enough space for this reservation")
+	}
+	i := 0
+	for _, stateRoom := range b.StateRooms() {
+		if (*stateRoom).CanReservate(*reservation) {
+			stateRoom.AddReservation(reservation)
+			break
+		}
+		i++
+	}
+	return nil
 }
 
 // ReservateFullBoat reservates all the staterooms in the boat.

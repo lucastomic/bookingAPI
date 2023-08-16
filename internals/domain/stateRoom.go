@@ -46,7 +46,7 @@ func (s *StateRoom) SetReservedDays(reservation []*Reservation) {
 // AddReservation adds a new reservation to a stateroom. If the reservation collides with another
 // reservation already reserved, it throws an error
 func (s *StateRoom) AddReservation(reservation *Reservation) error {
-	if !s.ableToReservate(*reservation) {
+	if !s.CanReservate(*reservation) {
 		return errors.New("reservation collides with another reservation")
 	}
 	s.reservations = append(s.reservations, reservation)
@@ -82,7 +82,7 @@ func (s *StateRoom) RemoveReservation(reservationToRemve Reservation) error {
 
 // ableToReservate checks whether the range of a given reservation is completly free for reservate in the
 // stateroom
-func (s *StateRoom) ableToReservate(reservationToCheck Reservation) bool {
+func (s *StateRoom) CanReservate(reservationToCheck Reservation) bool {
 	for _, stateRoomReservation := range s.reservations {
 		if stateRoomReservation.Overlaps(reservationToCheck) {
 			return false
