@@ -56,6 +56,10 @@ func (b userPrimitiveRepoBehaivor) Id(user domain.User) []string {
 	return []string{user.Email()}
 }
 
+func (repo userPrimitiveRepoBehaivor) ModifyId(user *domain.User, id int64) {
+	//Doesn't have to modify it
+}
+
 // isZero checks wether the user specified as paramter is a zero user
 func (b userPrimitiveRepoBehaivor) IsZero(user domain.User) bool {
 	return user.Email() == ""
@@ -65,7 +69,7 @@ func (b userPrimitiveRepoBehaivor) IsZero(user domain.User) bool {
 func (repo userPrimitiveRepoBehaivor) Scan(row *sql.Rows) (domain.User, error) {
 	var email string
 	var password string
-	var boats []domain.Boat = []domain.Boat{}
+	var boats []*domain.Boat = []*domain.Boat{}
 	err := row.Scan(&email, &password)
 	if err != nil {
 		return *domain.EmptyUser(), err

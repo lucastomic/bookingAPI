@@ -11,16 +11,16 @@ type Reservation struct {
 	id         int
 	firstDay   timesimplified.Time
 	lastDay    timesimplified.Time
-	clients    []Client
+	clients    []*Client
 	passengers int
 	isOpen     bool
 	boatId     int
 }
 
-func (r Reservation) Clients() []Client {
+func (r Reservation) Clients() []*Client {
 	return r.clients
 }
-func (r *Reservation) SetClients(clients []Client) {
+func (r *Reservation) SetClients(clients []*Client) {
 	r.clients = clients
 }
 
@@ -47,6 +47,10 @@ func (r Reservation) IsOpen() bool {
 // Id returns the unique ID of the reservation.
 func (r Reservation) Id() int {
 	return r.id
+}
+
+func (r *Reservation) SetId(id int) {
+	r.id = id
 }
 
 // IsZero checks whether the reservation is a zero value
@@ -120,10 +124,10 @@ func EmptyReservation() *Reservation {
 }
 
 // NewReservation creates and returns a new Reservation struct pointer with the provided parameters.
-func NewReservation(id int, firstDay timesimplified.Time, lastDay timesimplified.Time, client Client, isOpen bool, passengers int, boatId int) *Reservation {
+func NewReservation(id int, firstDay timesimplified.Time, lastDay timesimplified.Time, client *Client, isOpen bool, passengers int, boatId int) *Reservation {
 	return &Reservation{
 		id:         id,
-		clients:    []Client{client},
+		clients:    []*Client{client},
 		firstDay:   firstDay,
 		lastDay:    lastDay,
 		isOpen:     isOpen,
@@ -134,7 +138,7 @@ func NewReservation(id int, firstDay timesimplified.Time, lastDay timesimplified
 func NewReservationWithoutClient(id int, firstDay timesimplified.Time, lastDay timesimplified.Time, isOpen bool, passengers int, boatId int) *Reservation {
 	return &Reservation{
 		id:         id,
-		clients:    []Client{},
+		clients:    []*Client{},
 		firstDay:   firstDay,
 		lastDay:    lastDay,
 		isOpen:     isOpen,

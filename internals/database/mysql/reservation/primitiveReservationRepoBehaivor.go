@@ -44,6 +44,10 @@ func (repo reservationPrimitiveRepoBehaivor) Id(reservation domain.Reservation) 
 	return []int{reservation.Id()}
 }
 
+func (repo reservationPrimitiveRepoBehaivor) ModifyId(reservation *domain.Reservation, id int64) {
+	reservation.SetId(int(id))
+}
+
 func (repo reservationPrimitiveRepoBehaivor) Empty() *domain.Reservation {
 	return domain.EmptyReservation()
 }
@@ -92,7 +96,7 @@ func (repo reservationPrimitiveRepoBehaivor) SaveChildsChanges(reservation *doma
 }
 func (repo reservationPrimitiveRepoBehaivor) SaveRelations(reservation *domain.Reservation) error {
 	for _, client := range reservation.Clients() {
-		err := repo.clientReservationRepo.Save(client, *reservation)
+		err := repo.clientReservationRepo.Save(*client, *reservation)
 		if err != nil {
 			return err
 		}

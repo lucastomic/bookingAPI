@@ -43,7 +43,7 @@ func (s StateRoomService) setStateRoomId(stateRoom *domain.StateRoom) error {
 // UpdateStateRoom updates an existing state room by calling the Save() method with the given state room,
 // and returns the updated state room or an error if the save operation fails.
 func (s StateRoomService) UpdateStateRoom(stateRoom domain.StateRoom) (domain.StateRoom, error) {
-	err := s.Save(stateRoom)
+	err := s.Save(&stateRoom)
 	if err != nil {
 		return *domain.EmptyStateRoom(), err
 	}

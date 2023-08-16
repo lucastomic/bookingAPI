@@ -25,7 +25,7 @@ func (s ReservationServcie) CreateReservation(reservation domain.Reservation) er
 // UpdateReservation updates an existing reservation by calling the Save() method with the given reservation,
 // and returns an error if the save operation fails.
 func (s ReservationServcie) UpdateReservation(reservation domain.Reservation) error {
-	err := s.Save(reservation)
+	err := s.Save(&reservation)
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,6 @@ func (s ReservationServcie) DeleteReservation(reservation domain.Reservation) er
 
 // ParseReservationRequest retrieeves a Reservation given a reservationRequest. If there is an error, it specifies
 func (s ReservationServcie) ParseReservationRequest(req reservationrequest.ReservationRequest) (domain.Reservation, error) {
-
 	firstDay, err := timesimplified.FromString(req.FirstDay)
 	if err != nil {
 		ex := exceptions.NewApiError(http.StatusBadRequest, "Bad firstDay format. Must be a string with yyyy-mm-dd format")
@@ -69,6 +68,6 @@ func (s ReservationServcie) ParseReservationRequest(req reservationrequest.Reser
 		return *domain.EmptyReservation(), ex
 	}
 	user := domain.NewClient(req.Email, req.Phone)
-	reservation := domain.NewReservation(0, firstDay, lastDay, *user, false, 0, 0)
+	reservation := domain.NewReservation(0, firstDay, lastDay, user, req.IsOpen, req.Passengers, req.BoatId)
 	return *reservation, nil
 }

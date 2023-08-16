@@ -12,7 +12,7 @@ type StateRoomRepository struct {
 }
 
 const findStateRoomByBoatIDStmt string = "SELECT * FROM stateRoom WHERE boatId = ? "
-const findByReservationIDStmt string = "SELECT * FROM stateRoom JOIN stateRoom_reservation ON stateRoom.id = stateRoom_reservation.stateroom_id AND stateRoom.boatId = stateRoom_reservation.boat_id WHERE = stateRoom_reservation.reservation_id = ?"
+const findByReservationIDStmt string = "SELECT id,boatId FROM stateRoom JOIN stateRoom_reservation ON stateRoom.id = stateRoom_reservation.stateroom_id AND stateRoom.boatId = stateRoom_reservation.boat_id WHERE = stateRoom_reservation.reservation_id = ?"
 
 func NewStateRoomRepository(
 	reservationRepo databaseport.IReservationRepository,
@@ -23,17 +23,17 @@ func NewStateRoomRepository(
 	}
 	return StateRoomRepository{commonBehaivor}
 }
-func (repo StateRoomRepository) FindByBoatId(boatId int) ([]domain.StateRoom, error) {
+func (repo StateRoomRepository) FindByBoatId(boatId int) ([]*domain.StateRoom, error) {
 	response, err := repo.Query(findStateRoomByBoatIDStmt, []any{boatId})
 	if err != nil {
-		return []domain.StateRoom{}, err
+		return []*domain.StateRoom{}, err
 	}
 	return response, nil
 }
-func (repo StateRoomRepository) FindByReservation(reservation domain.Reservation) ([]domain.StateRoom, error) {
+func (repo StateRoomRepository) FindByReservation(reservation domain.Reservation) ([]*domain.StateRoom, error) {
 	response, err := repo.Query(findByReservationIDStmt, []any{reservation.Id()})
 	if err != nil {
-		return []domain.StateRoom{}, err
+		return []*domain.StateRoom{}, err
 	}
 	return response, nil
 }

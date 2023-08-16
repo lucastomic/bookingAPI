@@ -12,7 +12,7 @@ type stateRoomViewJSON struct {
 func (view stateRoomViewJSON) ParseView(stateRoom domain.StateRoom) gin.H {
 	var parsedReservations []gin.H = []gin.H{}
 	for _, reservation := range stateRoom.Reservations() {
-		view.appendAsJson(&parsedReservations, reservation)
+		view.appendAsJson(&parsedReservations, *reservation)
 	}
 	return gin.H{
 		"id":           stateRoom.Id(),

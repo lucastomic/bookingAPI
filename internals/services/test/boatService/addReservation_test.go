@@ -11,60 +11,64 @@ import (
 var today = timesimplified.Now()
 
 func newReservation(startDay int, finalDay int) *domain.Reservation {
-	return domain.NewReservation(0, today.AddDays(startDay), today.AddDays(finalDay), *user1, false, 2, 0)
+	return domain.NewReservation(0, today.AddDays(startDay), today.AddDays(finalDay), user1, false, 2, 0)
 }
 
-var stateRoom1 = domain.NewStateRoom(0, 0, []domain.Reservation{
-	*newReservation(0, 3), *newReservation(5, 8), *newReservation(10, 11), *newReservation(13, 16),
+var stateRoom1 = domain.NewStateRoom(0, 0, []*domain.Reservation{
+	newReservation(0, 3), newReservation(5, 8), newReservation(10, 11), newReservation(13, 16),
 })
 
-var stateRoom2 = domain.NewStateRoom(0, 0, []domain.Reservation{
-	*newReservation(0, 1), *newReservation(3, 7), *newReservation(9, 11), *newReservation(13, 14),
+var stateRoom2 = domain.NewStateRoom(0, 0, []*domain.Reservation{
+	newReservation(0, 1), newReservation(3, 7), newReservation(9, 11), newReservation(13, 14),
 })
 
-var stateRoom3 = domain.NewStateRoom(0, 0, []domain.Reservation{
-	*newReservation(1, 4), *newReservation(7, 10), *newReservation(14, 17),
+var stateRoom3 = domain.NewStateRoom(0, 0, []*domain.Reservation{
+	newReservation(1, 4), newReservation(7, 10), newReservation(14, 17),
 })
 
-var stateRoom4 = domain.NewStateRoom(0, 0, []domain.Reservation{
-	*newReservation(0, 2), *newReservation(4, 7), *newReservation(11, 13),
+var stateRoom4 = domain.NewStateRoom(0, 0, []*domain.Reservation{
+	newReservation(0, 2), newReservation(4, 7), newReservation(11, 13),
 })
 
-var boatWithReservations = domain.NewBoat("Boat with reservations", []domain.StateRoom{
-	*stateRoom1,
-	*stateRoom2,
-	*stateRoom3,
-	*stateRoom4,
+var stateRoom5 = domain.NewStateRoom(0, 0, []*domain.Reservation{
+	newReservation(0, 3), newReservation(5, 8), newReservation(10, 11), newReservation(13, 16),
 })
 
-var emptyBoat = domain.NewBoat("Empty boat", []domain.StateRoom{
-	*domain.EmptyStateRoom(),
-})
+var boatWithReservations = domain.NewBoat("Boat with reservations", []*domain.StateRoom{
+	stateRoom1,
+	stateRoom2,
+	stateRoom3,
+	stateRoom4,
+}, "")
 
-var firstDaysReserved = domain.NewBoat("First days reserved", []domain.StateRoom{
-	*stateRoom1,
-})
+var emptyBoat = domain.NewBoat("Empty boat", []*domain.StateRoom{
+	domain.EmptyStateRoom(),
+}, "")
 
-var possibleBoat = domain.NewBoat("Unable reservate", []domain.StateRoom{
-	*domain.NewStateRoom(0, 0, []domain.Reservation{
-		*newReservation(0, 3),
-		*newReservation(4, 7),
-		*newReservation(11, 17),
+var firstDaysReserved = domain.NewBoat("First days reserved", []*domain.StateRoom{
+	stateRoom5,
+}, "")
+
+var possibleBoat = domain.NewBoat("Unable reservate", []*domain.StateRoom{
+	domain.NewStateRoom(0, 0, []*domain.Reservation{
+		newReservation(0, 3),
+		newReservation(4, 7),
+		newReservation(11, 17),
 	}),
-	*domain.NewStateRoom(0, 0, []domain.Reservation{
-		*newReservation(3, 5),
-		*newReservation(8, 9),
-		*newReservation(0, 1),
+	domain.NewStateRoom(0, 0, []*domain.Reservation{
+		newReservation(3, 5),
+		newReservation(8, 9),
+		newReservation(0, 1),
 	}),
-	*domain.NewStateRoom(0, 0, []domain.Reservation{
-		*newReservation(1, 3),
-		*newReservation(6, 9),
+	domain.NewStateRoom(0, 0, []*domain.Reservation{
+		newReservation(1, 3),
+		newReservation(6, 9),
 	}),
-	*domain.NewStateRoom(0, 0, []domain.Reservation{
-		*newReservation(0, 5),
-		*newReservation(7, 10),
+	domain.NewStateRoom(0, 0, []*domain.Reservation{
+		newReservation(0, 5),
+		newReservation(7, 10),
 	}),
-})
+}, "")
 
 var addReservationTests = []struct {
 	domain.Boat

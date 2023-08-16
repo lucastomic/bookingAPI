@@ -6,5 +6,5 @@ import (
 
 type IClientRepository interface {
 	Repository[domain.Client, int]
-	FindByReservation(reservation domain.Reservation) ([]domain.Client, error)
+	FindByReservation(reservation domain.Reservation) ([]*domain.Client, error)
 }

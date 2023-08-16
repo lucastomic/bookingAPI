@@ -39,7 +39,7 @@ func RealloacteReserves(boat *domain.Boat, reservation *domain.Reservation) erro
 // explore the different options to allocate the remaining reservations
 func recursiveRealloaction(
 	success *bool,
-	stateRooms *[]domain.StateRoom,
+	stateRooms *[]*domain.StateRoom,
 	reservations *datastructure.Queue[*domain.Reservation],
 ) {
 	if reservations.IsEmpty() {
@@ -52,13 +52,13 @@ func recursiveRealloaction(
 // exploreChildNodes takes a reservation queue and explore the different options to allocate it in the given staterooms.
 func exploreChildNodes(
 	success *bool,
-	stateRooms *[]domain.StateRoom,
+	stateRooms *[]*domain.StateRoom,
 	reservations *datastructure.Queue[*domain.Reservation],
 ) {
 	i := 0
 	reservation, _ := reservations.Pop()
 	for !*success && len(*stateRooms) > i {
-		if err := (*stateRooms)[i].AddReservation(*reservation); err == nil {
+		if err := (*stateRooms)[i].AddReservation(reservation); err == nil {
 			recursiveRealloaction(success, stateRooms, reservations)
 		}
 		if !*success {

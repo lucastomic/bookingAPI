@@ -20,7 +20,7 @@ type IBoatService interface {
 	GetBoat(boatId int) (domain.Boat, error)
 	// GetAllBoats retrieves all the boats.
 	// It returns a slice of domain.Boat objects along with any error encountered.
-	GetAllBoats() ([]domain.Boat, error)
+	GetAllBoats() ([]*domain.Boat, error)
 	// GetFullCapacityDays returns a list of dates on which the specified boat is fully booked.
 	// It takes a domain.Boat object as input and returns a slice of strings representing the full capacity days.
 	GetFullCapacityDays(domain.Boat) []string

@@ -6,6 +6,6 @@ import (
 
 type IStateRoomRepository interface {
 	Repository[domain.StateRoom, int]
-	FindByBoatId(int) ([]domain.StateRoom, error)
-	FindByReservation(domain.Reservation) ([]domain.StateRoom, error)
+	FindByBoatId(int) ([]*domain.StateRoom, error)
+	FindByReservation(domain.Reservation) ([]*domain.StateRoom, error)
 }

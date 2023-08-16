@@ -24,10 +24,10 @@ func NewBoatRepository(
 	return BoatRepository{commonBehaivor}
 }
 
-func (repo BoatRepository) FindByUser(email string) ([]domain.Boat, error) {
+func (repo BoatRepository) FindByUser(email string) ([]*domain.Boat, error) {
 	response, err := repo.Query(findBoatsByOwnerStmt, []any{email})
 	if err != nil {
-		return []domain.Boat{}, err
+		return []*domain.Boat{}, err
 	}
 	return response, nil
 }

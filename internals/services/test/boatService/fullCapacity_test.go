@@ -9,47 +9,47 @@ import (
 
 var date = timesimplified.NewTime(2023, 05, 3)
 
-func newRes(from int, to int) domain.Reservation {
-	return *domain.NewReservation(0, date.AddDays(from), date.AddDays(to), *user1, false, 0, 0)
+func newRes(from int, to int) *domain.Reservation {
+	return domain.NewReservation(0, date.AddDays(from), date.AddDays(to), user1, false, 0, 0)
 }
 
 // StateRooms for testing
-var stateRoom2daysReserved = *domain.NewStateRoom(0, 0, []domain.Reservation{
+var stateRoom2daysReserved = domain.NewStateRoom(0, 0, []*domain.Reservation{
 	newRes(0, 1),
 })
 
-var stateRoomReserved3days = *domain.NewStateRoom(1, 0, []domain.Reservation{
+var stateRoomReserved3days = domain.NewStateRoom(1, 0, []*domain.Reservation{
 	newRes(0, 2),
 })
 
-var stateRoomReserved4days = *domain.NewStateRoom(2, 0, []domain.Reservation{
+var stateRoomReserved4days = domain.NewStateRoom(2, 0, []*domain.Reservation{
 	newRes(0, 3),
 })
 
-var stateRoomReserved2daysAnd4th = *domain.NewStateRoom(0, 0, []domain.Reservation{
+var stateRoomReserved2daysAnd4th = domain.NewStateRoom(0, 0, []*domain.Reservation{
 	newRes(0, 1),
 	newRes(3, 3),
 })
 
-var boatWith3days = domain.NewBoatWithId(0, "3 days", []domain.StateRoom{
+var boatWith3days = domain.NewBoatWithId(0, "3 days", []*domain.StateRoom{
 	stateRoom2daysReserved,
 	stateRoomReserved3days,
 	stateRoomReserved4days,
-})
+}, "")
 
-var boatWithoutDays = domain.NewBoatWithId(0, "Without days", []domain.StateRoom{
+var boatWithoutDays = domain.NewBoatWithId(0, "Without days", []*domain.StateRoom{
 	stateRoom2daysReserved,
-	*domain.NewStateRoom(1, 0, []domain.Reservation{
-		*domain.NewReservation(0, date.AddDays(3), date.AddDays(4), *user1, false, 0, 0),
+	domain.NewStateRoom(1, 0, []*domain.Reservation{
+		domain.NewReservation(0, date.AddDays(3), date.AddDays(4), user1, false, 0, 0),
 	}),
-})
+}, "")
 
-var boatWithSeparatedRanges = domain.NewBoatWithId(2, "Separated range days", []domain.StateRoom{
+var boatWithSeparatedRanges = domain.NewBoatWithId(2, "Separated range days", []*domain.StateRoom{
 	stateRoomReserved4days,
 	stateRoomReserved2daysAnd4th,
 	stateRoomReserved2daysAnd4th,
 	stateRoomReserved2daysAnd4th,
-})
+}, "")
 var fullCapacityDaysTest = []struct {
 	boat     domain.Boat
 	expected []string

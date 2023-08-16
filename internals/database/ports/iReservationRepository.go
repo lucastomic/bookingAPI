@@ -6,6 +6,6 @@ import (
 
 type IReservationRepository interface {
 	Repository[domain.Reservation, int]
-	FindByStateRoom(domain.StateRoom) ([]domain.Reservation, error)
-	FindByClient(client domain.Client) ([]domain.Reservation, error)
+	FindByStateRoom(domain.StateRoom) ([]*domain.Reservation, error)
+	FindByClient(client domain.Client) ([]*domain.Reservation, error)
 }

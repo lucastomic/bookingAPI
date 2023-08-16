@@ -41,7 +41,7 @@ func (b boatService) CreateBoat(boat domain.Boat) (domain.Boat, error) {
 // UpdateBoat updates an existing boat by calling the Save() method with the given boat,
 // and returns the updated boat or an error if the save operation fails.
 func (b boatService) UpdateBoat(boat domain.Boat) (domain.Boat, error) {
-	err := b.Save(boat)
+	err := b.Save(&boat)
 	if err != nil {
 		return *domain.EmptyBoat(), err
 	}
@@ -73,11 +73,8 @@ func (b boatService) GetBoat(boatId int) (domain.Boat, error) {
 
 // GetAllBoats retrieves all boats by calling the FindAll() method,
 // and returns a slice of domain.Boat and an error.
-func (b boatService) GetAllBoats() ([]domain.Boat, error) {
+func (b boatService) GetAllBoats() ([]*domain.Boat, error) {
 	boats := authenticationstate.UserAuthenticated().Boats()
-	// if err != nil {
-	// 	return []domain.Boat{}, err
-	// }
 	return boats, nil
 }
 
@@ -104,7 +101,7 @@ func (b boatService) AddReservation(boat domain.Boat, reservation domain.Reserva
 			return exceptions.ReservationCollides
 		}
 	}
-	err := b.Save(boat)
+	err := b.Save(&boat)
 	return err
 }
 
@@ -125,6 +122,6 @@ func (b boatService) ResevateFullBoat(boat domain.Boat, reservation domain.Reser
 	if !couldReservate {
 		return exceptions.ReservationCollides
 	}
-	err := b.Save(boat)
+	err := b.Save(&boat)
 	return err
 }

@@ -28,7 +28,7 @@ func (as authenticationService) Register(email string, rawPassword string) error
 		return errors.New("failed to hash password")
 	}
 	user := domain.NewUserWithoutBoats(email, string(hashPassword))
-	err = as.Save(user)
+	err = as.Save(&user)
 	return err
 }
 

@@ -11,7 +11,7 @@ import (
 type StateRoom struct {
 	id           int
 	boatId       int
-	reservations []Reservation
+	reservations []*Reservation
 }
 
 // Id returns the id of the state room.
@@ -34,19 +34,19 @@ func (s *StateRoom) SetBoatId(boatId int) {
 }
 
 // Reservations returns the list of reservations made for the state room.
-func (s StateRoom) Reservations() []Reservation {
+func (s StateRoom) Reservations() []*Reservation {
 	return s.reservations
 }
 
 // SetReservedDays sets the list of reservations made for the state room.
-func (s *StateRoom) SetReservedDays(reservation []Reservation) {
+func (s *StateRoom) SetReservedDays(reservation []*Reservation) {
 	s.reservations = reservation
 }
 
 // AddReservation adds a new reservation to a stateroom. If the reservation collides with another
 // reservation already reserved, it throws an error
-func (s *StateRoom) AddReservation(reservation Reservation) error {
-	if !s.ableToReservate(reservation) {
+func (s *StateRoom) AddReservation(reservation *Reservation) error {
+	if !s.ableToReservate(*reservation) {
 		return errors.New("reservation collides with another reservation")
 	}
 	s.reservations = append(s.reservations, reservation)
@@ -55,13 +55,13 @@ func (s *StateRoom) AddReservation(reservation Reservation) error {
 
 // GetStartedReservation returns the current reservation (those which has already started but hasn't finished yet)
 // if it exists. If it doesn't existm returns a zero reservation
-func (s StateRoom) GetStartedReservation() Reservation {
+func (s StateRoom) GetStartedReservation() *Reservation {
 	for _, stateRoomReservation := range s.reservations {
 		if stateRoomReservation.Contains(timesimplified.Now()) {
 			return stateRoomReservation
 		}
 	}
-	return *new(Reservation)
+	return new(Reservation)
 }
 
 // RemoveReservation removes the given reservation. If the specified reservation is not
@@ -98,6 +98,6 @@ func EmptyStateRoom() *StateRoom {
 }
 
 // NewStateRoom creates and returns a new StateRoom with the given parameters.
-func NewStateRoom(id int, boatId int, reservedDays []Reservation) *StateRoom {
+func NewStateRoom(id int, boatId int, reservedDays []*Reservation) *StateRoom {
 	return &StateRoom{id, boatId, reservedDays}
 }

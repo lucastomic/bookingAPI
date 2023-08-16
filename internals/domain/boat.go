@@ -9,15 +9,15 @@ type Boat struct {
 	owner       string
 	id          int
 	name        string
-	stateRooms  []StateRoom
+	stateRooms  []*StateRoom
 }
 
-func NewBoat(name string, stateRooms []StateRoom) *Boat {
-	return &Boat{name: name, stateRooms: stateRooms}
+func NewBoat(name string, stateRooms []*StateRoom, owner string) *Boat {
+	return &Boat{name: name, stateRooms: stateRooms, owner: owner}
 }
 
-func NewBoatWithId(id int, name string, stateRooms []StateRoom) *Boat {
-	return &Boat{id: id, name: name, stateRooms: stateRooms}
+func NewBoatWithId(id int, name string, stateRooms []*StateRoom, owner string) *Boat {
+	return &Boat{id: id, name: name, stateRooms: stateRooms, owner: owner}
 }
 
 func EmptyBoat() *Boat {
@@ -26,6 +26,10 @@ func EmptyBoat() *Boat {
 
 func (b Boat) Id() int {
 	return b.id
+}
+
+func (b *Boat) SetId(id int) {
+	b.id = id
 }
 
 func (b Boat) Owner() string {
@@ -40,7 +44,7 @@ func (b *Boat) SetName(name string) {
 	b.name = name
 }
 
-func (b Boat) StateRooms() []StateRoom {
+func (b Boat) StateRooms() []*StateRoom {
 	return b.stateRooms
 }
 
@@ -50,7 +54,7 @@ func (b Boat) GetUnstartedReservations() []*Reservation {
 	for _, stateRoom := range b.stateRooms {
 		for i, reservation := range stateRoom.Reservations() {
 			if reservation.StartsAfter(timesimplified.Now()) {
-				response = append(response, &stateRoom.Reservations()[i])
+				response = append(response, stateRoom.Reservations()[i])
 			}
 		}
 	}
@@ -66,7 +70,7 @@ func (b *Boat) AddReservation(reservation *Reservation) bool {
 	i := 0
 	for i < len(b.StateRooms()) && !couldReservate {
 		stateRoom := &b.StateRooms()[i]
-		err := stateRoom.AddReservation(*reservation)
+		err := (*stateRoom).AddReservation(reservation)
 		couldReservate = err == nil
 		i++
 	}
@@ -80,7 +84,7 @@ func (b *Boat) ReservateFullBoat(reservation *Reservation) bool {
 	i := 0
 	stateroomsCopy := b.StateRooms()
 	for i < len(b.StateRooms()) && timeRangeIsAvailable {
-		err := stateroomsCopy[i].AddReservation(*reservation)
+		err := stateroomsCopy[i].AddReservation(reservation)
 		timeRangeIsAvailable = err == nil
 		i++
 	}
@@ -92,13 +96,13 @@ func (b *Boat) ReservateFullBoat(reservation *Reservation) bool {
 
 // GetStateRoomsWithStartedReservations retrieves the boat's staterooms with only thje reservations which has already started
 // It doesn't modifies the actual staterooms. Only returns a copy of them with the started reservations
-func (b Boat) GetStateRoomsWithStartedReservations() []StateRoom {
-	var response []StateRoom
+func (b Boat) GetStateRoomsWithStartedReservations() []*StateRoom {
+	var response []*StateRoom
 	for _, stateRoom := range b.stateRooms {
 		if reservation := stateRoom.GetStartedReservation(); !reservation.IsZero() {
-			stateRoom.SetReservedDays([]Reservation{stateRoom.GetStartedReservation()})
+			stateRoom.SetReservedDays([]*Reservation{stateRoom.GetStartedReservation()})
 		} else {
-			stateRoom.SetReservedDays([]Reservation{})
+			stateRoom.SetReservedDays([]*Reservation{})
 		}
 		response = append(response, stateRoom)
 	}
@@ -155,6 +159,6 @@ func (b Boat) updateHashDays(
 }
 
 // This method sets the state rooms of the boat.
-func (b *Boat) SetStateRooms(stateRooms []StateRoom) {
+func (b *Boat) SetStateRooms(stateRooms []*StateRoom) {
 	b.stateRooms = stateRooms
 }

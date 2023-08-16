@@ -6,5 +6,5 @@ import (
 
 type IBoatRepository interface {
 	Repository[domain.Boat, int]
-	FindByUser(email string) ([]domain.Boat, error)
+	FindByUser(email string) ([]*domain.Boat, error)
 }

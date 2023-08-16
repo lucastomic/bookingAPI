@@ -61,6 +61,10 @@ func (repo stateRoomPrimitiveRepoBehaivor) Id(stateRoom domain.StateRoom) []int 
 	return []int{stateRoom.Id(), stateRoom.BoatId()}
 }
 
+func (repo stateRoomPrimitiveRepoBehaivor) ModifyId(stateRoom *domain.StateRoom, id int64) {
+	//Doesn't have to be modified
+}
+
 // isZero checks wether the stateRoom specified as paramter is a zero boat
 func (repo stateRoomPrimitiveRepoBehaivor) IsZero(stateRoom domain.StateRoom) bool {
 	return stateRoom.Reservations() == nil && stateRoom.Id() == 0 && stateRoom.BoatId() == 0
@@ -71,7 +75,7 @@ func (repo stateRoomPrimitiveRepoBehaivor) Scan(row *sql.Rows) (domain.StateRoom
 	var id int
 	var boatId int
 
-	var reservedDays []domain.Reservation = []domain.Reservation{}
+	var reservedDays []*domain.Reservation = []*domain.Reservation{}
 	err := row.Scan(&id, &boatId)
 	if err != nil {
 		return *domain.EmptyStateRoom(), err
@@ -102,7 +106,7 @@ func (repo stateRoomPrimitiveRepoBehaivor) SaveChildsChanges(stateRoom *domain.S
 
 func (repo stateRoomPrimitiveRepoBehaivor) SaveRelations(stateRoom *domain.StateRoom) error {
 	for _, reservation := range stateRoom.Reservations() {
-		err := repo.clientReservationRepo.Save(*stateRoom, reservation)
+		err := repo.clientReservationRepo.Save(*stateRoom, *reservation)
 		if err != nil {
 			return err
 		}
