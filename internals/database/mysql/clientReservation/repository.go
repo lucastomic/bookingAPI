@@ -5,7 +5,7 @@ import (
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 )
 
-const insertClientHasReservationStmt string = "INSERT INTO client_reservation(client_id, reservation_id) VALUES(?,?)"
+const insertClientHasReservationStmt string = "INSERT IGNORE INTO client_reservation(client_id, reservation_id) VALUES(?,?)"
 
 type Repository struct {
 }
