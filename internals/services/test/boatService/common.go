@@ -14,4 +14,4 @@ var boatService = func() serviceports.IBoatService {
 	return services.NewBoatService(repo, reservationRepo)
 }()
 
-var user1 = domain.NewClient("Lucas Tomic", "1234212")
+var user1 = domain.NewClient("Lucas Tomic", "1234212", 0)

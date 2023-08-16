@@ -14,8 +14,8 @@ type reservationPrimitiveRepoBehaivor struct {
 	clientReservationRepo databaseport.RelationSaver[domain.Client, domain.Reservation]
 }
 
-const insertStmt string = "INSERT INTO reservation(firstDay,lastDay,passengers,isOpen,boatId) VALUES(?,?,?,?,?)"
-const updateStmt string = "UPDATE reservation SET firstDay = ?, lastDay = ?, passengers = ?, isOpen = ?, boatId = ? WHERE id = ?"
+const insertStmt string = "INSERT INTO reservation(firstDay,lastDay,isOpen,boatId) VALUES(?,?,?,?)"
+const updateStmt string = "UPDATE reservation SET firstDay = ?, lastDay = ?, isOpen = ?, boatId = ? WHERE id = ?"
 const findByIdStmt string = "SELECT * FROM reservation WHERE id = ?"
 const findAllStmt string = "SELECT * FROM reservation"
 const removeStmt string = "DELETE FROM reservation WHERE id = ?"
@@ -37,7 +37,7 @@ func (repo reservationPrimitiveRepoBehaivor) FindAllStmt() string {
 }
 
 func (repo reservationPrimitiveRepoBehaivor) PersistenceValues(reservation domain.Reservation) []any {
-	return []any{time.Time(reservation.FirstDay()), time.Time(reservation.LastDay()), reservation.Passengers(), reservation.IsOpen(), reservation.BoatId()}
+	return []any{time.Time(reservation.FirstDay()), time.Time(reservation.LastDay()), reservation.IsOpen(), reservation.BoatId()}
 }
 
 func (repo reservationPrimitiveRepoBehaivor) Id(reservation domain.Reservation) []int {

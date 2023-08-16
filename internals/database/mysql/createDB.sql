@@ -28,7 +28,6 @@ CREATE TABLE reservation(
   id INT AUTO_INCREMENT,
   firstDay DATE NOT NULL,
   lastDay DATE NOT NULL,
-  passengers INT,
   isOpen BOOLEAN,
   boatId INT NOT NULL,
   
@@ -40,6 +39,7 @@ CREATE TABLE client(
   id INT AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL,
   phone VARCHAR(255) NOT NULL,
+  passengers INT,
   PRIMARY KEY(id)
 );
 

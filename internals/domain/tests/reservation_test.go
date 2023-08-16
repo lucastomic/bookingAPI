@@ -8,7 +8,7 @@ import (
 	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
 )
 
-var user1 = domain.NewClient("Lucas Tomic", "1234212")
+var user1 = domain.NewClient("Lucas Tomic", "1234212", 0)
 var date = timesimplified.NewTime(2023, 05, 06)
 
 var reservation2Days = domain.NewReservation(0, date, date.AddDays(2), user1, false, 0, 0)

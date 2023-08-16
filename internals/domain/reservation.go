@@ -8,18 +8,18 @@ import (
 
 // Reservation struct represents a booking reservation for a boat state room.
 type Reservation struct {
-	id         int
-	firstDay   timesimplified.Time
-	lastDay    timesimplified.Time
-	clients    []*Client
-	passengers int
-	isOpen     bool
-	boatId     int
+	id       int
+	firstDay timesimplified.Time
+	lastDay  timesimplified.Time
+	clients  []*Client
+	isOpen   bool
+	boatId   int
 }
 
 func (r Reservation) Clients() []*Client {
 	return r.clients
 }
+
 func (r *Reservation) SetClients(clients []*Client) {
 	r.clients = clients
 }
@@ -37,9 +37,7 @@ func (r Reservation) BoatId() int {
 func (r Reservation) LastDay() timesimplified.Time {
 	return r.lastDay
 }
-func (r Reservation) Passengers() int {
-	return r.passengers
-}
+
 func (r Reservation) IsOpen() bool {
 	return r.isOpen
 }
@@ -56,7 +54,6 @@ func (r *Reservation) SetId(id int) {
 // IsZero checks whether the reservation is a zero value
 func (s Reservation) IsZero() bool {
 	return s.id == 0 && s.firstDay.IsZero() && s.lastDay.IsZero()
-
 }
 
 // String parses the reservation into a redeable string
@@ -74,7 +71,6 @@ func (s Reservation) String() string {
 	response += "first day: " + s.firstDay.ToString() + "\n"
 	response += "last day: " + s.lastDay.ToString() + "\n"
 	return response
-
 }
 
 // ForEachDay takes a function as a parameter and executes that function for each day of the reservation period.
@@ -88,13 +84,17 @@ func (r Reservation) ForEachDay(function func(timesimplified.Time)) {
 
 // Contains checks whether a concret day is contained in the reservation
 func (r Reservation) Contains(dateToCheck timesimplified.Time) bool {
-	return (r.firstDay.Before(dateToCheck) && r.lastDay.After(dateToCheck)) || dateToCheck.Equals(r.firstDay) || dateToCheck.Equals(r.lastDay)
+	return (r.firstDay.Before(dateToCheck) && r.lastDay.After(dateToCheck)) ||
+		dateToCheck.Equals(r.firstDay) ||
+		dateToCheck.Equals(r.lastDay)
 }
 
 // Overlaps checks whether the reservation r collides with the given reservation reservationToCheck. This means, this reservations
 // shares at least one day
 func (r Reservation) Overlaps(reservationToCheck Reservation) bool {
-	return r.Contains(reservationToCheck.firstDay) || r.Contains(reservationToCheck.lastDay) || reservationToCheck.Contains(r.firstDay) || reservationToCheck.Contains(r.lastDay)
+	return r.Contains(reservationToCheck.firstDay) || r.Contains(reservationToCheck.lastDay) ||
+		reservationToCheck.Contains(r.firstDay) ||
+		reservationToCheck.Contains(r.lastDay)
 }
 
 // HasStarted cheks whether the reservation has started yet (don't care if the reservation has already ended or not).
@@ -124,25 +124,38 @@ func EmptyReservation() *Reservation {
 }
 
 // NewReservation creates and returns a new Reservation struct pointer with the provided parameters.
-func NewReservation(id int, firstDay timesimplified.Time, lastDay timesimplified.Time, client *Client, isOpen bool, passengers int, boatId int) *Reservation {
+func NewReservation(
+	id int,
+	firstDay timesimplified.Time,
+	lastDay timesimplified.Time,
+	client *Client,
+	isOpen bool,
+	passengers int,
+	boatId int,
+) *Reservation {
 	return &Reservation{
-		id:         id,
-		clients:    []*Client{client},
-		firstDay:   firstDay,
-		lastDay:    lastDay,
-		isOpen:     isOpen,
-		passengers: passengers,
-		boatId:     boatId,
+		id:       id,
+		clients:  []*Client{client},
+		firstDay: firstDay,
+		lastDay:  lastDay,
+		isOpen:   isOpen,
+		boatId:   boatId,
 	}
 }
-func NewReservationWithoutClient(id int, firstDay timesimplified.Time, lastDay timesimplified.Time, isOpen bool, passengers int, boatId int) *Reservation {
+
+func NewReservationWithoutClient(
+	id int,
+	firstDay timesimplified.Time,
+	lastDay timesimplified.Time,
+	isOpen bool,
+	passengers int,
+	boatId int,
+) *Reservation {
 	return &Reservation{
-		id:         id,
-		clients:    []*Client{},
-		firstDay:   firstDay,
-		lastDay:    lastDay,
-		isOpen:     isOpen,
-		passengers: passengers,
-		boatId:     boatId,
+		id:       id,
+		clients:  []*Client{},
+		firstDay: firstDay,
+		lastDay:  lastDay,
+		boatId:   boatId,
 	}
 }

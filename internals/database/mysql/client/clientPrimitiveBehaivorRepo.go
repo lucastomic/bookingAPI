@@ -9,8 +9,8 @@ import (
 type clientPrimitiveRepoBehaivor struct {
 }
 
-const insertStmt string = "INSERT INTO client(name, phone) VALUES(?,?)"
-const updateStmt string = "UPDATE client SET name = ?, phone =? WHERE id = ? "
+const insertStmt string = "INSERT INTO client(name, phone,passengers) VALUES(?,?,?)"
+const updateStmt string = "UPDATE client SET name = ?, phone =?, passengers = ? WHERE id = ? "
 const findStmt string = "SELECT * FROM client WHERE id = ?"
 const findAllstmt string = "SELECT * FROM client"
 const removeStmt string = "DELETE FROM client WHERE id = ?"
@@ -32,7 +32,7 @@ func (repo clientPrimitiveRepoBehaivor) FindAllStmt() string {
 }
 
 func (repo clientPrimitiveRepoBehaivor) PersistenceValues(client domain.Client) []any {
-	return []any{client.Name(), client.Phone()}
+	return []any{client.Name(), client.Phone(), client.Passengers()}
 }
 
 func (repo clientPrimitiveRepoBehaivor) Empty() *domain.Client {
@@ -53,16 +53,16 @@ func (repo clientPrimitiveRepoBehaivor) IsZero(client domain.Client) bool {
 
 // scan scans the stateRoom inside the row passed by argument
 func (repo clientPrimitiveRepoBehaivor) Scan(row *sql.Rows) (domain.Client, error) {
-	var id int
+	var id, passengers int
 	var name string
 	var phone string
 
-	err := row.Scan(&id, &name, &phone)
+	err := row.Scan(&id, &name, &phone, &passengers)
 	if err != nil {
 		return domain.Client{}, err
 	}
 
-	return *domain.NewClientWithId(id, name, phone), nil
+	return *domain.NewClientWithId(id, name, phone, passengers), nil
 }
 
 func (repo clientPrimitiveRepoBehaivor) UpdateRelations(client *domain.Client) error {

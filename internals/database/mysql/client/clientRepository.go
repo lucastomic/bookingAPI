@@ -9,7 +9,7 @@ type ClientRepository struct {
 	mysql.CommonMysqlLogic[domain.Client, int]
 }
 
-const findByReservationStmt string = "SELECT id,name,phone FROM client JOIN client_reservation ON client.id = client_reservation.client_id WHERE client_reservation.reservation_id = ?"
+const findByReservationStmt string = "SELECT id,name,phone,passengers FROM client JOIN client_reservation ON client.id = client_reservation.client_id WHERE client_reservation.reservation_id = ?"
 
 func NewClientRepository() ClientRepository {
 	commonBehaivor := mysql.CommonMysqlLogic[domain.Client, int]{
