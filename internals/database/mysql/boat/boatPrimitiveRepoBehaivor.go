@@ -12,10 +12,10 @@ type boatPrimitiveRepoBehaivor struct {
 	stateRoomRepo databaseport.IStateRoomRepository
 }
 
-const insertBoatStmt string = "INSERT INTO boat(name) VALUES(?)"
-const updateBoatStmt string = "UPDATE boat SET name = ? WHERE id = ?"
-const findBoatByIdStmt string = "SELECT id, name FROM boat WHERE id = ?"
-const findAllStmt string = "SELECT id, name FROM boat"
+const insertBoatStmt string = "INSERT INTO boat(name,owner) VALUES(?,?)"
+const updateBoatStmt string = "UPDATE boat SET name = ?, owner = ? WHERE id = ?"
+const findBoatByIdStmt string = "SELECT id, name, owner FROM boat WHERE id = ?"
+const findAllStmt string = "SELECT id, name, owner FROM boat"
 const removeStmt string = "DELETE FROM boat WHERE id = ?"
 
 // insertStmt returns the statement to insert a new boat
@@ -46,7 +46,7 @@ func (b boatPrimitiveRepoBehaivor) FindAllStmt() string {
 // persistenceValues returns an array with the fields of a boat wihch will be
 // persisted in the database
 func (b boatPrimitiveRepoBehaivor) PersistenceValues(boat domain.Boat) []any {
-	return []any{boat.Name()}
+	return []any{boat.Name(), boat.Owner()}
 }
 
 // empty returns an empty boat
@@ -59,6 +59,10 @@ func (b boatPrimitiveRepoBehaivor) Id(boat domain.Boat) []int {
 	return []int{boat.Id()}
 }
 
+func (repo boatPrimitiveRepoBehaivor) ModifyId(boat *domain.Boat, id int64) {
+	boat.SetId(int(id))
+}
+
 // isZero checks wether the boat specified as paramter is a zero boat
 func (b boatPrimitiveRepoBehaivor) IsZero(boat domain.Boat) bool {
 	return boat.Name() == ""
@@ -67,13 +71,13 @@ func (b boatPrimitiveRepoBehaivor) IsZero(boat domain.Boat) bool {
 // scan scans the boat inside the row passed by argument
 func (repo boatPrimitiveRepoBehaivor) Scan(row *sql.Rows) (domain.Boat, error) {
 	var id int
-	var name string
-	var stateRooms []domain.StateRoom = []domain.StateRoom{}
-	err := row.Scan(&id, &name)
+	var name, owner string
+	var stateRooms []*domain.StateRoom = []*domain.StateRoom{}
+	err := row.Scan(&id, &name, &owner)
 	if err != nil {
 		return *domain.EmptyBoat(), err
 	}
-	return *domain.NewBoatWithId(id, name, stateRooms), nil
+	return *domain.NewBoatWithId(id, name, stateRooms, owner), nil
 }
 
 func (repo boatPrimitiveRepoBehaivor) UpdateRelations(boat *domain.Boat) error {
