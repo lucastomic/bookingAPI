@@ -13,38 +13,33 @@ func newReservation(startDay int, finalDay int) *domain.Reservation {
 	return domain.NewReservation(0, today.AddDays(startDay), today.AddDays(finalDay), user1, false, 0, 0)
 }
 
-var reserveFromTodayUntil3 = newReservation(0, 3)
-var reserveFrom2Until4 = newReservation(2, 4)
-var reserveFromTodayUntil4 = newReservation(0, 4)
-var reserveFrom1Until4 = newReservation(1, 4)
-var reserveFrom8Until9 = newReservation(8, 9)
-
 var boat1 = domain.NewBoat("Test 1", []*domain.StateRoom{
 	domain.NewStateRoom(0, 0, []*domain.Reservation{
-		reserveFromTodayUntil3,
-		reserveFrom8Until9,
+		newReservation(0, 3),
+		newReservation(8, 9),
 	}),
 	domain.NewStateRoom(0, 0, []*domain.Reservation{
-		reserveFrom2Until4,
-		reserveFrom8Until9,
+		newReservation(2, 4),
+		newReservation(8, 9),
 	}),
 }, "")
 
 var boat2 = domain.NewBoat("Test 2", []*domain.StateRoom{
 	domain.NewStateRoom(0, 0, []*domain.Reservation{
-		reserveFromTodayUntil3,
+		newReservation(0, 3),
 	}),
 }, "")
 
 var boat3 = domain.NewBoat("Test 3", []*domain.StateRoom{
 	domain.NewStateRoom(0, 0, []*domain.Reservation{
-		reserveFromTodayUntil4,
+		newReservation(0, 4),
 	}),
 	domain.NewStateRoom(0, 0, []*domain.Reservation{
-		reserveFromTodayUntil3,
-		reserveFrom1Until4,
+		newReservation(0, 3),
+		newReservation(1, 4),
 	}),
 }, "")
+
 var boat4 = domain.NewBoat("Test 4", []*domain.StateRoom{
 	domain.NewStateRoom(0, 0, []*domain.Reservation{}),
 }, "")
@@ -55,7 +50,7 @@ var getUnstartedReservationsTests = []struct {
 }{
 	{
 		*boat1,
-		[]*domain.Reservation{reserveFrom8Until9, reserveFrom2Until4, reserveFrom8Until9},
+		[]*domain.Reservation{newReservation(8, 9), newReservation(2, 4), newReservation(8, 9)},
 	},
 	{
 		*boat2,
@@ -63,23 +58,13 @@ var getUnstartedReservationsTests = []struct {
 	},
 	{
 		*boat3,
-		[]*domain.Reservation{reserveFrom1Until4},
+		[]*domain.Reservation{newReservation(1, 4)},
 	},
 	{
 		*boat4,
 		[]*domain.Reservation{},
 	},
 }
-
-// var maxCapacityBoatTests = []struct{
-// 	boat domain.Boat
-// 	personsToReserve int
-// 	expected bool
-// }{
-// 	{
-
-// 	}
-// }
 
 func TestGetUnestartedReservations(t *testing.T) {
 	for _, tt := range getUnstartedReservationsTests {
