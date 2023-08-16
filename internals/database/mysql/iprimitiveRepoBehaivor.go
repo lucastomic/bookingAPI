@@ -48,6 +48,7 @@ type IPrimitiveRepoBehaivor[T any, I any] interface {
 	// and not like this:
 	// []{id2,id1}
 	Id(T) []I
+	ModifyId(*T, int64)
 	// empty returns a Zero object of type T
 	Empty() *T
 	// isZero checks whether tge T object passed as argument is a Zero object
