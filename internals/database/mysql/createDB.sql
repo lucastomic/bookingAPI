@@ -47,6 +47,8 @@ CREATE TABLE client_reservation(
   client_id INT NOT NULL,
   reservation_id INT NOT NULL,
 
+
+  PRIMARY KEY(client_id,reservation_id)
   FOREIGN KEY(client_id) REFERENCES client(id),
   FOREIGN KEY(reservation_id) REFERENCES reservation(id)
 );
@@ -56,6 +58,8 @@ CREATE TABLE stateRoom_reservation(
   reservation_id INT NOT NULL,
   stateroom_id INT NOT NULL,
   boat_id INT NOT NULL,
+
+  PRIMARY KEY(reservation_id,stateroom_id,boat_id)
 
   FOREIGN KEY(reservation_id) REFERENCES reservation(id),
   FOREIGN KEY(boat_id, stateroom_id) REFERENCES stateRoom(boatId,id)
