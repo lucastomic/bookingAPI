@@ -15,9 +15,19 @@ type ReservationViewJSON struct {
 // The resulting map is then returned by the function as the output. This function essentially maps the fields of a reservation domain
 // object to a map object that can be returned as a JSON object using the Gin web framework.
 func (view ReservationViewJSON) ParseView(reservation domain.Reservation) gin.H {
+	clients := []gin.H{}
+	for _, client := range reservation.Clients() {
+		clients = append(clients,
+			gin.H{
+				"id":    client.Id(),
+				"name":  client.Name(),
+				"phone": client.Phone(),
+			},
+		)
+	}
 	return gin.H{
 		"id":       reservation.Id(),
-		"clients":  reservation.Clients(),
+		"clients":  clients,
 		"firstDay": reservation.FirstDay().ToString(),
 		"lastDay":  reservation.LastDay().ToString(),
 	}
