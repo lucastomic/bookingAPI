@@ -28,8 +28,7 @@ Authenticate the user and retrieve the Json Web Token, expects a JSON body reque
 ```
 ### `GET /boat/:id`
 Get a specific boat, given its ID
-### `GET /boat/:id`
-Get a specific boat, given its ID
+
 ### `GET /boat/reserved/:id`
 Get the days when a boat it's in its full capacity (this means those days when all the staterooms are reserved) given its ID
 ### `GET /boat/notEmpty/:id`
