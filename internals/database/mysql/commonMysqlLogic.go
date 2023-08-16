@@ -27,23 +27,23 @@ type CommonMysqlLogic[T any, I any] struct {
 //
 // Save(A) would persist the object A and its field "name", but it also would persist,
 // all the changes/insertions in their childs (the slice of B objects)
-func (repo CommonMysqlLogic[T, I]) Save(object T) error {
+func (repo CommonMysqlLogic[T, I]) Save(object *T) error {
 	var err error
-	if repo.alreadyExists(object) {
-		err = repo.update(object)
+	if repo.alreadyExists(*object) {
+		err = repo.update(*object)
 	} else {
 		err = repo.insertNew(object)
 	}
 	if err != nil {
 		return err
 	}
-	err = repo.SaveChildsChanges(&object)
+	err = repo.SaveChildsChanges(object)
 
 	if err != nil {
 		return err
 	}
 
-	err = repo.SaveRelations(&object)
+	err = repo.SaveRelations(object)
 
 	return err
 }
@@ -60,16 +60,16 @@ func (repo CommonMysqlLogic[T, I]) FindById(id ...I) (T, error) {
 	if err != nil || len(response) == 0 {
 		return *repo.Empty(), err
 	}
-	return response[0], nil
+	return *response[0], nil
 }
 
 // GetAll retrieves all the T objects form the database
 // In case of error, it returns an empty slice and the error.
-func (repo CommonMysqlLogic[T, I]) FindAll() ([]T, error) {
+func (repo CommonMysqlLogic[T, I]) FindAll() ([]*T, error) {
 	stmt := repo.FindAllStmt()
 	response, err := repo.Query(stmt, []any{})
 	if err != nil || len(response) == 0 {
-		return []T{}, err
+		return []*T{}, err
 	}
 	return response, nil
 
@@ -103,28 +103,28 @@ func (repo CommonMysqlLogic[T, I]) Remove(object T) error {
 // And the next params
 // []any{"Orange", 4}
 // Then, it would return a slice with all the orange cats with 4 yeats old
-func (repo CommonMysqlLogic[T, I]) Query(queryStmt string, queryParams []any) ([]T, error) {
-	var response []T
+func (repo CommonMysqlLogic[T, I]) Query(queryStmt string, queryParams []any) ([]*T, error) {
+	var response []*T
 	db := GetInstance()
 	stmt, err := db.Prepare(queryStmt)
 	if err != nil {
-		return []T{}, err
+		return []*T{}, err
 	}
 	defer stmt.Close()
 	rows, err := stmt.Query(queryParams...)
 	if err != nil {
-		return []T{}, err
+		return []*T{}, err
 	}
 	for rows.Next() {
 		newValue, err := repo.getEntityFromRow(rows)
 		if err != nil {
-			return []T{}, err
+			return []*T{}, err
 		}
-		response = append(response, newValue)
+		response = append(response, &newValue)
 	}
 
 	if err != nil {
-		return []T{}, err
+		return []*T{}, err
 	}
 
 	return response, nil
@@ -135,16 +135,20 @@ func (repo CommonMysqlLogic[T, I]) ExecStmt(stmt string, params []any) error {
 }
 
 // insertNew creates a new DB register given a T object
-func (repo CommonMysqlLogic[T, I]) insertNew(object T) error {
+func (repo CommonMysqlLogic[T, I]) insertNew(object *T) error {
 	db := GetInstance()
 	stmt, err := db.Prepare(repo.InsertStmt())
-	if err == nil {
-		defer stmt.Close()
-		values := repo.PersistenceValues(object)
-		_, err = stmt.Exec(values...)
+	if err != nil {
+		return err
 	}
+	defer stmt.Close()
+	values := repo.PersistenceValues(*object)
+	res, err := stmt.Exec(values...)
+	if err != nil {
+		return err
+	}
+	repo.modifyIdFromInsert(object, res)
 	return err
-
 }
 
 // alreadyExists checks whether an object has already been inserted into the DB
@@ -210,4 +214,11 @@ func (repo CommonMysqlLogic[T, I]) getEntityFromRow(rows *sql.Rows) (T, error) {
 		return *repo.Empty(), err
 	}
 	return response, nil
+}
+
+func (repo CommonMysqlLogic[T, I]) modifyIdFromInsert(object *T, result sql.Result) {
+	lastId, err := result.LastInsertId()
+	if err == nil {
+		repo.ModifyId(object, lastId)
+	}
 }
