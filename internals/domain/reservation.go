@@ -8,12 +8,24 @@ import (
 
 // Reservation struct represents a booking reservation for a boat state room.
 type Reservation struct {
-	id       int
-	firstDay timesimplified.Time
-	lastDay  timesimplified.Time
-	clients  []*Client
-	isOpen   bool
-	boatId   int
+	id          int
+	maxCapacity int
+	firstDay    timesimplified.Time
+	lastDay     timesimplified.Time
+	clients     []*Client
+	isOpen      bool
+	boatId      int
+}
+
+func (r Reservation) CanAddClient(client Client) bool {
+	if !r.isOpen {
+		return false
+	}
+	return !r.exceedsMaximumCapacityWith(client)
+}
+
+func (r *Reservation) AddClient(client *Client) {
+
 }
 
 func (r Reservation) Clients() []*Client {
@@ -22,6 +34,10 @@ func (r Reservation) Clients() []*Client {
 
 func (r *Reservation) SetClients(clients []*Client) {
 	r.clients = clients
+}
+
+func (r *Reservation) SetMaxCapacity(maxCap int) {
+	r.maxCapacity = maxCap
 }
 
 // FirstDay returns the start date of the reservation.
@@ -118,6 +134,18 @@ func (r Reservation) Equals(reservation Reservation) bool {
 	return reservation.id == r.id
 }
 
+func (r Reservation) getTotalPassengers() int {
+	response := 0
+	for _, client := range r.clients {
+		response += client.passengers
+	}
+	return response
+}
+
+func (r Reservation) exceedsMaximumCapacityWith(client Client) bool {
+	return client.passengers+r.getTotalPassengers() > r.maxCapacity
+}
+
 // EmptyReservation returns a new empty Reservation struct pointer.
 func EmptyReservation() *Reservation {
 	return &Reservation{}
@@ -130,7 +158,6 @@ func NewReservation(
 	lastDay timesimplified.Time,
 	client *Client,
 	isOpen bool,
-	passengers int,
 	boatId int,
 ) *Reservation {
 	return &Reservation{
@@ -142,13 +169,30 @@ func NewReservation(
 		boatId:   boatId,
 	}
 }
-
+func NewReservationWithCapacity(
+	id int,
+	firstDay timesimplified.Time,
+	lastDay timesimplified.Time,
+	client *Client,
+	isOpen bool,
+	maxCapacity int,
+	boatId int,
+) *Reservation {
+	return &Reservation{
+		id:          id,
+		maxCapacity: maxCapacity,
+		clients:     []*Client{client},
+		firstDay:    firstDay,
+		lastDay:     lastDay,
+		isOpen:      isOpen,
+		boatId:      boatId,
+	}
+}
 func NewReservationWithoutClient(
 	id int,
 	firstDay timesimplified.Time,
 	lastDay timesimplified.Time,
 	isOpen bool,
-	passengers int,
 	boatId int,
 ) *Reservation {
 	return &Reservation{
@@ -157,5 +201,6 @@ func NewReservationWithoutClient(
 		firstDay: firstDay,
 		lastDay:  lastDay,
 		boatId:   boatId,
+		isOpen:   isOpen,
 	}
 }
