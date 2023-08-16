@@ -29,7 +29,7 @@ func Auth() gin.HandlerFunc {
 		user := getUserFromTokenString(token)
 		authenticationstate.SetAuthenticatedUser(user)
 		context.Next()
-		authenticationstate.RemoveAuthenticatedUser()
+		// defer authenticationstate.RemoveAuthenticatedUser()
 	}
 }
 

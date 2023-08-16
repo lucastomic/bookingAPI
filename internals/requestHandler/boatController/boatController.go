@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/exceptions"
+	authenticationstate "github.com/lucastomic/naturalYSalvajeRent/internals/state/authentication"
 
 	exceptionhandling "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/exceptionHandling"
 	reservationrequest "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/reservationController/reservationRequest"
@@ -51,7 +52,8 @@ func createBoat(c *gin.Context) {
 		exceptionhandling.HandleException(c, err)
 		return
 	}
-	boat, err := boatService.CreateBoat(*domain.NewBoat(body.Name, []domain.StateRoom{}))
+	emailAuth := authenticationstate.UserAuthenticated().Email()
+	boat, err := boatService.CreateBoat(*domain.NewBoat(body.Name, []*domain.StateRoom{}, emailAuth))
 	if err != nil {
 		exceptionhandling.HandleException(c, err)
 		return
@@ -245,5 +247,4 @@ func parseReservationFromBody(c *gin.Context) (domain.Reservation, error) {
 		return *domain.EmptyReservation(), err
 	}
 	return reservation, nil
-
 }
