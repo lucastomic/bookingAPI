@@ -73,7 +73,7 @@ func (repo reservationPrimitiveRepoBehaivor) Scan(rows *sql.Rows) (domain.Reserv
 		return *domain.EmptyReservation(), err
 	}
 
-	return *domain.NewReservationWithoutClient(id, firstDayParsed, lastDayParsed, isOpen, passengers, boatId), nil
+	return *domain.NewReservationWithoutClient(id, firstDayParsed, lastDayParsed, isOpen, boatId), nil
 }
 
 func (repo reservationPrimitiveRepoBehaivor) UpdateRelations(reservation *domain.Reservation) error {

@@ -67,7 +67,7 @@ func (s ReservationServcie) ParseReservationRequest(req reservationrequest.Reser
 		ex := exceptions.NewApiError(http.StatusBadRequest, "Bad lastDay format. Must be a string with yyyy-mm-dd format")
 		return *domain.EmptyReservation(), ex
 	}
-	user := domain.NewClient(req.Email, req.Phone, req.Passengers)
-	reservation := domain.NewReservation(0, firstDay, lastDay, user, req.IsOpen, req.Passengers, req.BoatId)
+	client := domain.NewClient(req.Email, req.Phone, req.Passengers)
+	reservation := domain.NewReservation(0, firstDay, lastDay, client, req.IsOpen, req.BoatId)
 	return *reservation, nil
 }
