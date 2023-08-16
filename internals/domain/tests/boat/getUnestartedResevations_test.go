@@ -1,4 +1,4 @@
-package domaintests
+package boattest
 
 import (
 	"testing"
@@ -8,9 +8,10 @@ import (
 )
 
 var today = timesimplified.Now()
+var user = domain.NewClient("Lucas Tomic", "1234212", 0)
 
 func newReservation(startDay int, finalDay int) *domain.Reservation {
-	return domain.NewReservation(0, today.AddDays(startDay), today.AddDays(finalDay), user1, false, 0, 0)
+	return domain.NewReservation(0, today.AddDays(startDay), today.AddDays(finalDay), user, false, 0)
 }
 
 var boat1 = domain.NewBoat("Test 1", []*domain.StateRoom{

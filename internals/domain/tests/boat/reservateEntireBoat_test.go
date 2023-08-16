@@ -1,4 +1,4 @@
-package domaintests
+package boattest
 
 import (
 	"testing"
