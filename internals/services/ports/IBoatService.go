@@ -11,7 +11,7 @@ type IBoatService interface {
 	CreateBoat(domain.Boat) (domain.Boat, error)
 	// UpdateBoat updates an existing boat.
 	// It takes a domain.Boat object as input and returns the updated domain.Boat object along with any error encountered.
-	UpdateBoat(boat domain.Boat) (domain.Boat, error)
+	UpdateBoat(boat *domain.Boat) (domain.Boat, error)
 	// DeleteBoat deletes a boat.
 	// It takes a domain.Boat object as input and returns an error if any occurred.
 	DeleteBoat(boat domain.Boat) error

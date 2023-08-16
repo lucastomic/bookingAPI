@@ -31,7 +31,7 @@ func (b boatService) CreateBoat(boat domain.Boat) (domain.Boat, error) {
 	if boat.Name() == "" {
 		return *domain.EmptyBoat(), errors.New("boat must have a name")
 	}
-	_, err := b.UpdateBoat(boat)
+	_, err := b.UpdateBoat(&boat)
 	if err != nil {
 		return *domain.EmptyBoat(), err
 	}
@@ -40,12 +40,12 @@ func (b boatService) CreateBoat(boat domain.Boat) (domain.Boat, error) {
 
 // UpdateBoat updates an existing boat by calling the Save() method with the given boat,
 // and returns the updated boat or an error if the save operation fails.
-func (b boatService) UpdateBoat(boat domain.Boat) (domain.Boat, error) {
-	err := b.Save(&boat)
+func (b boatService) UpdateBoat(boat *domain.Boat) (domain.Boat, error) {
+	err := b.Save(boat)
 	if err != nil {
 		return *domain.EmptyBoat(), err
 	}
-	return boat, nil
+	return *boat, nil
 }
 
 // DeleteBoat deletes a boat by calling the Remove() method with the given boat,
