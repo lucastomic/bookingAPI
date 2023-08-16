@@ -10,8 +10,8 @@ type ReservationRepository struct {
 	mysql.CommonMysqlLogic[domain.Reservation, int]
 }
 
-const findByStateRoomStmt string = "SELECT * FROM reservation WHERE stateRoomId = ? AND boatId = ?"
-const findByClientStmt string = "SELECT * FROM reservation JOIN client_reservation WHERE client_reservation.client_id = ?"
+const findByStateRoomStmt string = "SELECT id,firstDay,lastDay,passengers,isOpen,boatId FROM reservation JOIN stateRoom_reservation ON stateRoom_reservation.reservation_id = reservation.id WHERE stateRoom_reservation.stateroom_id = ? AND stateRoom_reservation.boat_id = ?"
+const findByClientStmt string = "SELECT id,firstDay,lastDay,passengers,isOpen,boatId FROM reservation JOIN client_reservation ON reservation.id = client_reservation.reservation_id WHERE client_reservation.client_id = ?"
 
 func NewReservationRepository(
 	clientRepo databaseport.IClientRepository,
@@ -26,18 +26,18 @@ func NewReservationRepository(
 	return ReservationRepository{commonBehaivor}
 }
 
-func (repo ReservationRepository) FindByStateRoom(stateRoom domain.StateRoom) ([]domain.Reservation, error) {
+func (repo ReservationRepository) FindByStateRoom(stateRoom domain.StateRoom) ([]*domain.Reservation, error) {
 	response, err := repo.Query(findByStateRoomStmt, []any{stateRoom.Id(), stateRoom.BoatId()})
 	if err != nil {
-		return []domain.Reservation{}, err
+		return []*domain.Reservation{}, err
 	}
 	return response, nil
 }
 
-func (repo ReservationRepository) FindByClient(client domain.Client) ([]domain.Reservation, error) {
+func (repo ReservationRepository) FindByClient(client domain.Client) ([]*domain.Reservation, error) {
 	response, err := repo.Query(findByClientStmt, []any{client.Id()})
 	if err != nil {
-		return []domain.Reservation{}, err
+		return []*domain.Reservation{}, err
 	}
 	return response, nil
 }
