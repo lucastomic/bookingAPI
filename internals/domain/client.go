@@ -18,6 +18,10 @@ func (c Client) Id() int {
 	return c.id
 }
 
+func (c *Client) SetId(id int) {
+	c.id = id
+}
+
 func (c Client) Name() string {
 	return c.name
 }

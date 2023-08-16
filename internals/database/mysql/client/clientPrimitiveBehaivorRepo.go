@@ -43,6 +43,10 @@ func (repo clientPrimitiveRepoBehaivor) Id(client domain.Client) []int {
 	return []int{client.Id()}
 }
 
+func (repo clientPrimitiveRepoBehaivor) ModifyId(client *domain.Client, id int64) {
+	client.SetId(int(id))
+}
+
 func (repo clientPrimitiveRepoBehaivor) IsZero(client domain.Client) bool {
 	return client.Id() == 0 && client.Name() == "" && client.Phone() == ""
 }
