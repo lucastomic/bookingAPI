@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
@@ -24,8 +25,12 @@ func (r Reservation) CanAddClient(client Client) bool {
 	return !r.exceedsMaximumCapacityWith(client)
 }
 
-func (r *Reservation) AddClient(client *Client) {
-
+func (r *Reservation) AddClient(client *Client) error {
+	if !r.CanAddClient(*client) {
+		return errors.New("can't add client " + client.name)
+	}
+	r.clients = append(r.clients, client)
+	return nil
 }
 
 func (r Reservation) Clients() []*Client {
