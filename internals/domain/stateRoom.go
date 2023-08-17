@@ -80,11 +80,12 @@ func (s *StateRoom) RemoveReservation(reservationToRemve Reservation) error {
 	return errors.New("reservation doesn't exist")
 }
 
-// ableToReservate checks whether the range of a given reservation is completly free for reservate in the
-// stateroom
 func (s *StateRoom) CanReservate(reservationToCheck Reservation) bool {
-	for _, stateRoomReservation := range s.reservations {
-		if stateRoomReservation.Overlaps(reservationToCheck) {
+	for _, reservation := range s.reservations {
+		if reservation.Overlaps(reservationToCheck) {
+			if reservation.CanMerge(reservationToCheck) {
+				return true
+			}
 			return false
 		}
 	}

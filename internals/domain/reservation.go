@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"errors"
 	"strconv"
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
@@ -18,19 +17,15 @@ type Reservation struct {
 	boatId      int
 }
 
-func (r Reservation) CanAddClient(client Client) bool {
-	if !r.isOpen {
-		return false
-	}
-	return !r.exceedsMaximumCapacityWith(client)
+func (r Reservation) CanMerge(reservation Reservation) bool {
+	return r.bothAreOpen(reservation) && r.datesMatch(reservation) && !r.exceedsMaximumCapacityWith(reservation.clients...)
 }
 
-func (r *Reservation) AddClient(client *Client) error {
-	if !r.CanAddClient(*client) {
-		return errors.New("can't add client " + client.name)
+func (r *Reservation) Merge(reservation Reservation) {
+	if !r.CanMerge(reservation) {
+		return
 	}
-	r.clients = append(r.clients, client)
-	return nil
+	r.addClients(reservation.clients...)
 }
 
 func (r Reservation) Clients() []*Client {
@@ -42,10 +37,10 @@ func (r *Reservation) SetClients(clients []*Client) {
 }
 
 func (r *Reservation) SetMaxCapacity(maxCap int) {
+
 	r.maxCapacity = maxCap
 }
 
-// FirstDay returns the start date of the reservation.
 func (r Reservation) FirstDay() timesimplified.Time {
 	return r.firstDay
 }
@@ -54,7 +49,6 @@ func (r Reservation) BoatId() int {
 	return r.boatId
 }
 
-// LastDay returns the end date of the reservation.
 func (r Reservation) LastDay() timesimplified.Time {
 	return r.lastDay
 }
@@ -136,7 +130,7 @@ func (r Reservation) StartsAfter(dateToCheck timesimplified.Time) bool {
 
 // Equals cheks whether the reservation is the same as the specified by argument.
 func (r Reservation) Equals(reservation Reservation) bool {
-	return reservation.id == r.id
+	return reservation.id == r.id && reservation.firstDay.Equals(r.firstDay) && reservation.lastDay.Equals(r.lastDay) && reservation.maxCapacity == r.maxCapacity && r.isOpen == reservation.isOpen && r.boatId == reservation.boatId && r.getTotalPassengers() == reservation.getTotalPassengers()
 }
 
 func (r Reservation) getTotalPassengers() int {
@@ -147,8 +141,24 @@ func (r Reservation) getTotalPassengers() int {
 	return response
 }
 
-func (r Reservation) exceedsMaximumCapacityWith(client Client) bool {
-	return client.passengers+r.getTotalPassengers() > r.maxCapacity
+func (r Reservation) datesMatch(reservation Reservation) bool {
+	return reservation.firstDay.Equals(r.firstDay) && reservation.lastDay.Equals(r.lastDay)
+}
+
+func (r Reservation) exceedsMaximumCapacityWith(clients ...*Client) bool {
+	totalPassengers := r.getTotalPassengers()
+	for _, client := range clients {
+		totalPassengers += client.passengers
+	}
+	return totalPassengers > r.maxCapacity
+}
+
+func (r Reservation) bothAreOpen(reservation Reservation) bool {
+	return reservation.isOpen && r.isOpen
+}
+
+func (r *Reservation) addClients(clients ...*Client) {
+	r.clients = append(r.clients, clients...)
 }
 
 // EmptyReservation returns a new empty Reservation struct pointer.

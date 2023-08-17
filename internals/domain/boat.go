@@ -75,9 +75,6 @@ func (b *Boat) TimeRangeHasDisponibility(reservation Reservation) bool {
 }
 
 func (b *Boat) ReservateStateroom(reservation *Reservation) error {
-	if !reservation.IsOpen() {
-		return errors.New("can't allocate close reservations in only one stateroom. Must be allocated in the entire boat")
-	}
 	if !b.TimeRangeHasDisponibility(*reservation) {
 		return errors.New("there is not enough space for this reservation")
 	}
@@ -99,8 +96,10 @@ func (b *Boat) ReservateFullBoat(reservation *Reservation) bool {
 	i := 0
 	stateroomsCopy := b.StateRooms()
 	for i < len(b.StateRooms()) && timeRangeIsAvailable {
-		err := stateroomsCopy[i].AddReservation(reservation)
-		timeRangeIsAvailable = err == nil
+		timeRangeIsAvailable = stateroomsCopy[i].CanReservate(*reservation)
+		if timeRangeIsAvailable {
+			stateroomsCopy[i].AddReservation(reservation)
+		}
 		i++
 	}
 	if timeRangeIsAvailable {
