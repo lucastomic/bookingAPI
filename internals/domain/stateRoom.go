@@ -43,13 +43,15 @@ func (s *StateRoom) SetReservedDays(reservation []*Reservation) {
 	s.reservations = reservation
 }
 
-// AddReservation adds a new reservation to a stateroom. If the reservation collides with another
-// reservation already reserved, it throws an error
-func (s *StateRoom) AddReservation(reservation *Reservation) error {
+func (s *StateRoom) Reservate(reservation *Reservation) error {
 	if !s.CanReservate(*reservation) {
-		return errors.New("reservation collides with another reservation")
+		return errors.New("there is not enough space for allocating this reservation")
 	}
-	s.reservations = append(s.reservations, reservation)
+	if s.canMergeWithAny(*reservation) {
+		s.mergeWithAny(*reservation)
+	} else {
+		s.addReservation(reservation)
+	}
 	return nil
 }
 
@@ -83,14 +85,31 @@ func (s *StateRoom) RemoveReservation(reservationToRemve Reservation) error {
 func (s *StateRoom) CanReservate(reservationToCheck Reservation) bool {
 	for _, reservation := range s.reservations {
 		if reservation.Overlaps(reservationToCheck) {
-			if reservation.CanMerge(reservationToCheck) {
-				return true
-			}
-			return false
+			return reservation.CanMerge(reservationToCheck)
 		}
 	}
 	return true
+}
 
+func (s *StateRoom) canMergeWithAny(reservationToAdd Reservation) bool {
+	for _, reservation := range s.reservations {
+		if reservation.CanMerge(reservationToAdd) {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *StateRoom) mergeWithAny(reservationToAdd Reservation) {
+	for _, reservation := range s.reservations {
+		if reservation.CanMerge(reservationToAdd) {
+			reservation.Merge(reservationToAdd)
+		}
+	}
+}
+
+func (s *StateRoom) addReservation(reservation *Reservation) {
+	s.reservations = append(s.reservations, reservation)
 }
 
 // EmptyStateRoom creates and returns a new empty StateRoom.
