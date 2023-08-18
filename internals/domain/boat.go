@@ -3,7 +3,8 @@ package domain
 import (
 	"errors"
 
-	dayscounter "github.com/lucastomic/naturalYSalvajeRent/internals/domain/daysCounter"
+	dayscounter "github.com/lucastomic/naturalYSalvajeRent/internals/daysCounter"
+	timeset "github.com/lucastomic/naturalYSalvajeRent/internals/timeSet"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
 )
 
@@ -131,17 +132,25 @@ func (b Boat) GetStateRoomsWithStartedReservations() []*StateRoom {
 }
 
 func (b Boat) GetNotEmptyDays() []timesimplified.Time {
-	daysAlreadyCounted := make(map[timesimplified.Time]bool)
-	var response []timesimplified.Time
+	days := timeset.NewTimeSet()
 	b.forEachReservation(func(reservation *Reservation) {
 		reservation.ForEachDay(func(t timesimplified.Time) {
-			if alreadyCounted := daysAlreadyCounted[t]; !alreadyCounted {
-				daysAlreadyCounted[t] = true
-				response = append(response, t)
-			}
+			days.AddIfNotExists(t)
 		})
 	})
-	return response
+	return days.GetAsArray()
+}
+
+func (b Boat) GetDaysWithCloseReservations() []timesimplified.Time {
+	days := timeset.NewTimeSet()
+	b.forEachReservation(func(reservation *Reservation) {
+		if !reservation.IsOpen() {
+			reservation.ForEachDay(func(t timesimplified.Time) {
+				days.AddIfNotExists(t)
+			})
+		}
+	})
+	return days.GetAsArray()
 }
 
 func (b Boat) GetFullCapacityDays() []timesimplified.Time {
