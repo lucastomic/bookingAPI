@@ -12,10 +12,10 @@ type boatPrimitiveRepoBehaivor struct {
 	stateRoomRepo databaseport.IStateRoomRepository
 }
 
-const insertBoatStmt string = "INSERT INTO boat(name,owner) VALUES(?,?)"
-const updateBoatStmt string = "UPDATE boat SET name = ?, owner = ? WHERE id = ?"
-const findBoatByIdStmt string = "SELECT id, name, owner FROM boat WHERE id = ?"
-const findAllStmt string = "SELECT id, name, owner FROM boat"
+const insertBoatStmt string = "INSERT INTO boat(name,max_capacity,owner) VALUES(?,?)"
+const updateBoatStmt string = "UPDATE boat SET name = ?, max_capacity = ?, owner = ? WHERE id = ?"
+const findBoatByIdStmt string = "SELECT id, name, max_capacity,owner FROM boat WHERE id = ?"
+const findAllStmt string = "SELECT id, name, owner,max_capacity FROM boat"
 const removeStmt string = "DELETE FROM boat WHERE id = ?"
 
 // insertStmt returns the statement to insert a new boat
@@ -70,14 +70,14 @@ func (b boatPrimitiveRepoBehaivor) IsZero(boat domain.Boat) bool {
 
 // scan scans the boat inside the row passed by argument
 func (repo boatPrimitiveRepoBehaivor) Scan(row *sql.Rows) (domain.Boat, error) {
-	var id int
+	var id, maxCapacity int
 	var name, owner string
 	var stateRooms []*domain.StateRoom = []*domain.StateRoom{}
-	err := row.Scan(&id, &name, &owner)
+	err := row.Scan(&id, &name, &owner, &maxCapacity)
 	if err != nil {
 		return *domain.EmptyBoat(), err
 	}
-	return *domain.NewBoatWithId(id, name, stateRooms, owner), nil
+	return *domain.NewBoatWithId(id, name, stateRooms, owner, maxCapacity), nil
 }
 
 func (repo boatPrimitiveRepoBehaivor) UpdateRelations(boat *domain.Boat) error {

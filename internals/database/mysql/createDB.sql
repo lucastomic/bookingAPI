@@ -11,6 +11,7 @@ CREATE TABLE user(
 CREATE TABLE boat(
   id INT AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL,
+  max_capacity INT NOT NULL,
   owner VARCHAR(255) NOT NULL,
   
   PRIMARY KEY(id),
@@ -48,7 +49,7 @@ CREATE TABLE client_reservation(
   reservation_id INT NOT NULL,
 
 
-  PRIMARY KEY(client_id,reservation_id)
+  PRIMARY KEY(client_id,reservation_id),
   FOREIGN KEY(client_id) REFERENCES client(id),
   FOREIGN KEY(reservation_id) REFERENCES reservation(id)
 );
@@ -59,7 +60,7 @@ CREATE TABLE stateRoom_reservation(
   stateroom_id INT NOT NULL,
   boat_id INT NOT NULL,
 
-  PRIMARY KEY(reservation_id,stateroom_id,boat_id)
+  PRIMARY KEY(reservation_id,stateroom_id,boat_id),
 
   FOREIGN KEY(reservation_id) REFERENCES reservation(id),
   FOREIGN KEY(boat_id, stateroom_id) REFERENCES stateRoom(boatId,id)

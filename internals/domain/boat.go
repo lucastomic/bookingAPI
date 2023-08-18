@@ -18,8 +18,8 @@ func NewBoat(name string, stateRooms []*StateRoom, owner string) *Boat {
 	return &Boat{name: name, stateRooms: stateRooms, owner: owner}
 }
 
-func NewBoatWithId(id int, name string, stateRooms []*StateRoom, owner string) *Boat {
-	return &Boat{id: id, name: name, stateRooms: stateRooms, owner: owner}
+func NewBoatWithId(id int, name string, stateRooms []*StateRoom, owner string, maxCapacity int) *Boat {
+	return &Boat{id: id, name: name, stateRooms: stateRooms, owner: owner, maxCapacity: maxCapacity}
 }
 
 func EmptyBoat() *Boat {

@@ -35,21 +35,21 @@ var boatWith3days = domain.NewBoatWithId(0, "3 days", []*domain.StateRoom{
 	stateRoom2daysReserved,
 	stateRoomReserved3days,
 	stateRoomReserved4days,
-}, "")
+}, "", 100)
 
 var boatWithoutDays = domain.NewBoatWithId(0, "Without days", []*domain.StateRoom{
 	stateRoom2daysReserved,
 	domain.NewStateRoom(1, 0, []*domain.Reservation{
 		domain.NewReservation(0, date.AddDays(3), date.AddDays(4), user1, false, 0),
 	}),
-}, "")
+}, "", 100)
 
 var boatWithSeparatedRanges = domain.NewBoatWithId(2, "Separated range days", []*domain.StateRoom{
 	stateRoomReserved4days,
 	stateRoomReserved2daysAnd4th,
 	stateRoomReserved2daysAnd4th,
 	stateRoomReserved2daysAnd4th,
-}, "")
+}, "", 100)
 var fullCapacityDaysTest = []struct {
 	boat     domain.Boat
 	expected []string
