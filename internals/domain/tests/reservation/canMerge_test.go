@@ -62,7 +62,7 @@ var canMergeTests = []struct {
 	},
 }
 
-func TestMergeClient(t *testing.T) {
+func TestCanMerge(t *testing.T) {
 	for _, tt := range canMergeTests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := tt.reservation.CanMerge(tt.client)
