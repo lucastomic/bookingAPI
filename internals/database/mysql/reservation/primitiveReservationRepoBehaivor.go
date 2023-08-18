@@ -57,11 +57,11 @@ func (repo reservationPrimitiveRepoBehaivor) IsZero(reservation domain.Reservati
 }
 
 func (repo reservationPrimitiveRepoBehaivor) Scan(rows *sql.Rows) (domain.Reservation, error) {
-	var id, boatId, passengers int
+	var id, boatId int
 	var firstDay, lastDay string
 	var isOpen bool
 
-	err := rows.Scan(&id, &firstDay, &lastDay, &passengers, &isOpen, &boatId)
+	err := rows.Scan(&id, &firstDay, &lastDay, &isOpen, &boatId)
 	if err != nil {
 		return *domain.EmptyReservation(), err
 	}

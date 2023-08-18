@@ -10,8 +10,8 @@ type ReservationRepository struct {
 	mysql.CommonMysqlLogic[domain.Reservation, int]
 }
 
-const findByStateRoomStmt string = "SELECT id,firstDay,lastDay,passengers,isOpen,boatId FROM reservation JOIN stateRoom_reservation ON stateRoom_reservation.reservation_id = reservation.id WHERE stateRoom_reservation.stateroom_id = ? AND stateRoom_reservation.boat_id = ?"
-const findByClientStmt string = "SELECT id,firstDay,lastDay,passengers,isOpen,boatId FROM reservation JOIN client_reservation ON reservation.id = client_reservation.reservation_id WHERE client_reservation.client_id = ?"
+const findByStateRoomStmt string = "SELECT id,firstDay,lastDay,isOpen,boatId FROM reservation JOIN stateRoom_reservation ON stateRoom_reservation.reservation_id = reservation.id WHERE stateRoom_reservation.stateroom_id = ? AND stateRoom_reservation.boat_id = ?"
+const findByClientStmt string = "SELECT id,firstDay,lastDay,isOpen,boatId FROM reservation JOIN client_reservation ON reservation.id = client_reservation.reservation_id WHERE client_reservation.client_id = ?"
 
 func NewReservationRepository(
 	clientRepo databaseport.IClientRepository,
