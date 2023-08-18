@@ -15,7 +15,7 @@ var canReservateTests = []struct {
 }{
 	{
 		"should be true, because should add reservation in day 5",
-		testutils.GetStateRoom([]*domain.Reservation{
+		*testutils.GetStateRoom([]*domain.Reservation{
 			testutils.GetReservationWithDaysOpenAndPassengers(0, 3, false, 3),
 			testutils.GetReservationWithDaysOpenAndPassengers(5, 5, true, 3),
 			testutils.GetReservationWithDaysOpenAndPassengers(7, 8, false, 3),
@@ -26,7 +26,7 @@ var canReservateTests = []struct {
 	},
 	{
 		"should be false, because reservation in day 5 is close and can't merge",
-		testutils.GetStateRoom([]*domain.Reservation{
+		*testutils.GetStateRoom([]*domain.Reservation{
 			testutils.GetReservationWithDaysOpenAndPassengers(0, 3, false, 3),
 			testutils.GetReservationWithDaysOpenAndPassengers(5, 5, false, 3),
 			testutils.GetReservationWithDaysOpenAndPassengers(7, 8, false, 3),
@@ -37,7 +37,7 @@ var canReservateTests = []struct {
 	},
 	{
 		"should be false, because reservations dates doesn't match",
-		testutils.GetStateRoom([]*domain.Reservation{
+		*testutils.GetStateRoom([]*domain.Reservation{
 			testutils.GetReservationWithDaysOpenAndPassengers(0, 3, false, 3),
 			testutils.GetReservationWithDaysOpenAndPassengers(5, 6, true, 3),
 			testutils.GetReservationWithDaysOpenAndPassengers(7, 8, false, 3),
@@ -48,7 +48,7 @@ var canReservateTests = []struct {
 	},
 	{
 		"should be true, because dates are free",
-		testutils.GetStateRoom([]*domain.Reservation{
+		*testutils.GetStateRoom([]*domain.Reservation{
 			testutils.GetReservationWithDaysOpenAndPassengers(0, 3, false, 3),
 			testutils.GetReservationWithDaysOpenAndPassengers(7, 8, false, 3),
 			testutils.GetReservationWithDaysOpenAndPassengers(10, 12, false, 2),
@@ -58,7 +58,7 @@ var canReservateTests = []struct {
 	},
 	{
 		"should be true, because there isn't any reservation",
-		testutils.GetStateRoom([]*domain.Reservation{}),
+		*testutils.GetStateRoom([]*domain.Reservation{}),
 		testutils.GetReservationWithDaysOpenAndPassengers(5, 6, false, 3),
 		true,
 	},

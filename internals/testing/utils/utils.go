@@ -5,8 +5,20 @@ import (
 	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
 )
 
-func GetStateRoom(reservations []*domain.Reservation) domain.StateRoom {
-	return *domain.NewStateRoom(
+func GetBoat(name string, reservations ...[]*domain.Reservation) domain.Boat {
+	var stateRooms []*domain.StateRoom
+	for _, reservation := range reservations {
+		stateRooms = append(stateRooms, GetStateRoom(reservation))
+	}
+	return *domain.NewBoat(
+		name,
+		stateRooms,
+		"",
+	)
+}
+
+func GetStateRoom(reservations []*domain.Reservation) *domain.StateRoom {
+	return domain.NewStateRoom(
 		0,
 		0,
 		reservations,
