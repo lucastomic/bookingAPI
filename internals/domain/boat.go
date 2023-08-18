@@ -14,8 +14,8 @@ type Boat struct {
 	stateRooms  []*StateRoom
 }
 
-func NewBoat(name string, stateRooms []*StateRoom, owner string) *Boat {
-	return &Boat{name: name, stateRooms: stateRooms, owner: owner}
+func NewBoat(name string, stateRooms []*StateRoom, owner string, maxCapacity int) *Boat {
+	return &Boat{name: name, stateRooms: stateRooms, owner: owner, maxCapacity: maxCapacity}
 }
 
 func NewBoatWithId(id int, name string, stateRooms []*StateRoom, owner string, maxCapacity int) *Boat {
@@ -24,6 +24,10 @@ func NewBoatWithId(id int, name string, stateRooms []*StateRoom, owner string, m
 
 func EmptyBoat() *Boat {
 	return &Boat{}
+}
+
+func (b Boat) MaxCapacity() int {
+	return b.maxCapacity
 }
 
 func (b Boat) Id() int {
@@ -173,5 +177,10 @@ func (b Boat) updateHashDays(
 
 // This method sets the state rooms of the boat.
 func (b *Boat) SetStateRooms(stateRooms []*StateRoom) {
+	for _, stateroom := range stateRooms {
+		for _, reservation := range stateroom.reservations {
+			reservation.maxCapacity = b.maxCapacity
+		}
+	}
 	b.stateRooms = stateRooms
 }

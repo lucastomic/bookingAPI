@@ -46,14 +46,15 @@ func AddEndpoints(r *gin.IRoutes) {
 // it returns the created boat's id and name as a JSON response. Otherwise, it returns an error message.
 func createBoat(c *gin.Context) {
 	var body struct {
-		Name string `json:"name"`
+		Name        string `json:"name"`
+		MaxCapacity int    `json:"maxCapacity"`
 	}
 	if err := c.Bind(&body); err != nil {
 		exceptionhandling.HandleException(c, err)
 		return
 	}
 	emailAuth := authenticationstate.UserAuthenticated().Email()
-	boat, err := boatService.CreateBoat(*domain.NewBoat(body.Name, []*domain.StateRoom{}, emailAuth))
+	boat, err := boatService.CreateBoat(*domain.NewBoat(body.Name, []*domain.StateRoom{}, emailAuth, body.MaxCapacity))
 	if err != nil {
 		exceptionhandling.HandleException(c, err)
 		return
