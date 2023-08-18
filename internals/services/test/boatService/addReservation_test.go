@@ -39,15 +39,15 @@ var boatWithReservations = domain.NewBoat("Boat with reservations", []*domain.St
 	stateRoom2,
 	stateRoom3,
 	stateRoom4,
-}, "")
+}, "", 0)
 
 var emptyBoat = domain.NewBoat("Empty boat", []*domain.StateRoom{
 	domain.EmptyStateRoom(),
-}, "")
+}, "", 0)
 
 var firstDaysReserved = domain.NewBoat("First days reserved", []*domain.StateRoom{
 	stateRoom5,
-}, "")
+}, "", 0)
 
 var possibleBoat = domain.NewBoat("Unable reservate", []*domain.StateRoom{
 	domain.NewStateRoom(0, 0, []*domain.Reservation{
@@ -68,7 +68,7 @@ var possibleBoat = domain.NewBoat("Unable reservate", []*domain.StateRoom{
 		newReservation(0, 5),
 		newReservation(7, 10),
 	}),
-}, "")
+}, "", 0)
 
 var addReservationTests = []struct {
 	domain.Boat

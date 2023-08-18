@@ -23,13 +23,13 @@ var boat1 = domain.NewBoat("Test 1", []*domain.StateRoom{
 		newReservation(2, 4),
 		newReservation(8, 9),
 	}),
-}, "")
+}, "", 0)
 
 var boat2 = domain.NewBoat("Test 2", []*domain.StateRoom{
 	domain.NewStateRoom(0, 0, []*domain.Reservation{
 		newReservation(0, 3),
 	}),
-}, "")
+}, "", 0)
 
 var boat3 = domain.NewBoat("Test 3", []*domain.StateRoom{
 	domain.NewStateRoom(0, 0, []*domain.Reservation{
@@ -39,11 +39,11 @@ var boat3 = domain.NewBoat("Test 3", []*domain.StateRoom{
 		newReservation(0, 3),
 		newReservation(1, 4),
 	}),
-}, "")
+}, "", 0)
 
 var boat4 = domain.NewBoat("Test 4", []*domain.StateRoom{
 	domain.NewStateRoom(0, 0, []*domain.Reservation{}),
-}, "")
+}, "", 0)
 
 var getUnstartedReservationsTests = []struct {
 	boat     domain.Boat

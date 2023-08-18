@@ -14,6 +14,7 @@ func GetBoat(name string, reservations ...[]*domain.Reservation) domain.Boat {
 		name,
 		stateRooms,
 		"",
+		0,
 	)
 }
 
