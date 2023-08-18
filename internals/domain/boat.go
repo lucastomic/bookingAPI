@@ -81,7 +81,7 @@ func (b *Boat) ReservateStateroom(reservation *Reservation) error {
 	i := 0
 	for _, stateRoom := range b.StateRooms() {
 		if (*stateRoom).CanReservate(*reservation) {
-			stateRoom.AddReservation(reservation)
+			stateRoom.Reservate(reservation)
 			break
 		}
 		i++
@@ -89,16 +89,14 @@ func (b *Boat) ReservateStateroom(reservation *Reservation) error {
 	return nil
 }
 
-// ReservateFullBoat reservates all the staterooms in the boat.
-// Returns true if the reservation was allocated propperly and false if there is no free range for the reservation
-func (b *Boat) ReservateFullBoat(reservation *Reservation) bool {
+func (b *Boat) ReservateEveryStateroom(reservation *Reservation) bool {
 	timeRangeIsAvailable := true
 	i := 0
 	stateroomsCopy := b.StateRooms()
 	for i < len(b.StateRooms()) && timeRangeIsAvailable {
 		timeRangeIsAvailable = stateroomsCopy[i].CanReservate(*reservation)
 		if timeRangeIsAvailable {
-			stateroomsCopy[i].AddReservation(reservation)
+			stateroomsCopy[i].Reservate(reservation)
 		}
 		i++
 	}

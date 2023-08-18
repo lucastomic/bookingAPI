@@ -58,7 +58,7 @@ func exploreChildNodes(
 	i := 0
 	reservation, _ := reservations.Pop()
 	for !*success && len(*stateRooms) > i {
-		if err := (*stateRooms)[i].AddReservation(reservation); err == nil {
+		if err := (*stateRooms)[i].Reservate(reservation); err == nil {
 			recursiveRealloaction(success, stateRooms, reservations)
 		}
 		if !*success {
