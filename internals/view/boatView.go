@@ -21,9 +21,10 @@ func (bv BoatView) ParseView(boat domain.Boat) gin.H {
 		parsedStateRooms = append(parsedStateRooms, stateRoomView.ParseView(*stateRoom))
 	}
 	return gin.H{
-		"name":      boat.Name(),
-		"id":        boat.Id(),
-		"owner":     boat.Owner(),
-		"stateRoom": parsedStateRooms,
+		"name":        boat.Name(),
+		"id":          boat.Id(),
+		"owner":       boat.Owner(),
+		"maxCapacity": boat.MaxCapacity(),
+		"stateRoom":   parsedStateRooms,
 	}
 }

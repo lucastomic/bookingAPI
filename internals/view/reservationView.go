@@ -19,9 +19,10 @@ func (view ReservationViewJSON) ParseView(reservation domain.Reservation) gin.H 
 	for _, client := range reservation.Clients() {
 		clients = append(clients,
 			gin.H{
-				"id":    client.Id(),
-				"name":  client.Name(),
-				"phone": client.Phone(),
+				"id":         client.Id(),
+				"name":       client.Name(),
+				"phone":      client.Phone(),
+				"passengers": client.Passengers(),
 			},
 		)
 	}
