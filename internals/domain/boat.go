@@ -63,19 +63,17 @@ func (b Boat) GetUnstartedReservations() []*Reservation {
 	return response
 }
 
-func (b *Boat) TimeRangeHasDisponibility(reservation Reservation) bool {
-	response := false
-	i := 0
-	for i < len(b.StateRooms()) && !response {
-		stateRoom := &b.StateRooms()[i]
-		response = (*stateRoom).CanReservate(reservation)
-		i++
+func (b *Boat) TimeRangeHasDisponibilityForOneStateroom(reservation Reservation) bool {
+	for _, stateroom := range b.StateRooms() {
+		if stateroom.CanReservate(reservation) {
+			return true
+		}
 	}
-	return response
+	return false
 }
 
 func (b *Boat) ReservateStateroom(reservation *Reservation) error {
-	if !b.TimeRangeHasDisponibility(*reservation) {
+	if !b.TimeRangeHasDisponibilityForOneStateroom(*reservation) {
 		return errors.New("there is not enough space for this reservation")
 	}
 	i := 0

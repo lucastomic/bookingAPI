@@ -89,7 +89,7 @@ func (b boatService) GetFullCapacityDays(boat domain.Boat) []string {
 }
 
 func (b boatService) ReservateStateroom(boat domain.Boat, reservation domain.Reservation) error {
-	if boat.TimeRangeHasDisponibility(reservation) {
+	if boat.TimeRangeHasDisponibilityForOneStateroom(reservation) {
 		err := boat.ReservateStateroom(&reservation)
 		return err
 	}
