@@ -26,10 +26,6 @@ func GetStateRoom(reservations []*domain.Reservation) *domain.StateRoom {
 	)
 }
 
-func GetDayFromToday(daysAfter int) timesimplified.Time {
-	return timesimplified.Now().AddDays(daysAfter)
-}
-
 func GetClientWithPassengers(passengers int) *domain.Client {
 	return domain.NewClient("Jhon Doe", "123321123", passengers)
 }
@@ -50,8 +46,8 @@ func GetReservationWithDaysOpenAndPassengers(starterDay, finalDay int, isOpen bo
 func createReservation(starterDay, finalDay int, isOpen bool, passengers ...int) domain.Reservation {
 	res := domain.NewReservationWithoutClient(
 		0,
-		GetDayFromToday(starterDay),
-		GetDayFromToday(finalDay),
+		GetDay(starterDay),
+		GetDay(finalDay),
 		isOpen,
 		0,
 	)
@@ -62,4 +58,8 @@ func createReservation(starterDay, finalDay int, isOpen bool, passengers ...int)
 	}
 	res.SetClients(clients)
 	return *res
+}
+
+func GetDay(daysAfter int) timesimplified.Time {
+	return timesimplified.NewTime(2200, 0, 0).AddDays(daysAfter)
 }
