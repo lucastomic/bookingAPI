@@ -84,6 +84,7 @@ func (b *Boat) ReservateStateroom(reservation *Reservation) error {
 	i := 0
 	for _, stateRoom := range b.StateRooms() {
 		if (*stateRoom).CanReservate(*reservation) {
+			reservation.SetMaxCapacity(b.maxCapacity)
 			stateRoom.Reservate(reservation)
 			break
 		}
@@ -101,6 +102,7 @@ func (b *Boat) ReservateEveryStateroom(reservation *Reservation) error {
 		if err != nil {
 			return err
 		}
+		reservation.SetMaxCapacity(b.maxCapacity)
 	}
 	return nil
 }
