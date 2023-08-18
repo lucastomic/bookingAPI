@@ -63,17 +63,22 @@ func (b Boat) GetUnstartedReservations() []*Reservation {
 	return response
 }
 
-func (b *Boat) TimeRangeHasDisponibilityForOneStateroom(reservation Reservation) bool {
+func (b *Boat) HasDisponibilityFor(reservation Reservation, stateroomsNeeded int) bool {
+	availableStaterooms := 0
 	for _, stateroom := range b.StateRooms() {
 		if stateroom.CanReservate(reservation) {
-			return true
+			availableStaterooms++
 		}
 	}
-	return false
+	return availableStaterooms >= stateroomsNeeded
+}
+
+func (b *Boat) HasDisponibilityForEntireBoat(reservation Reservation) bool {
+	return b.HasDisponibilityFor(reservation, len(b.stateRooms))
 }
 
 func (b *Boat) ReservateStateroom(reservation *Reservation) error {
-	if !b.TimeRangeHasDisponibilityForOneStateroom(*reservation) {
+	if !b.HasDisponibilityFor(*reservation, 1) {
 		return errors.New("there is not enough space for this reservation")
 	}
 	i := 0
@@ -87,21 +92,17 @@ func (b *Boat) ReservateStateroom(reservation *Reservation) error {
 	return nil
 }
 
-func (b *Boat) ReservateEveryStateroom(reservation *Reservation) bool {
-	timeRangeIsAvailable := true
-	i := 0
-	stateroomsCopy := b.StateRooms()
-	for i < len(b.StateRooms()) && timeRangeIsAvailable {
-		timeRangeIsAvailable = stateroomsCopy[i].CanReservate(*reservation)
-		if timeRangeIsAvailable {
-			stateroomsCopy[i].Reservate(reservation)
+func (b *Boat) ReservateEveryStateroom(reservation *Reservation) error {
+	if !b.HasDisponibilityForEntireBoat(*reservation) {
+		return errors.New("there is not enough space for this reservation")
+	}
+	for _, stateroom := range b.StateRooms() {
+		err := stateroom.Reservate(reservation)
+		if err != nil {
+			return err
 		}
-		i++
 	}
-	if timeRangeIsAvailable {
-		b.SetStateRooms(stateroomsCopy)
-	}
-	return timeRangeIsAvailable
+	return nil
 }
 
 // GetStateRoomsWithStartedReservations retrieves the boat's staterooms with only thje reservations which has already started

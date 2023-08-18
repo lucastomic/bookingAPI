@@ -89,7 +89,7 @@ func (b boatService) GetFullCapacityDays(boat domain.Boat) []string {
 }
 
 func (b boatService) ReservateStateroom(boat domain.Boat, reservation domain.Reservation) error {
-	if boat.TimeRangeHasDisponibilityForOneStateroom(reservation) {
+	if boat.HasDisponibilityFor(reservation, 1) {
 		err := boat.ReservateStateroom(&reservation)
 		return err
 	}
@@ -114,8 +114,9 @@ func (b boatService) GetNotEmptyDays(boat domain.Boat) []string {
 // ReservateFullBoat reservates all the staterooms in the boat.
 // Returns true if the reservation was allocated propperly and false if there is no free range for the reservation
 func (b boatService) ResevateFullBoat(boat domain.Boat, reservation domain.Reservation) error {
-	couldReservate := boat.ReservateEveryStateroom(&reservation)
-	if !couldReservate {
+	if boat.HasDisponibilityForEntireBoat(reservation) {
+		boat.ReservateEveryStateroom(&reservation)
+	} else {
 		return exceptions.ReservationCollides
 	}
 	err := b.Save(&boat)
