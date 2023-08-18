@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+	testutils "github.com/lucastomic/naturalYSalvajeRent/internals/testing/utils"
 )
 
 var mergeTests = []struct {
@@ -13,24 +14,24 @@ var mergeTests = []struct {
 	expected domain.Reservation
 }{
 	{
-		getReservation(true, 2, 3),
-		getReservation(true, 3),
-		getReservation(true, 8),
+		testutils.GetReservation(true, 2, 3),
+		testutils.GetReservation(true, 3),
+		testutils.GetReservation(true, 8),
 	},
 	{
-		getReservation(true, 2, 3),
-		getReservation(true, 4),
-		getReservation(true, 9),
+		testutils.GetReservation(true, 2, 3),
+		testutils.GetReservation(true, 4),
+		testutils.GetReservation(true, 9),
 	},
 	{
-		getReservation(true, 3),
-		getReservation(true, 8),
-		getReservation(true, 3),
+		testutils.GetReservation(true, 3),
+		testutils.GetReservation(true, 8),
+		testutils.GetReservation(true, 3),
 	},
 	{
-		getReservation(false, 3),
-		getReservation(true, 3),
-		getReservation(false, 3),
+		testutils.GetReservation(false, 3),
+		testutils.GetReservation(true, 3),
+		testutils.GetReservation(false, 3),
 	},
 }
 

@@ -45,7 +45,7 @@ var reservateFullBoat = []struct {
 func TestReservateFullBoat(t *testing.T) {
 	for _, tt := range reservateFullBoat {
 		t.Run(tt.boat.Name(), func(t *testing.T) {
-			got := tt.boat.ReservateFullBoat(&tt.res)
+			got := tt.boat.ReservateEveryStateroom(&tt.res)
 			if got != tt.expected {
 				t.Errorf("Expected: \n%v, got: \n%v", tt.expected, got)
 			}

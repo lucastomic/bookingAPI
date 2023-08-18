@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
+	testutils "github.com/lucastomic/naturalYSalvajeRent/internals/testing/utils"
 )
 
 var overlapsTests = []struct {
@@ -13,38 +14,38 @@ var overlapsTests = []struct {
 	expected bool
 }{
 	{
-		getReservationInDays(0, 1),
-		getReservationInDays(2, 3),
+		testutils.GetReservationInDays(0, 1),
+		testutils.GetReservationInDays(2, 3),
 		false,
 	},
 	{
-		getReservationInDays(0, 1),
-		getReservationInDays(1, 3),
+		testutils.GetReservationInDays(0, 1),
+		testutils.GetReservationInDays(1, 3),
 		true,
 	},
 	{
-		getReservationInDays(0, 0),
-		getReservationInDays(0, 1),
+		testutils.GetReservationInDays(0, 0),
+		testutils.GetReservationInDays(0, 1),
 		true,
 	},
 	{
-		getReservationInDays(3, 4),
-		getReservationInDays(1, 5),
+		testutils.GetReservationInDays(3, 4),
+		testutils.GetReservationInDays(1, 5),
 		true,
 	},
 	{
-		getReservationInDays(1, 5),
-		getReservationInDays(3, 4),
+		testutils.GetReservationInDays(1, 5),
+		testutils.GetReservationInDays(3, 4),
 		true,
 	},
 	{
-		getReservationInDays(0, 1),
-		getReservationInDays(0, 1),
+		testutils.GetReservationInDays(0, 1),
+		testutils.GetReservationInDays(0, 1),
 		true,
 	},
 	{
-		getReservationInDays(0, 0),
-		getReservationInDays(0, 0),
+		testutils.GetReservationInDays(0, 0),
+		testutils.GetReservationInDays(0, 0),
 		true,
 	},
 }
