@@ -91,13 +91,16 @@ func (b boatService) GetFullCapacityDays(boat domain.Boat) []string {
 func (b boatService) ReservateStateroom(boat domain.Boat, reservation domain.Reservation) error {
 	if boat.HasDisponibilityFor(reservation, 1) {
 		err := boat.ReservateStateroom(&reservation)
-		return err
+		if err != nil {
+			return exceptions.ReservationCollides
+		}
+	} else {
+		err := reservesreallocator.RealloacteReserves(&boat, &reservation)
+		if err != nil {
+			return exceptions.ReservationCollides
+		}
 	}
-	err := reservesreallocator.RealloacteReserves(&boat, &reservation)
-	if err != nil {
-		return exceptions.ReservationCollides
-	}
-	err = b.Save(&boat)
+	err := b.Save(&boat)
 	return err
 }
 
