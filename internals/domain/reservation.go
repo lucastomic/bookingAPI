@@ -18,7 +18,10 @@ type Reservation struct {
 }
 
 func (r Reservation) CanMerge(reservation Reservation) bool {
-	return r.bothAreOpen(reservation) && r.datesMatch(reservation) && !r.exceedsMaximumCapacityWith(reservation.clients...)
+	bothReservationsAreOpen := r.bothAreOpen(reservation)
+	datesMatch := r.datesMatch(reservation)
+	dontExceedsMaximumCapacityWith := !r.exceedsMaximumCapacityWith(reservation.clients...)
+	return bothReservationsAreOpen && datesMatch && dontExceedsMaximumCapacityWith
 }
 
 func (r *Reservation) Merge(reservation Reservation) {
