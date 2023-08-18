@@ -49,14 +49,20 @@ func (t Time) After(dateToCheck Time) bool {
 	return tParsed.After(dateToCheckParsed)
 }
 
+func (t Time) Unix() int64 {
+	tParsed := time.Time(t)
+	return tParsed.Unix()
+}
+
 func Now() Time {
 	return Time(time.Now())
 }
 
-// Equals checks whether two dates are the same. It compares if both days,
-// months and years are the same
-func (t Time) Equals(timeToCompare Time) bool {
-	return t.Day() == timeToCompare.Day() && t.Month() == timeToCompare.Month() && t.Year() == timeToCompare.Year()
+func (t Time) Equals(other interface{}) bool {
+	if otherTime, ok := other.(Time); ok {
+		return t.Year() == otherTime.Year() && t.Month() == otherTime.Month() && t.Day() == otherTime.Day()
+	}
+	return false
 }
 
 // FromString returns a new Time given a string with the yyyy-mm-dd format
