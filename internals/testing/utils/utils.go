@@ -61,5 +61,5 @@ func createReservation(starterDay, finalDay int, isOpen bool, passengers ...int)
 }
 
 func GetDay(daysAfter int) timesimplified.Time {
-	return timesimplified.NewTime(2200, 0, 0).AddDays(daysAfter)
+	return timesimplified.NewTime(2200, 1, 1).AddDays(daysAfter)
 }
