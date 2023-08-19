@@ -153,18 +153,6 @@ func (b Boat) GetNotAvailableDaysForSharedReservation(passengers int) []timesimp
 	return response.GetAsArray()
 }
 
-func (b Boat) GetDaysWithCloseReservations() []timesimplified.Time {
-	days := timeset.NewTimeSet()
-	b.forEachReservation(func(reservation *Reservation) {
-		if !reservation.IsOpen() {
-			reservation.ForEachDay(func(t timesimplified.Time) {
-				days.AddIfNotExists(t)
-			})
-		}
-	})
-	return days.GetAsArray()
-}
-
 func (b Boat) GetFullCapacityDays() []timesimplified.Time {
 	daysCounter := dayscounter.NewDaysCounter(len(b.stateRooms))
 	b.forEachReservation(func(reservation *Reservation) {

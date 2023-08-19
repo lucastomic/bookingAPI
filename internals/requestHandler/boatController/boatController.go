@@ -19,11 +19,9 @@ const boatEndpoint = "boat"
 
 const getBoatEndpoint = boatEndpoint + "/:id"
 const createBoatEndpoint = boatEndpoint
-const addReservationEndpoint = boatEndpoint + "/reservate"
 const deleteBoatEndpoint = boatEndpoint + "/:id"
-const getFullCapacityDaysEndpoint = boatEndpoint + "/reserved/:id"
-const getNotEmptyDaysEndpoints = boatEndpoint + "/notEmpty/:id"
-const getNotAvailableDaysForSharedReservationEndpoint = boatEndpoint + "/notAvailabeForShared/:id"
+const getNotEmptyDaysEndpoints = boatEndpoint + "/notAvailableForClose/:id"
+const getNotAvailableDaysForSharedReservationEndpoint = boatEndpoint + "/notAvailableForShared/:id"
 const reservateFullBoatEndpoint = boatEndpoint + "/reservateFullBoat"
 
 var boatService = serviceinjector.NewBoatService()
@@ -33,11 +31,9 @@ var boatView = viewport.NewBoatView()
 // AddEndpoints takes a gin.Engine object and updates all the boat endpoints
 func AddEndpoints(r *gin.IRoutes) {
 	(*r).GET(getBoatEndpoint, getBoat)
-	(*r).GET(getFullCapacityDaysEndpoint, getFullCapacityDays)
 	(*r).GET(getNotEmptyDaysEndpoints, getNotEmptyDays)
 	(*r).GET(getNotAvailableDaysForSharedReservationEndpoint, getNotAvailableDaysForSharedReservation)
 	(*r).POST(createBoatEndpoint, createBoat)
-	(*r).POST(addReservationEndpoint, addReservation)
 	(*r).POST(reservateFullBoatEndpoint, reservateFullBoat)
 	(*r).DELETE(deleteBoatEndpoint, deleteBoat)
 }
@@ -128,31 +124,6 @@ func parseBoat(c *gin.Context, boat domain.Boat) {
 	c.JSON(http.StatusOK, boatView.ParseView(boat))
 }
 
-// getFullCapacityDays retrieves the completed days of a boat given its ID.
-// This means, the days when all the boat's staterooms are reserved
-func getFullCapacityDays(c *gin.Context) {
-	c.Header("Access-Control-Allow-Origin", "*")
-
-	id := c.Param("id")
-
-	idParsed, err := strconv.Atoi(id)
-	if err != nil {
-		exceptionhandling.HandleException(c, exceptions.WrongIdType)
-		return
-	}
-
-	boat, err := boatService.GetBoat(idParsed)
-	if err != nil {
-		exceptionhandling.HandleException(c, err)
-		return
-	}
-
-	completeDays := boatService.GetFullCapacityDays(boat)
-	c.JSON(http.StatusOK, gin.H{
-		"days": completeDays,
-	})
-}
-
 // getNotEmptyDays retrives those days where there is at least one reservation of a boat given its ID.
 func getNotEmptyDays(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
@@ -204,36 +175,6 @@ func getNotAvailableDaysForSharedReservation(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"days": completeDays,
 	})
-}
-
-// addReservation adds a new reservation to a boat.
-// If there isn't enoguh space to reservate in the specified dates range, it returns an error.
-// Also returns an error if the request body is not correct or if the boat id specified doesn't exist
-func addReservation(c *gin.Context) {
-	c.Header("Access-Control-Allow-Origin", "*")
-
-	reservation, err := parseReservationFromBody(c)
-	if err != nil {
-		exceptionhandling.HandleException(c, err)
-		return
-	}
-
-	if reservation.HasStarted() {
-		err = exceptions.NewApiError(http.StatusBadRequest, "this dates are not allowed (first day has already passed)")
-		exceptionhandling.HandleException(c, err)
-		return
-	}
-
-	boat, err := boatService.GetBoat(reservation.BoatId())
-	if err != nil {
-		err = exceptions.NewApiError(http.StatusBadRequest, "boat with id "+strconv.Itoa(reservation.BoatId())+" doesn't exist")
-		exceptionhandling.HandleException(c, err)
-		return
-	}
-	err = boatService.ReservateStateroom(boat, reservation)
-	if err != nil {
-		exceptionhandling.HandleException(c, err)
-	}
 }
 
 // addReservation adds a new reservation to a boat.

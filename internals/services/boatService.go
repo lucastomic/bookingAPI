@@ -110,11 +110,6 @@ func (b boatService) GetNotEmptyDays(boat domain.Boat) []string {
 	return b.parseTimeSliceToString(notEmptyDays)
 }
 
-func (b boatService) GetDaysWithCloseReservations(boat domain.Boat) []string {
-	daysWithCloseReservation := boat.GetDaysWithCloseReservations()
-	return b.parseTimeSliceToString(daysWithCloseReservation)
-}
-
 func (b boatService) GetNotAvailableDaysForSharedReservation(boat domain.Boat, passengers int) []string {
 	days := boat.GetNotAvailableDaysForSharedReservation(passengers)
 	return b.parseTimeSliceToString(days)
