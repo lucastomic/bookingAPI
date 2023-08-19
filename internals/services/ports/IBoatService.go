@@ -27,6 +27,12 @@ type IBoatService interface {
 	// GetNotEmptyDays returns a list of dates on which the specified boat has at least one reservation.
 	// It takes a domain.Boat object as input and returns a slice of strings representing the non-empty days.
 	GetNotEmptyDays(domain.Boat) []string
+	// GetNotEmptyDays returns a list of dates on which the specified boat has at least one close reservation.
+	// It takes a domain.Boat object as input and returns a slice of strings representing the non-empty days.
+	GetDaysWithCloseReservations(domain.Boat) []string
+
+	GetNotAvailableDaysForSharedReservation(boat domain.Boat, passengers int) []string
+
 	// AddReservation adds a new reservation to the specified boat.
 	// It takes a domain.Boat object and a domain.Reservation object as input and returns an error if any occurred.
 	// For example, it would return an error if the reservation can't be allocated because there is not enough space.

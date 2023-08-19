@@ -23,6 +23,7 @@ const addReservationEndpoint = boatEndpoint + "/reservate"
 const deleteBoatEndpoint = boatEndpoint + "/:id"
 const getFullCapacityDaysEndpoint = boatEndpoint + "/reserved/:id"
 const getNotEmptyDaysEndpoints = boatEndpoint + "/notEmpty/:id"
+const getNotAvailableDaysForSharedReservationEndpoint = boatEndpoint + "/notAvailabeForShared/:id"
 const reservateFullBoatEndpoint = boatEndpoint + "/reservateFullBoat"
 
 var boatService = serviceinjector.NewBoatService()
@@ -34,6 +35,7 @@ func AddEndpoints(r *gin.IRoutes) {
 	(*r).GET(getBoatEndpoint, getBoat)
 	(*r).GET(getFullCapacityDaysEndpoint, getFullCapacityDays)
 	(*r).GET(getNotEmptyDaysEndpoints, getNotEmptyDays)
+	(*r).GET(getNotAvailableDaysForSharedReservationEndpoint, getNotAvailableDaysForSharedReservation)
 	(*r).POST(createBoatEndpoint, createBoat)
 	(*r).POST(addReservationEndpoint, addReservation)
 	(*r).POST(reservateFullBoatEndpoint, reservateFullBoat)
@@ -170,6 +172,35 @@ func getNotEmptyDays(c *gin.Context) {
 	}
 
 	completeDays := boatService.GetNotEmptyDays(boat)
+	c.JSON(http.StatusOK, gin.H{
+		"days": completeDays,
+	})
+}
+
+func getNotAvailableDaysForSharedReservation(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+
+	id := c.Param("id")
+	passengers := c.DefaultQuery("passengers", "3")
+
+	idParsed, err := strconv.Atoi(id)
+	if err != nil {
+		exceptionhandling.HandleException(c, exceptions.WrongIdType)
+		return
+	}
+	passengersParsed, err := strconv.Atoi(passengers)
+	if err != nil {
+		exceptionhandling.HandleException(c, exceptions.NewApiError(400, "wrong passengers parameter type"))
+		return
+	}
+
+	boat, err := boatService.GetBoat(idParsed)
+	if err != nil {
+		exceptionhandling.HandleException(c, err)
+		return
+	}
+
+	completeDays := boatService.GetNotAvailableDaysForSharedReservation(boat, passengersParsed)
 	c.JSON(http.StatusOK, gin.H{
 		"days": completeDays,
 	})

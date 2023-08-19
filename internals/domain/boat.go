@@ -141,6 +141,18 @@ func (b Boat) GetNotEmptyDays() []timesimplified.Time {
 	return days.GetAsArray()
 }
 
+func (b Boat) GetNotAvailableDaysForSharedReservation(passengers int) []timesimplified.Time {
+	response := timeset.NewTimeSet()
+	b.forEachReservation(func(res *Reservation) {
+		if !res.isOpen || res.exceedsMaximumCapacityWith(&Client{0, "", "", passengers}) {
+			res.ForEachDay(func(day timesimplified.Time) {
+				response.AddIfNotExists(day)
+			})
+		}
+	})
+	return response.GetAsArray()
+}
+
 func (b Boat) GetDaysWithCloseReservations() []timesimplified.Time {
 	days := timeset.NewTimeSet()
 	b.forEachReservation(func(reservation *Reservation) {

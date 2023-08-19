@@ -8,6 +8,7 @@ import (
 	"github.com/lucastomic/naturalYSalvajeRent/internals/exceptions"
 	reservesreallocator "github.com/lucastomic/naturalYSalvajeRent/internals/reservesReallocator"
 	authenticationstate "github.com/lucastomic/naturalYSalvajeRent/internals/state/authentication"
+	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
 )
 
 // boatService is a service that provides operations related to boats.
@@ -104,14 +105,19 @@ func (b boatService) ReservateStateroom(boat domain.Boat, reservation domain.Res
 	return err
 }
 
-// GetNotEmptyDays retrives those days where there is at least one reservation of a boat.
 func (b boatService) GetNotEmptyDays(boat domain.Boat) []string {
-	var response []string
-	days := boat.GetNotEmptyDays()
-	for _, day := range days {
-		response = append(response, day.ToString())
-	}
-	return response
+	notEmptyDays := boat.GetNotEmptyDays()
+	return b.parseTimeSliceToString(notEmptyDays)
+}
+
+func (b boatService) GetDaysWithCloseReservations(boat domain.Boat) []string {
+	daysWithCloseReservation := boat.GetDaysWithCloseReservations()
+	return b.parseTimeSliceToString(daysWithCloseReservation)
+}
+
+func (b boatService) GetNotAvailableDaysForSharedReservation(boat domain.Boat, passengers int) []string {
+	days := boat.GetNotAvailableDaysForSharedReservation(passengers)
+	return b.parseTimeSliceToString(days)
 }
 
 // ReservateFullBoat reservates all the staterooms in the boat.
@@ -124,4 +130,12 @@ func (b boatService) ResevateFullBoat(boat domain.Boat, reservation domain.Reser
 	}
 	err := b.Save(&boat)
 	return err
+}
+
+func (b boatService) parseTimeSliceToString(s []timesimplified.Time) []string {
+	var response []string
+	for _, day := range s {
+		response = append(response, day.ToString())
+	}
+	return response
 }
