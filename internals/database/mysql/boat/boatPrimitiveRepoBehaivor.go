@@ -12,10 +12,10 @@ type boatPrimitiveRepoBehaivor struct {
 	stateRoomRepo databaseport.IStateRoomRepository
 }
 
-const insertBoatStmt string = "INSERT INTO boat(name,max_capacity,owner) VALUES(?,?)"
+const insertBoatStmt string = "INSERT INTO boat(name,max_capacity,owner) VALUES(?,?,?)"
 const updateBoatStmt string = "UPDATE boat SET name = ?, max_capacity = ?, owner = ? WHERE id = ?"
-const findBoatByIdStmt string = "SELECT id, name, max_capacity,owner FROM boat WHERE id = ?"
-const findAllStmt string = "SELECT id, name, max_capacity,owner FROM boat"
+const findBoatByIdStmt string = "SELECT * FROM boat WHERE id = ?"
+const findAllStmt string = "SELECT * FROM boat"
 const removeStmt string = "DELETE FROM boat WHERE id = ?"
 
 // insertStmt returns the statement to insert a new boat
@@ -73,7 +73,7 @@ func (repo boatPrimitiveRepoBehaivor) Scan(row *sql.Rows) (domain.Boat, error) {
 	var id, maxCapacity int
 	var name, owner string
 	var stateRooms []*domain.StateRoom = []*domain.StateRoom{}
-	err := row.Scan(&id, &name, &maxCapacity, &owner)
+	err := row.Scan(&id, &name, &owner, &maxCapacity)
 	if err != nil {
 		return *domain.EmptyBoat(), err
 	}
