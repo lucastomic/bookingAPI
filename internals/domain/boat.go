@@ -28,39 +28,6 @@ func EmptyBoat() *Boat {
 	return &Boat{}
 }
 
-func (b Boat) MaxCapacity() int {
-	return b.maxCapacity
-}
-
-func (b Boat) Id() int {
-	return b.id
-}
-
-func (b *Boat) SetId(id int) {
-	b.id = id
-}
-
-func (b Boat) Owner() string {
-	return b.owner
-}
-
-func (b Boat) Name() string {
-	return b.name
-}
-
-func (b *Boat) SetName(name string) {
-	b.name = name
-}
-
-func (b Boat) StateRooms() []*StateRoom {
-	return b.stateRooms
-}
-
-func (b *Boat) SetStateRooms(stateRooms []*StateRoom) {
-	stateRoomsModified := b.getWithMaxCapacity(stateRooms)
-	b.stateRooms = stateRoomsModified
-}
-
 func (b Boat) GetUnstartedReservations() []*Reservation {
 	var response []*Reservation
 	b.forEachReservation(func(reservation *Reservation) {
@@ -161,6 +128,39 @@ func (b Boat) GetFullCapacityDays() []timesimplified.Time {
 		})
 	})
 	return daysCounter.GetWhichArchivedObjetive()
+}
+
+func (b Boat) Id() int {
+	return b.id
+}
+
+func (b *Boat) SetId(id int) {
+	b.id = id
+}
+
+func (b Boat) Owner() string {
+	return b.owner
+}
+
+func (b Boat) Name() string {
+	return b.name
+}
+
+func (b *Boat) SetName(name string) {
+	b.name = name
+}
+
+func (b Boat) StateRooms() []*StateRoom {
+	return b.stateRooms
+}
+
+func (b *Boat) SetStateRooms(stateRooms []*StateRoom) {
+	stateRoomsModified := b.getWithMaxCapacity(stateRooms)
+	b.stateRooms = stateRoomsModified
+}
+
+func (b Boat) MaxCapacity() int {
+	return b.maxCapacity
 }
 
 func (b Boat) getWithMaxCapacity(stateRooms []*StateRoom) []*StateRoom {
