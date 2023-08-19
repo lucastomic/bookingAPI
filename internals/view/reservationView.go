@@ -31,5 +31,6 @@ func (view ReservationViewJSON) ParseView(reservation domain.Reservation) gin.H 
 		"clients":  clients,
 		"firstDay": reservation.FirstDay().ToString(),
 		"lastDay":  reservation.LastDay().ToString(),
+		"isShared": reservation.IsOpen(),
 	}
 }
