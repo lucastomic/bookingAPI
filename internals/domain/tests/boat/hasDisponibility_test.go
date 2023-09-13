@@ -7,7 +7,7 @@ import (
 	testutils "github.com/lucastomic/naturalYSalvajeRent/internals/testing/utils"
 )
 
-var reservateFullBoat = []struct {
+var hasDisponibilityTestSet = []struct {
 	boat            domain.Boat
 	stateroomNeeded int
 	reservation     domain.Reservation
@@ -164,13 +164,12 @@ var reservateFullBoat = []struct {
 }
 
 func TestReservateFullBoat(t *testing.T) {
-	for _, tt := range reservateFullBoat {
+	for _, tt := range hasDisponibilityTestSet {
 		t.Run(tt.boat.Name(), func(t *testing.T) {
 			got := tt.boat.HasDisponibilityFor(tt.reservation, tt.stateroomNeeded)
 			if got != tt.expected {
 				t.Errorf("Expected: \n%v, got: \n%v", tt.expected, got)
 			}
-
 		})
 	}
 }
