@@ -35,6 +35,19 @@ func (b *ReservationManager) ReservateStaterooms(reservation *Reservation, state
 			"only close reservations can reserve only one stateroom. Shared resrevations must reservate all of them",
 		)
 	}
+	b.reservateUnsafe(reservation, staterooms)
+	return nil
+}
+
+func (b *ReservationManager) ReservateEveryStateroom(reservation *Reservation) error {
+	if !b.HasDisponibilityForEntireBoat(*reservation) {
+		return errors.New("there is not enough space for this reservation")
+	}
+	b.reservateUnsafe(reservation, len(b.staterooms))
+	return nil
+}
+
+func (b *ReservationManager) reservateUnsafe(reservation *Reservation, staterooms int) {
 	stateroomReserved := 0
 	for _, stateRoom := range b.staterooms {
 		if (*stateRoom).CanReservate(*reservation) {
@@ -46,23 +59,4 @@ func (b *ReservationManager) ReservateStaterooms(reservation *Reservation, state
 			break
 		}
 	}
-	return nil
-}
-
-func (b *ReservationManager) ReservateStateroom(reservation *Reservation) error {
-	return b.ReservateStaterooms(reservation, 1)
-}
-
-func (b *ReservationManager) ReservateEveryStateroom(reservation *Reservation) error {
-	if !b.HasDisponibilityForEntireBoat(*reservation) {
-		return errors.New("there is not enough space for this reservation")
-	}
-	for _, stateroom := range b.staterooms {
-		err := stateroom.Reservate(reservation)
-		if err != nil {
-			return err
-		}
-		reservation.SetMaxCapacity(b.maxCapacity)
-	}
-	return nil
 }
