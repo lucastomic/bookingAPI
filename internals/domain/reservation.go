@@ -144,6 +144,10 @@ func (r *Reservation) SetClients(clients []*Client) {
 	r.clients = clients
 }
 
+func (r Reservation) MaxCapacity() int {
+	return r.maxCapacity
+}
+
 func (r *Reservation) SetMaxCapacity(maxCap int) {
 	r.maxCapacity = maxCap
 }
