@@ -31,44 +31,6 @@ func (r *Reservation) Merge(reservation Reservation) {
 	r.addClients(reservation.clients...)
 }
 
-func (r Reservation) Clients() []*Client {
-	return r.clients
-}
-
-func (r *Reservation) SetClients(clients []*Client) {
-	r.clients = clients
-}
-
-func (r *Reservation) SetMaxCapacity(maxCap int) {
-
-	r.maxCapacity = maxCap
-}
-
-func (r Reservation) FirstDay() timesimplified.Time {
-	return r.firstDay
-}
-
-func (r Reservation) BoatId() int {
-	return r.boatId
-}
-
-func (r Reservation) LastDay() timesimplified.Time {
-	return r.lastDay
-}
-
-func (r Reservation) IsOpen() bool {
-	return r.isOpen
-}
-
-// Id returns the unique ID of the reservation.
-func (r Reservation) Id() int {
-	return r.id
-}
-
-func (r *Reservation) SetId(id int) {
-	r.id = id
-}
-
 // IsZero checks whether the reservation is a zero value
 func (s Reservation) IsZero() bool {
 	return s.id == 0 && s.firstDay.IsZero() && s.lastDay.IsZero()
@@ -133,7 +95,12 @@ func (r Reservation) StartsAfter(dateToCheck timesimplified.Time) bool {
 
 // Equals cheks whether the reservation is the same as the specified by argument.
 func (r Reservation) Equals(reservation Reservation) bool {
-	return reservation.id == r.id && reservation.firstDay.Equals(r.firstDay) && reservation.lastDay.Equals(r.lastDay) && reservation.maxCapacity == r.maxCapacity && r.isOpen == reservation.isOpen && r.boatId == reservation.boatId && r.getTotalPassengers() == reservation.getTotalPassengers()
+	return reservation.id == r.id && reservation.firstDay.Equals(r.firstDay) &&
+		reservation.lastDay.Equals(r.lastDay) &&
+		reservation.maxCapacity == r.maxCapacity &&
+		r.isOpen == reservation.isOpen &&
+		r.boatId == reservation.boatId &&
+		r.getTotalPassengers() == reservation.getTotalPassengers()
 }
 
 func (r Reservation) getTotalPassengers() int {
@@ -169,6 +136,43 @@ func EmptyReservation() *Reservation {
 	return &Reservation{}
 }
 
+func (r Reservation) Clients() []*Client {
+	return r.clients
+}
+
+func (r *Reservation) SetClients(clients []*Client) {
+	r.clients = clients
+}
+
+func (r *Reservation) SetMaxCapacity(maxCap int) {
+	r.maxCapacity = maxCap
+}
+
+func (r Reservation) FirstDay() timesimplified.Time {
+	return r.firstDay
+}
+
+func (r Reservation) BoatId() int {
+	return r.boatId
+}
+
+func (r Reservation) LastDay() timesimplified.Time {
+	return r.lastDay
+}
+
+func (r Reservation) IsOpen() bool {
+	return r.isOpen
+}
+
+// Id returns the unique ID of the reservation.
+func (r Reservation) Id() int {
+	return r.id
+}
+
+func (r *Reservation) SetId(id int) {
+	r.id = id
+}
+
 // NewReservation creates and returns a new Reservation struct pointer with the provided parameters.
 func NewReservation(
 	id int,
@@ -187,6 +191,7 @@ func NewReservation(
 		boatId:   boatId,
 	}
 }
+
 func NewReservationWithCapacity(
 	id int,
 	firstDay timesimplified.Time,
@@ -206,6 +211,7 @@ func NewReservationWithCapacity(
 		boatId:      boatId,
 	}
 }
+
 func NewReservationWithoutClient(
 	id int,
 	firstDay timesimplified.Time,

@@ -5,34 +5,41 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/lucastomic/naturalYSalvajeRent/internals/domain"
 	"github.com/lucastomic/naturalYSalvajeRent/internals/exceptions"
-	authenticationstate "github.com/lucastomic/naturalYSalvajeRent/internals/state/authentication"
-
 	exceptionhandling "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/exceptionHandling"
 	reservationrequest "github.com/lucastomic/naturalYSalvajeRent/internals/requestHandler/reservationController/reservationRequest"
 	serviceinjector "github.com/lucastomic/naturalYSalvajeRent/internals/services/injection"
+	authenticationstate "github.com/lucastomic/naturalYSalvajeRent/internals/state/authentication"
 	viewport "github.com/lucastomic/naturalYSalvajeRent/internals/view/port"
 )
 
 const boatEndpoint = "boat"
 
-const getBoatEndpoint = boatEndpoint + "/:id"
-const createBoatEndpoint = boatEndpoint
-const deleteBoatEndpoint = boatEndpoint + "/:id"
-const getNotEmptyDaysEndpoints = boatEndpoint + "/notAvailableForClose/:id"
-const getNotAvailableDaysForSharedReservationEndpoint = boatEndpoint + "/notAvailableForShared/:id"
-const reservateFullBoatEndpoint = boatEndpoint + "/reservateFullBoat"
+const (
+	getBoatEndpoint                                 = boatEndpoint + "/:id"
+	createBoatEndpoint                              = boatEndpoint
+	deleteBoatEndpoint                              = boatEndpoint + "/:id"
+	getNotEmptyDaysEndpoints                        = boatEndpoint + "/notAvailableForClose/:id"
+	getNotAvailableDaysForSharedReservationEndpoint = boatEndpoint + "/notAvailableForShared/:id"
+	reservateFullBoatEndpoint                       = boatEndpoint + "/reservateFullBoat"
+)
 
-var boatService = serviceinjector.NewBoatService()
-var reservationService = serviceinjector.NewReservationService()
-var boatView = viewport.NewBoatView()
+var (
+	boatService        = serviceinjector.NewBoatService()
+	reservationService = serviceinjector.NewReservationService()
+	boatView           = viewport.NewBoatView()
+)
 
 // AddEndpoints takes a gin.Engine object and updates all the boat endpoints
 func AddEndpoints(r *gin.IRoutes) {
 	(*r).GET(getBoatEndpoint, getBoat)
 	(*r).GET(getNotEmptyDaysEndpoints, getNotEmptyDays)
-	(*r).GET(getNotAvailableDaysForSharedReservationEndpoint, getNotAvailableDaysForSharedReservation)
+	(*r).GET(
+		getNotAvailableDaysForSharedReservationEndpoint,
+		getNotAvailableDaysForSharedReservation,
+	)
 	(*r).POST(createBoatEndpoint, createBoat)
 	(*r).POST(reservateFullBoatEndpoint, reservateFullBoat)
 	(*r).DELETE(deleteBoatEndpoint, deleteBoat)
@@ -52,7 +59,9 @@ func createBoat(c *gin.Context) {
 		return
 	}
 	emailAuth := authenticationstate.UserAuthenticated().Email()
-	boat, err := boatService.CreateBoat(*domain.NewBoat(body.Name, []*domain.StateRoom{}, emailAuth, body.MaxCapacity))
+	boat, err := boatService.CreateBoat(
+		*domain.NewBoat(body.Name, []*domain.StateRoom{}, emailAuth, body.MaxCapacity),
+	)
 	if err != nil {
 		exceptionhandling.HandleException(c, err)
 		return
@@ -112,18 +121,6 @@ func getBoat(c *gin.Context) {
 	parseBoat(c, boat)
 }
 
-// parseBoat receives a boat object and returns the boat details,
-// including the boat's id, name, and state rooms, as a JSON response.
-// If the boat object is not found or there is an error while parsing the boat, it returns an error message.
-func parseBoat(c *gin.Context, boat domain.Boat) {
-	if boat.Name() == "" {
-		exceptionhandling.HandleException(c, exceptions.NotFound)
-		return
-	}
-
-	c.JSON(http.StatusOK, boatView.ParseView(boat))
-}
-
 // getNotEmptyDays retrives those days where there is at least one reservation of a boat given its ID.
 func getNotEmptyDays(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
@@ -161,7 +158,10 @@ func getNotAvailableDaysForSharedReservation(c *gin.Context) {
 	}
 	passengersParsed, err := strconv.Atoi(passengers)
 	if err != nil {
-		exceptionhandling.HandleException(c, exceptions.NewApiError(400, "wrong passengers parameter type"))
+		exceptionhandling.HandleException(
+			c,
+			exceptions.NewApiError(400, "wrong passengers parameter type"),
+		)
 		return
 	}
 
@@ -190,14 +190,20 @@ func reservateFullBoat(c *gin.Context) {
 	}
 
 	if reservation.HasStarted() {
-		err = exceptions.NewApiError(http.StatusBadRequest, "this dates are not allowed (first day has already passed)")
+		err = exceptions.NewApiError(
+			http.StatusBadRequest,
+			"this dates are not allowed (first day has already passed)",
+		)
 		exceptionhandling.HandleException(c, err)
 		return
 	}
 
 	boat, err := boatService.GetBoat(reservation.BoatId())
 	if err != nil {
-		err = exceptions.NewApiError(http.StatusBadRequest, "boat with id "+strconv.Itoa(reservation.BoatId())+" doesn't exist")
+		err = exceptions.NewApiError(
+			http.StatusBadRequest,
+			"boat with id "+strconv.Itoa(reservation.BoatId())+" doesn't exist",
+		)
 		exceptionhandling.HandleException(c, err)
 		return
 	}
@@ -220,4 +226,16 @@ func parseReservationFromBody(c *gin.Context) (domain.Reservation, error) {
 		return *domain.EmptyReservation(), err
 	}
 	return reservation, nil
+}
+
+// parseBoat receives a boat object and returns the boat details,
+// including the boat's id, name, and state rooms, as a JSON response.
+// If the boat object is not found or there is an error while parsing the boat, it returns an error message.
+func parseBoat(c *gin.Context, boat domain.Boat) {
+	if boat.Name() == "" {
+		exceptionhandling.HandleException(c, exceptions.NotFound)
+		return
+	}
+
+	c.JSON(http.StatusOK, boatView.ParseView(boat))
 }
