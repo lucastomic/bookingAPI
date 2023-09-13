@@ -1,23 +1,20 @@
 package domain
 
-import (
-	dayscounter "github.com/lucastomic/naturalYSalvajeRent/internals/daysCounter"
-	timeset "github.com/lucastomic/naturalYSalvajeRent/internals/timeSet"
-	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
-)
-
 type Boat struct {
 	maxCapacity int
 	owner       string
 	id          int
 	name        string
 	stateRooms  []*StateRoom
-	ReservationHandler
+	ReservationManager
+	DatesManager
 }
 
 func NewBoat(name string, stateRooms []*StateRoom, owner string, maxCapacity int) *Boat {
-	return &Boat{name: name, stateRooms: stateRooms, owner: owner, maxCapacity: maxCapacity,
-		ReservationHandler: ReservationHandler{stateRooms, maxCapacity},
+	return &Boat{
+		name: name, stateRooms: stateRooms, owner: owner, maxCapacity: maxCapacity,
+		ReservationManager: ReservationManager{stateRooms, maxCapacity},
+		DatesManager:       DatesManager{staterooms: stateRooms},
 	}
 }
 
@@ -34,22 +31,13 @@ func NewBoatWithId(
 		stateRooms:         stateRooms,
 		owner:              owner,
 		maxCapacity:        maxCapacity,
-		ReservationHandler: ReservationHandler{stateRooms, maxCapacity},
+		ReservationManager: ReservationManager{stateRooms, maxCapacity},
+		DatesManager:       DatesManager{staterooms: stateRooms},
 	}
 }
 
 func EmptyBoat() *Boat {
 	return &Boat{}
-}
-
-func (b Boat) GetUnstartedReservations() []*Reservation {
-	var response []*Reservation
-	b.forEachReservation(func(reservation *Reservation) {
-		if reservation.StartsAfter(timesimplified.Now()) {
-			response = append(response, reservation)
-		}
-	})
-	return response
 }
 
 func (b Boat) GetStateRoomsWithStartedReservations() []*StateRoom {
@@ -63,38 +51,6 @@ func (b Boat) GetStateRoomsWithStartedReservations() []*StateRoom {
 		response = append(response, stateRoom)
 	}
 	return response
-}
-
-func (b Boat) GetNotEmptyDays() []timesimplified.Time {
-	days := timeset.NewTimeSet()
-	b.forEachReservation(func(reservation *Reservation) {
-		reservation.ForEachDay(func(t timesimplified.Time) {
-			days.AddIfNotExists(t)
-		})
-	})
-	return days.GetAsArray()
-}
-
-func (b Boat) GetNotAvailableDaysForSharedReservation(passengers int) []timesimplified.Time {
-	response := timeset.NewTimeSet()
-	b.forEachReservation(func(res *Reservation) {
-		if !res.isOpen || res.exceedsMaximumCapacityWith(&Client{0, "", "", passengers}) {
-			res.ForEachDay(func(day timesimplified.Time) {
-				response.AddIfNotExists(day)
-			})
-		}
-	})
-	return response.GetAsArray()
-}
-
-func (b Boat) GetFullCapacityDays() []timesimplified.Time {
-	daysCounter := dayscounter.NewDaysCounter(len(b.stateRooms))
-	b.forEachReservation(func(reservation *Reservation) {
-		reservation.ForEachDay(func(date timesimplified.Time) {
-			daysCounter.Add(date)
-		})
-	})
-	return daysCounter.GetWhichArchivedObjetive()
 }
 
 func (b Boat) Id() int {
@@ -138,12 +94,4 @@ func (b Boat) getWithMaxCapacity(stateRooms []*StateRoom) []*StateRoom {
 		}
 	}
 	return stateroomsModified
-}
-
-func (b Boat) forEachReservation(function func(*Reservation)) {
-	for _, stateRoom := range b.stateRooms {
-		for _, reservation := range stateRoom.Reservations() {
-			function(reservation)
-		}
-	}
 }
