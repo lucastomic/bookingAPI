@@ -22,18 +22,10 @@ func (b DatesManager) GetUnstartedReservations() []*Reservation {
 
 func (b DatesManager) GetNotEmptyDays() []timesimplified.Time {
 	days := timeset.NewTimeSet()
-	b.forEachReservationDay(func(t timesimplified.Time, r *Reservation) {
+	b.forEachReservationDay(func(t timesimplified.Time, _ *Reservation) {
 		days.AddIfNotExists(t)
 	})
 	return days.GetAsArray()
-}
-
-func (b DatesManager) GetFullCapacityDays() []timesimplified.Time {
-	daysCounter := dayscounter.NewDaysCounter(len(b.staterooms))
-	b.forEachReservationDay(func(date timesimplified.Time, r *Reservation) {
-		daysCounter.Add(date)
-	})
-	return daysCounter.GetWhichArchivedObjetive()
 }
 
 func (b DatesManager) GetNotAvailableDaysForSharedReservation(
