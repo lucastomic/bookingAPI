@@ -65,9 +65,41 @@ Get a specific boat, given its ID. As the Create-Boat endpoint, returns a JSON l
 }
 ```
 
-### `GET /boat/reserved/:id`
-Get the days when a boat it's in its full capacity (this means those days when all the staterooms are reserved) given its ID
+### `GET /notAvailableForShared/:boatId?passengers=:passengers`
+Get the days when a boat it's in not avaialble for shared reservations, given the boat ID.
+A day is not available for a shared resrevation if:
 
+- Exists other not-shared reservation in those days
+- Exist other shared reservation in those days. But, the sum of the passengers exceeds the maximum capacity.
+
+The query-parameter `passengers` is the amount of passengers to check disponibility. The default value is 1.
+
+Expects to return a JSON like the following:
+```
+{
+    "days": [
+        "2023-12-20",
+        "2023-12-22",
+        "2023-12-23",
+        "2023-12-24"
+    ]
+}
+```
+### `GET /notAvailableForClose/:boatId?staterooms=:staterooms`
+Get the days when a boat it's in not avaialble for not-shared (close) reservations, given the boat ID.
+A day is not available for a shared resrevation if:
+
+Expects to return a JSON like the following:
+```
+{
+    "days": [
+        "2023-12-20",
+        "2023-12-22",
+        "2023-12-23",
+        "2023-12-24"
+    ]
+}
+```
 ### `GET /boat/notEmpty/:id`
 Get those days where there is at least one reservation of a boat given its ID
 
