@@ -70,7 +70,7 @@ func (b boatService) ReservateStaterooms(
 	if boat.HasDisponibilityFor(reservation, stateroomsNeeded) {
 		err := boat.ReservateStaterooms(&reservation, 1)
 		if err != nil {
-			return exceptions.ReservationCollides
+			return exceptions.NewApiError(400, err.Error())
 		}
 	} else {
 		return exceptions.ReservationCollides
