@@ -1,10 +1,10 @@
 # Booking API
-Booking API is a simple API for reservation management in a boat with different staterooms. This is designed mainly for the porpouse of showing mu backend skills.
-This is the stack used for the project development:
-- Go
-- Docker
-- MYSQL
-- AWS
+Booking API is a simple API for reservation management in a boat with different staterooms. Supports the next features:
+
+-  Booking the full boat for N days
+-  Booking just N staterooms of the boat
+-  Booking the boat in shared way. This mean, other client's can join to your reservation.
+
 
 # API usage
 This section won't get in details deeply (explanation of the parameters, possible returns, etc) because it's not the porpouse of the repository, but the explanation of the Software engeneering areas involved in its construction.
@@ -26,20 +26,51 @@ Authenticate the user and retrieve the Json Web Token, expects a JSON body reque
   "password":"secretPassword"
 }
 ```
-### `GET /boat/:id`
-Get a specific boat, given its ID
-
-### `GET /boat/reserved/:id`
-Get the days when a boat it's in its full capacity (this means those days when all the staterooms are reserved) given its ID
-### `GET /boat/notEmpty/:id`
-Get those days where there is at least one reservation of a boat given its ID
 ### `POST /boat`
 Creates a new boat, expects a JSON body request like this:
 ```json
 {
-  "name": "Boat 1"
+  "name": "BoatName",
+  "maxCapacity":10
 }
 ```
+| Nombre del Parámetro | Tipo   | Descripción                            |
+| --------------------- | ------ | --------------------------------------|
+| `name`                | String | Boat's name                  |
+| `maxCapacity`         | Number | Boat's max capacity      |
+
+If successful it will return a JSON like the following
+
+```json
+{
+    "id": 14,
+    "maxCapacity": 10,
+    "name": "BoatName",
+    "owner": "myEmail@gmail.com",
+    "stateRoom": null
+}
+```
+### `PUT /stateRoom/add/:boatId`
+Adds a new stateroom to a boat, given the boat ID
+
+### `GET /boat/:id`
+Get a specific boat, given its ID. As the Create-Boat endpoint, returns a JSON like the following
+```json
+{
+    "id": 14,
+    "maxCapacity": 10,
+    "name": "BoatName",
+    "owner": "myEmail@gmail.com",
+    "stateRoom": null
+}
+```
+
+### `GET /boat/reserved/:id`
+Get the days when a boat it's in its full capacity (this means those days when all the staterooms are reserved) given its ID
+
+### `GET /boat/notEmpty/:id`
+Get those days where there is at least one reservation of a boat given its ID
+
 ### `POST /boat/reservate`
 Makes a reservation in a boat, expects a JSON body request like this:
 ```json
@@ -72,12 +103,6 @@ Adds a new stateroom to a boat, given the boat ID
 
 ### `DELETE /reservation/:id`
 Deletes a specific reservation, given its ID
-
-# Software engeneering areas involved
-## Architecture
-The architecture follows a MVC pattern, where the differents layers are connected through interfaces (dependency inversion) similar to a hexagonal architecture
-
-![Diagram class](https://github.com/lucastomic/bookingAPI/assets/65186233/cdf91e60-1345-42d7-8f05-92a4f0825f65)
 
 ## Algorithmics
 Sometimes, the reservations may need a reallocation to be able to insert a new one, which can't be allocated with the current reservations distribution.
@@ -148,130 +173,3 @@ func exploreChildNodes(
 ```
 The algorithm takes into account that the reservations which have already started, can't be reallocated (the clients could be already in their staterooms)
 
-## Data structures
-For the implementation of the last algorithm, we make use of a Queue, implemented in `internals/datastructure/queue.go` as 
-(comments ommited)
-
-```
-type Queue[T any] struct {
-	array []T
-}
-
-func (q *Queue[T]) Push(el T) {
-	q.array = append(q.array, el)
-}
-
-func (q *Queue[T]) Pop() (T, error) {
-	if len(q.array) == 0 {
-		return *new(T), errors.New("there is no elements in queue")
-	}
-	response := q.array[0]
-	q.array = q.array[1:]
-	return response, nil
-}
-
-func (q *Queue[T]) IsEmpty() bool {
-	return len(q.array) == 0
-}
-func (q Queue[T]) Size() int {
-	return len(q.array)
-}
-
-func NewQueue[T any](arr []T) *Queue[T] {
-	return &Queue[T]{arr}
-}
-
-```
-## Database
-The database is managed with MYSQL and raw SQL (no ORM). The architecture of the database code implementation, can be seen in the [architecture section](#architecture), where the `database` struct is the implementation of the singleton pattern.
-
-Although the structure of the database is quite simple, this is the layout of the diagram.
-
-![database diagram](https://github.com/lucastomic/bookingAPI/assets/65186233/bf933efa-52d7-4332-9377-577aeee3739d)
-
-And the SQL used to generate the schema
-```
-CREATE SCHEMA IF NOT EXISTS naturalYSalvaje;
-
-USE naturalYSalvaje;
-
-CREATE TABLE boat(
-  id INT AUTO_INCREMENT,
-  name VARCHAR(255) NOT NULL,
-  PRIMARY KEY(id)
-);
-
-CREATE TABLE stateRoom(
-  id INT NOT NULL,
-  boatId INT NOT NULL,
-  PRIMARY KEY(boatId, id),
-  FOREIGN KEY(boatId) REFERENCES boat(id)
-);
-
-CREATE TABLE reservation(
-  id INT AUTO_INCREMENT,
-  name VARCHAR(255) NOT NULL,
-  phone VARCHAR(255) NOT NULL,
-  firstDay DATE NOT NULL,
-  lastDay DATE NOT NULL,
-  boatId INT NOT NULL,
-  stateRoomId INT NOT NULL,
-  
-  PRIMARY KEY(id),
-  FOREIGN KEY(boatId, stateRoomId) REFERENCES stateRoom(boatId,id)
-);
-```
-
-## Testing
-As this is not a real project, there was no need of spending time in a extensive coverage. However, for the demonstration of knowledge, some functions were covered
-
-
-
-
-```
-var user1 = domain.NewUser("Lucas Tomic", "1234212")
-var date = time.Date(2023, 05, 03, 20, 34, 58, 651387237, time.UTC)
-
-var reservation2Days = domain.NewReservation(0, user1, date, date.Add(time.Hour*24*2), 0, 0)
-
-var containsTests = []struct {
-	reservation1 domain.Reservation
-	date         time.Time
-	expected     bool
-}{
-	{
-		*reservation2Days,
-		date.Add(time.Hour * 24),
-		true,
-	},
-	{
-		*reservation2Days,
-		date.Add(time.Hour * 72),
-		false,
-	},
-	{
-		*reservation2Days,
-		date,
-		true,
-	},
-}
-
-func TestContains(t *testing.T) {
-	for i, tt := range containsTests {
-		t.Run("Test N: "+strconv.Itoa(i), func(t *testing.T) {
-			got := tt.reservation1.Contains(tt.date)
-			if got != tt.expected {
-				t.Errorf("Expected: %v, got: %v", tt.expected, got)
-			}
-
-		})
-	}
-}
-```
-
-## Docker
-Also, it makes use of Docker for managing the database and dockerize the application, using besides [air](https://github.com/cosmtrek/air) for live reload.
-
-## Deployment
-For the deployment of the project, there where used AWS services, specifically AWS EC2 for the API hosting and RDS for the database.
-(The public endpoint for using the API is not exposed as the security section of the project hasn't been finished yet)
