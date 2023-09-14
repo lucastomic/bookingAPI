@@ -73,7 +73,7 @@ func (repo boatPrimitiveRepoBehaivor) Scan(row *sql.Rows) (domain.Boat, error) {
 	var id, maxCapacity int
 	var name, owner string
 	var stateRooms []*domain.StateRoom = []*domain.StateRoom{}
-	err := row.Scan(&id, &name, &owner, &maxCapacity)
+	err := row.Scan(&id, &name, &maxCapacity, &owner)
 	if err != nil {
 		return *domain.EmptyBoat(), err
 	}
