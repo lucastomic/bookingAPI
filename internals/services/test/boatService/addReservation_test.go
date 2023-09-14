@@ -102,7 +102,7 @@ var addReservationTests = []struct {
 func TestAddReservation(t *testing.T) {
 	for _, tt := range addReservationTests {
 		t.Run(tt.Name(), func(t *testing.T) {
-			err := boatService.ReservateStateroom(tt.Boat, tt.Reservation)
+			err := boatService.ReservateStateroomWithReallocation(tt.Boat, tt.Reservation)
 			if (err != nil) == tt.expected {
 				t.Errorf("Failed")
 			}
