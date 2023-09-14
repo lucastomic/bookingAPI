@@ -12,7 +12,9 @@ type Boat struct {
 
 func NewBoat(name string, stateRooms []*StateRoom, owner string, maxCapacity int) *Boat {
 	return &Boat{
-		name: name, stateRooms: stateRooms, owner: owner, maxCapacity: maxCapacity,
+		name: name, stateRooms: stateRooms,
+		owner:              owner,
+		maxCapacity:        maxCapacity,
 		ReservationManager: ReservationManager{stateRooms, maxCapacity},
 		DatesManager:       DatesManager{staterooms: stateRooms},
 	}
@@ -80,6 +82,8 @@ func (b Boat) StateRooms() []*StateRoom {
 func (b *Boat) SetStateRooms(stateRooms []*StateRoom) {
 	stateRoomsModified := b.getWithMaxCapacity(stateRooms)
 	b.stateRooms = stateRoomsModified
+	b.DatesManager = DatesManager{staterooms: b.stateRooms}
+	b.ReservationManager = ReservationManager{staterooms: b.stateRooms}
 }
 
 func (b Boat) MaxCapacity() int {
