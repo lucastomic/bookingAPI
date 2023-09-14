@@ -21,9 +21,11 @@ const (
 	getBoatEndpoint                                 = boatEndpoint + "/:id"
 	createBoatEndpoint                              = boatEndpoint
 	deleteBoatEndpoint                              = boatEndpoint + "/:id"
-	getNotEmptyDaysEndpoints                        = boatEndpoint + "/notAvailableForClose/:id"
+	getNotEmptyDaysEndpoints                        = boatEndpoint + "/notEmptyDays/:id"
 	getNotAvailableDaysForSharedReservationEndpoint = boatEndpoint + "/notAvailableForShared/:id"
+	getNotAvailableDaysForCloseReservationEndpoint  = boatEndpoint + "/notAvailableForClose/:id"
 	reservateFullBoatEndpoint                       = boatEndpoint + "/reservateFullBoat"
+	reservateStateroomsEndpoint                     = boatEndpoint + "/reservate"
 )
 
 var (
@@ -37,11 +39,16 @@ func AddEndpoints(r *gin.IRoutes) {
 	(*r).GET(getBoatEndpoint, getBoat)
 	(*r).GET(getNotEmptyDaysEndpoints, getNotEmptyDays)
 	(*r).GET(
+		getNotAvailableDaysForCloseReservationEndpoint,
+		getNotAvailableDaysForCloseReservation,
+	)
+	(*r).GET(
 		getNotAvailableDaysForSharedReservationEndpoint,
 		getNotAvailableDaysForSharedReservation,
 	)
 	(*r).POST(createBoatEndpoint, createBoat)
 	(*r).POST(reservateFullBoatEndpoint, reservateFullBoat)
+	(*r).POST(reservateStateroomsEndpoint, reservateStaterooms)
 	(*r).DELETE(deleteBoatEndpoint, deleteBoat)
 }
 
@@ -66,10 +73,7 @@ func createBoat(c *gin.Context) {
 		exceptionhandling.HandleException(c, err)
 		return
 	}
-	c.JSON(http.StatusAccepted, gin.H{
-		"id":   boat.Id(),
-		"name": boat.Name(),
-	})
+	c.JSON(http.StatusAccepted, boatView.ParseView(boat))
 }
 
 // deleteBoat receives a request to delete a boat with a specific id,
@@ -149,7 +153,7 @@ func getNotAvailableDaysForSharedReservation(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
 
 	id := c.Param("id")
-	passengers := c.DefaultQuery("passengers", "3")
+	passengers := c.DefaultQuery("passengers", "1")
 
 	idParsed, err := strconv.Atoi(id)
 	if err != nil {
@@ -209,9 +213,6 @@ func getNotAvailableDaysForCloseReservation(c *gin.Context) {
 	})
 }
 
-// addReservation adds a new reservation to a boat.
-// If there isn't enoguh space to reservate in the specified dates range, it returns an error.
-// Also returns an error if the request body is not correct or if the boat id specified doesn't exist
 func reservateFullBoat(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
 
