@@ -177,6 +177,38 @@ func getNotAvailableDaysForSharedReservation(c *gin.Context) {
 	})
 }
 
+func getNotAvailableDaysForCloseReservation(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+
+	id := c.Param("id")
+	staterooms := c.DefaultQuery("staterooms", "1")
+
+	idParsed, err := strconv.Atoi(id)
+	if err != nil {
+		exceptionhandling.HandleException(c, exceptions.WrongIdType)
+		return
+	}
+	stateroomsParsed, err := strconv.Atoi(staterooms)
+	if err != nil {
+		exceptionhandling.HandleException(
+			c,
+			exceptions.NewApiError(400, "wrong staterooms parameter type"),
+		)
+		return
+	}
+
+	boat, err := boatService.GetBoat(idParsed)
+	if err != nil {
+		exceptionhandling.HandleException(c, err)
+		return
+	}
+
+	completeDays := boatService.GetNotAvailableDaysForCloseReservation(boat, stateroomsParsed)
+	c.JSON(http.StatusOK, gin.H{
+		"days": completeDays,
+	})
+}
+
 // addReservation adds a new reservation to a boat.
 // If there isn't enoguh space to reservate in the specified dates range, it returns an error.
 // Also returns an error if the request body is not correct or if the boat id specified doesn't exist
@@ -208,6 +240,48 @@ func reservateFullBoat(c *gin.Context) {
 		return
 	}
 	err = boatService.ResevateFullBoat(boat, reservation)
+	if err != nil {
+		exceptionhandling.HandleException(c, err)
+	}
+}
+
+func reservateStaterooms(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+
+	reservation, err := parseReservationFromBody(c)
+	if err != nil {
+		exceptionhandling.HandleException(c, err)
+		return
+	}
+	staterooms := c.DefaultQuery("staterooms", "1")
+
+	stateroomsParsed, err := strconv.Atoi(staterooms)
+	if err != nil {
+		exceptionhandling.HandleException(
+			c,
+			exceptions.NewApiError(400, "wrong staterooms parameter type"),
+		)
+		return
+	}
+	if reservation.HasStarted() {
+		err = exceptions.NewApiError(
+			http.StatusBadRequest,
+			"this dates are not allowed (first day has already passed)",
+		)
+		exceptionhandling.HandleException(c, err)
+		return
+	}
+
+	boat, err := boatService.GetBoat(reservation.BoatId())
+	if err != nil {
+		err = exceptions.NewApiError(
+			http.StatusBadRequest,
+			"boat with id "+strconv.Itoa(reservation.BoatId())+" doesn't exist",
+		)
+		exceptionhandling.HandleException(c, err)
+		return
+	}
+	err = boatService.ReservateStaterooms(boat, reservation, stateroomsParsed)
 	if err != nil {
 		exceptionhandling.HandleException(c, err)
 	}

@@ -62,17 +62,27 @@ func (b boatService) GetAllBoats() ([]*domain.Boat, error) {
 	return boats, nil
 }
 
-func (b boatService) GetFullCapacityDays(boat domain.Boat) []string {
-	var response []string
-	days := boat.GetFullCapacityDays()
-	for _, day := range days {
-		response = append(response, day.ToString())
+func (b boatService) ReservateStaterooms(
+	boat domain.Boat,
+	reservation domain.Reservation,
+	stateroomsNeeded int,
+) error {
+	if boat.HasDisponibilityFor(reservation, stateroomsNeeded) {
+		err := boat.ReservateStaterooms(&reservation, 1)
+		if err != nil {
+			return exceptions.ReservationCollides
+		}
+	} else {
+		return exceptions.ReservationCollides
 	}
-	return response
+	err := b.Save(&boat)
+	return err
 }
 
-// Note: This method isn't currently in use, but is expected to implement this use case in the future
-func (b boatService) ReservateStateroom(boat domain.Boat, reservation domain.Reservation) error {
+func (b boatService) ReservateStateroomWithReallocation(
+	boat domain.Boat,
+	reservation domain.Reservation,
+) error {
 	if boat.HasDisponibilityFor(reservation, 1) {
 		err := boat.ReservateStaterooms(&reservation, 1)
 		if err != nil {
@@ -98,6 +108,14 @@ func (b boatService) GetNotAvailableDaysForSharedReservation(
 	passengers int,
 ) []string {
 	days := boat.GetNotAvailableDaysForSharedReservation(passengers)
+	return b.parseTimeSliceToString(days)
+}
+
+func (b boatService) GetNotAvailableDaysForCloseReservation(
+	boat domain.Boat,
+	stateroomsNeeded int,
+) []string {
+	days := boat.GetNotAvailableDaysForCloseReservation(stateroomsNeeded)
 	return b.parseTimeSliceToString(days)
 }
 

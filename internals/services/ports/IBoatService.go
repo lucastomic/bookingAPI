@@ -27,10 +27,17 @@ type IBoatService interface {
 	// AddReservation adds a new reservation to the specified boat.
 	// It takes a domain.Boat object and a domain.Reservation object as input and returns an error if any occurred.
 	// For example, it would return an error if the reservation can't be allocated because there is not enough space.
-	ReservateStateroom(domain.Boat, domain.Reservation) error
+	ReservateStateroomWithReallocation(domain.Boat, domain.Reservation) error
+
+	ReservateStaterooms(
+		boat domain.Boat,
+		reservation domain.Reservation,
+		stateroomsNeeded int,
+	) error
 	// ResevateFullBoat reserves the entire boat for the specified reservation.
 	// It takes a domain.Boat object and a domain.Reservation object as input and returns an error if any occurred.
 	// For example, it would return an error if the reservation can't be allocated because there is not enough space.
 	ResevateFullBoat(boat domain.Boat, reservation domain.Reservation) error
 	GetNotAvailableDaysForSharedReservation(boat domain.Boat, passengers int) []string
+	GetNotAvailableDaysForCloseReservation(boat domain.Boat, passengers int) []string
 }
