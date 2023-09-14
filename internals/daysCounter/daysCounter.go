@@ -19,13 +19,9 @@ func NewDaysCounter(objective int) *DaysCounter {
 func (b *DaysCounter) Add(
 	date timesimplified.Time,
 ) {
-	if _, ok := (b.daysToReservations)[date]; ok {
-		b.daysToReservations[date]++
-		if b.daysToReservations[date] == b.objective {
-			b.archivedObjetive = append(b.archivedObjetive, date)
-		}
-	} else {
-		b.daysToReservations[date] = 1
+	b.daysToReservations[date]++
+	if b.daysToReservations[date] == b.objective {
+		b.archivedObjetive = append(b.archivedObjetive, date)
 	}
 }
 

@@ -24,6 +24,11 @@ func (r Reservation) CanMerge(reservation Reservation) bool {
 	return bothReservationsAreOpen && datesMatch && dontExceedsMaximumCapacityWith
 }
 
+func (r Reservation) CanMergePassengers(passengers int) bool {
+	dontExceedsMaximumCapacityWith := !r.exceedsMaximumCapacityWith(&Client{0, "", "", passengers})
+	return r.isOpen && dontExceedsMaximumCapacityWith
+}
+
 func (r *Reservation) Merge(reservation Reservation) {
 	if !r.CanMerge(reservation) {
 		return

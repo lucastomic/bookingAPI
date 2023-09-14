@@ -1,6 +1,8 @@
 package timeset
 
-import "github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
+import (
+	"github.com/lucastomic/naturalYSalvajeRent/internals/timesimplified"
+)
 
 type TimeSet struct {
 	daysAlreadyCounted map[int64]bool
@@ -19,6 +21,12 @@ func (t *TimeSet) AddIfNotExists(day timesimplified.Time) {
 	if !alreadyCounted {
 		t.daysAlreadyCounted[day.Unix()] = true
 		t.set = append(t.set, day)
+	}
+}
+
+func (t *TimeSet) AddSlice(days []timesimplified.Time) {
+	for _, day := range days {
+		t.AddIfNotExists(day)
 	}
 }
 

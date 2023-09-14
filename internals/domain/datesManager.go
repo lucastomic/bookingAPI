@@ -22,12 +22,18 @@ func (b DatesManager) GetUnstartedReservations() []*Reservation {
 
 func (b DatesManager) GetNotEmptyDays() []timesimplified.Time {
 	days := timeset.NewTimeSet()
-	b.forEachReservation(func(reservation *Reservation) {
-		reservation.ForEachDay(func(t timesimplified.Time) {
-			days.AddIfNotExists(t)
-		})
+	b.forEachReservationDay(func(t timesimplified.Time, r *Reservation) {
+		days.AddIfNotExists(t)
 	})
 	return days.GetAsArray()
+}
+
+func (b DatesManager) GetFullCapacityDays() []timesimplified.Time {
+	daysCounter := dayscounter.NewDaysCounter(len(b.staterooms))
+	b.forEachReservationDay(func(date timesimplified.Time, r *Reservation) {
+		daysCounter.Add(date)
+	})
+	return daysCounter.GetWhichArchivedObjetive()
 }
 
 func (b DatesManager) GetNotAvailableDaysForSharedReservation(
@@ -35,7 +41,7 @@ func (b DatesManager) GetNotAvailableDaysForSharedReservation(
 ) []timesimplified.Time {
 	response := timeset.NewTimeSet()
 	b.forEachReservation(func(res *Reservation) {
-		if !res.isOpen || res.exceedsMaximumCapacityWith(&Client{0, "", "", passengers}) {
+		if !res.CanMergePassengers(passengers) {
 			res.ForEachDay(func(day timesimplified.Time) {
 				response.AddIfNotExists(day)
 			})
@@ -44,14 +50,19 @@ func (b DatesManager) GetNotAvailableDaysForSharedReservation(
 	return response.GetAsArray()
 }
 
-func (b DatesManager) GetFullCapacityDays() []timesimplified.Time {
-	daysCounter := dayscounter.NewDaysCounter(len(b.staterooms))
-	b.forEachReservation(func(reservation *Reservation) {
-		reservation.ForEachDay(func(date timesimplified.Time) {
-			daysCounter.Add(date)
-		})
+func (b DatesManager) GetNotAvailableDaysForCloseReservation(
+	stateroomsNeeded int,
+) []timesimplified.Time {
+	response := timeset.NewTimeSet()
+	noEnoughStaterooms := b.getDaysCounterToNotEnoughStaterooms(stateroomsNeeded)
+	b.forEachReservationDay(func(date timesimplified.Time, reservation *Reservation) {
+		noEnoughStaterooms.Add(date)
+		if reservation.isOpen {
+			response.AddIfNotExists(date)
+		}
 	})
-	return daysCounter.GetWhichArchivedObjetive()
+	response.AddSlice(noEnoughStaterooms.GetWhichArchivedObjetive())
+	return response.GetAsArray()
 }
 
 func (b DatesManager) forEachReservation(function func(*Reservation)) {
@@ -60,4 +71,20 @@ func (b DatesManager) forEachReservation(function func(*Reservation)) {
 			function(reservation)
 		}
 	}
+}
+
+func (b DatesManager) forEachReservationDay(function func(timesimplified.Time, *Reservation)) {
+	b.forEachReservation(func(res *Reservation) {
+		res.ForEachDay(func(date timesimplified.Time) {
+			function(date, res)
+		})
+	})
+}
+
+func (b DatesManager) getDaysCounterToNotEnoughStaterooms(
+	stateroomsNeeded int,
+) *dayscounter.DaysCounter {
+	restantStaterooms := len(b.staterooms) - stateroomsNeeded
+	notEnoughStaterooms := restantStaterooms + 1
+	return dayscounter.NewDaysCounter(notEnoughStaterooms)
 }
