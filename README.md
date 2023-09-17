@@ -34,7 +34,7 @@ Creates a new boat, expects a JSON body request like this:
   "maxCapacity":10
 }
 ```
-| Nombre del Parámetro | Tipo   | Descripción                            |
+| Parameter | Type   | Description                            |
 | --------------------- | ------ | --------------------------------------|
 | `name`                | String | Boat's name                  |
 | `maxCapacity`         | Number | Boat's max capacity      |
@@ -69,7 +69,7 @@ Get a specific boat, given its ID. As the Create-Boat endpoint, returns a JSON l
 Get the days when a boat it's in not avaialble for shared reservations, given the boat ID.
 A day is not available for a shared resrevation if:
 
-- Exists other not-shared reservation in those days
+- Exists a not-shared reservation in those days
 - Exist other shared reservation in those days. But, the sum of the passengers exceeds the maximum capacity.
 
 The query-parameter `passengers` is the amount of passengers to check disponibility. The default value is 1.
@@ -87,7 +87,11 @@ Expects to return a JSON like the following:
 ```
 ### `GET /notAvailableForClose/:boatId?staterooms=:staterooms`
 Get the days when a boat it's in not avaialble for not-shared (close) reservations, given the boat ID.
-A day is not available for a shared resrevation if:
+The query parameter `staterooms` are the needed staterooms for the reservation. The default value is 1.
+A day is not available for a close resrevation if:
+
+- Exists a shared reservation on those days
+- There aren't enough staterooms
 
 Expects to return a JSON like the following:
 ```
@@ -100,108 +104,71 @@ Expects to return a JSON like the following:
     ]
 }
 ```
+
 ### `GET /boat/notEmpty/:id`
 Get those days where there is at least one reservation of a boat given its ID
 
-### `POST /boat/reservate`
-Makes a reservation in a boat, expects a JSON body request like this:
-```json
-{
-	"email":"ltomicb@gmail.com",
-	"phone":"623029321",
-	"firstDay":"2023-12-06",
-	"lastDay":"2023-12-09",
-	"boatId":13
-}
-```
-This endpoint could return an error if there is not enough space for the new reservation
 ### `POST /boat/reservateFullBoat`
-Reservates reserves the entire boat for the specified reservation. Expects a JSON body request like this:
+Makes a reservation in all the boat's stasterooms, expects a JSON body request like this:
 ```json
 {
-	"email":"ltomicb@gmail.com",
+	"email":"email@gmail.com",
 	"phone":"623029321",
-	"firstDay":"2023-12-06",
-	"lastDay":"2023-12-09",
-	"boatId":13
+	"firstDay":"2023-12-25",
+	"lastDay":"2023-12-25",
+	"boatId":1,
+    	"isOpen":true,
+    	"passengers":3
 }
 ```
+
+| Parameter | Type   | Description                            |
+| --------------------- | ------ | --------------------------------------|
+| `email`                | String | Client's email                |
+| `phone`         | String | Client's phone number    |
+| `firstDay`         | Date | Reservation's first day      |
+| `lastDay`         | Date | Reservation's last day      |
+| `boatId`         | Number | Boat's ID      |
+| `isOpen`         | Boolean | If the reservation is shared or not      |
+| `passengers`         | Number | Number of passengers if the reservation is shared      |
+
 This endpoint could return an error if there is not enough space for the new reservation
+
+### `POST /boat/reservate?staterooms=:staterooms`
+Makes a reservation in the staterooms specified. 
+The query parameter `staterooms` expects the staterooms's amount to reservate, the default value is 1.
+Only not-shared reservations can reservate a specific amount of staterooms. Shared ones must reservate the full boat.
+Expects a JSON body request like this:
+```json
+{
+	"email":"email@gmail.com",
+	"phone":"623029321",
+	"firstDay":"2023-12-25",
+	"lastDay":"2023-12-25",
+	"boatId":1
+}
+```
+
+| Parameter | Type   | Description                            |
+| --------------------- | ------ | --------------------------------------|
+| `email`                | String | Client's email                |
+| `phone`         | String | Client's phone number    |
+| `firstDay`         | Date | Reservation's first day      |
+| `lastDay`         | Date | Reservation's last day      |
+| `boatId`         | Number | Boat's ID      |
+
+This endpoint could return an error if there is not enough space for the new reservation
+
 ### `DELETE /boat/:id`
 Deletes a specific boat, given its ID
-
-### `PUT /stateRoom/add/:boatId`
-Adds a new stateroom to a boat, given the boat ID
 
 ### `DELETE /reservation/:id`
 Deletes a specific reservation, given its ID
 
-## Algorithmics
+## Reservations optimization
 Sometimes, the reservations may need a reallocation to be able to insert a new one, which can't be allocated with the current reservations distribution.
 For example, in the next reservation distribution, we would not be able to insert a new reservation between days 3 and 10, although this is possible if we reallocate all of them
 ![Reservation distribution](https://github.com/lucastomic/bookingAPI/assets/65186233/71ff2d40-895c-42f9-9576-a237f8b7f1ed)
 
-To achieve this, we will apply a Backtracking algorithm, where each node is the assignment of a reservation in a different stateroom.
-![Backtracking](https://github.com/lucastomic/bookingAPI/assets/65186233/7f9f57fd-a496-435f-8a98-7fa527648858)
-
-
-The implementation of the algorithm is in the file `internals/reservesReallocator/reallocator.go` with the next methods:
-(comments ommited)
-
-```
-func RealloacteReserves(boat *domain.Boat, reservation *domain.Reservation) error {
-	var success bool
-	reservations := append(boat.GetUnstartedReservations(), reservation)
-	var reservationsQueue = datastructure.NewQueue(reservations)
-	stateRooms := boat.GetStateRoomsWithStartedReservations()
-
-	recursiveRealloaction(&success, &stateRooms, reservationsQueue)
-
-	if !success {
-		return errors.New("unable to set the new reservation. There is not enough space")
-	} else {
-		boat.SetStateRooms(stateRooms)
-	}
-	return nil
-}
-```
-```
-func recursiveRealloaction(
-	success *bool,
-	stateRooms *[]domain.StateRoom,
-	reservations *datastructure.Queue[*domain.Reservation],
-) {
-	if reservations.IsEmpty() {
-		*success = true
-	} else {
-		exploreChildNodes(success, stateRooms, reservations)
-	}
-}
-```
-```
-func exploreChildNodes(
-	success *bool,
-	stateRooms *[]domain.StateRoom,
-	reservations *datastructure.Queue[*domain.Reservation],
-) {
-	i := 0
-	reservation, _ := reservations.Pop()
-	for !*success && len(*stateRooms) > i {
-		oldStateRoomId := reservation.StateRoomId()
-		reservation.SetStateRoomId((*stateRooms)[i].Id())
-		if err := (*stateRooms)[i].AddReservation(*reservation); err == nil {
-			recursiveRealloaction(success, stateRooms, reservations)
-		}
-		if !*success {
-			reservation.SetStateRoomId(oldStateRoomId)
-			(*stateRooms)[i].RemoveReservation(*reservation)
-		}
-		i++
-	}
-	if !*success {
-		reservations.Push(reservation)
-	}
-}
-```
 The algorithm takes into account that the reservations which have already started, can't be reallocated (the clients could be already in their staterooms)
 
