@@ -68,7 +68,7 @@ func (b boatService) ReservateStaterooms(
 	stateroomsNeeded int,
 ) error {
 	if boat.HasDisponibilityFor(reservation, stateroomsNeeded) {
-		err := boat.ReservateStaterooms(&reservation, 1)
+		err := boat.ReservateStaterooms(&reservation, stateroomsNeeded)
 		if err != nil {
 			return exceptions.NewApiError(400, err.Error())
 		}
